@@ -24,7 +24,9 @@ final class GutterView: NSRulerView {
         self.clientView = editor.textView
         self.ruleThickness = Theme.gutterWidth
     }
-    required init?(coder: NSCoder) { fatalError("not loaded from a nib") }
+    // NSRulerView redeclares initWithCoder: as non-failable, so unlike
+    // every NSView subclass here this override must not be failable.
+    required init(coder: NSCoder) { fatalError("not loaded from a nib") }
 
     override func drawHashMarksAndLabels(in rect: NSRect) {
         guard let text = editor?.textView,

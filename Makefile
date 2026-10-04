@@ -40,7 +40,7 @@ SRCS := $(wildcard $(SRCDIR)/*.c)
 OBJS := $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRCS))
 DEPS := $(OBJS:.o=.d)
 
-.PHONY: all clean test install dirs app dmg pdf stage docs guidebook
+.PHONY: all clean test install dirs app studio dmg pdf stage docs guidebook
 
 all: dirs $(BIN)/sprfst
 
@@ -78,6 +78,10 @@ guidebook: all
 # macOS application bundle + disk image (both need macOS)
 app: all
 	./tools/build_macos_app.sh
+
+# the one people want: build the editor, put it in /Applications, open it
+studio: all
+	./tools/build_macos_app.sh --install
 
 # on a Mac this wraps the built app; anywhere else it writes the
 # installer image, which carries the project and builds it on arrival

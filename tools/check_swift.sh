@@ -85,6 +85,12 @@ for f, code in src.items():
         body = rest[:nxt.start()] if nxt else rest
         if 'override init(frame' in body and 'init?(coder' not in body:
             problems.append(f"{os.path.basename(f)}: {name} needs init?(coder:)")
+        # NSRulerView is the odd one out: it redeclares initWithCoder: as
+        # non-failable, so a subclass must override init(coder:), not
+        # init?(coder:).  swiftc rejects the failable form outright.
+        if 'NSRulerView' in bases and 'init?(coder' in body:
+            problems.append(f"{os.path.basename(f)}: {name} subclasses NSRulerView, "
+                            "so init(coder:) must not be failable")
 
 # exactly one entry point
 entries = [os.path.basename(f) for f in files if '@main' in src[f]]

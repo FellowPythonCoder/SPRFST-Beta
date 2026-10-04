@@ -3,6 +3,8 @@
 #  Builds "SPRFST Studio.app" for Apple Silicon.
 #
 #      ./tools/build_macos_app.sh            full build (needs macOS)
+#      ./tools/build_macos_app.sh --install  build, put it in /Applications,
+#                                            open it — the usual one
 #      ./tools/build_macos_app.sh --stage    lay the bundle out only
 #      ./tools/build_macos_app.sh --skip-tests   build anyway, unverified
 #
@@ -27,10 +29,12 @@ VERSION="$(grep -o '"[0-9][^"]*"' compiler/include/sprfst/common.h | head -1 | t
 ARCH="${SPRFST_ARCH:-arm64}"
 STAGE_ONLY=0
 SKIP_TESTS=0
+INSTALL=0
 for arg in "$@"; do
     case "$arg" in
         --stage)       STAGE_ONLY=1 ;;
         --skip-tests)  SKIP_TESTS=1 ;;
+        --install)     INSTALL=1 ;;
         *) echo "unknown option: $arg" >&2; exit 2 ;;
     esac
 done
@@ -184,7 +188,35 @@ codesign --force --deep --sign - "$APP" 2>/dev/null \
 
 SIZE=$(du -sh "$APP" | cut -f1)
 amber "built  $APP  ($SIZE)"
+
+# ----------------------------------------------------------- install
+if [ "$INSTALL" = 1 ]; then
+    step "installing"
+    TARGET="/Applications"
+    if [ ! -w "$TARGET" ]; then
+        TARGET="$HOME/Applications"
+        mkdir -p "$TARGET"
+        echo "    /Applications is not writable, using $TARGET"
+    fi
+    # a running copy cannot be replaced underneath itself
+    osascript -e 'tell application "SPRFST Studio" to quit' >/dev/null 2>&1 || true
+    rm -rf "$TARGET/$APP_NAME.app"
+    cp -R "$APP" "$TARGET/" || die "could not copy the app into $TARGET"
+    xattr -dr com.apple.quarantine "$TARGET/$APP_NAME.app" 2>/dev/null || true
+    # teach the Finder about .spf straight away
+    /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister \
+        -f "$TARGET/$APP_NAME.app" >/dev/null 2>&1 || true
+    echo "    $TARGET/$APP_NAME.app"
+    open "$TARGET/$APP_NAME.app"
+    echo
+    amber "SPRFST Studio is open."
+    echo "    From now on: open it from Launchpad, Spotlight or the Dock."
+    echo "    Keep it in the Dock: right click its icon → Options → Keep in Dock."
+    echo
+    exit 0
+fi
+
 echo
-echo "    open \"$APP\""
-echo "    ./tools/make_dmg.sh        to build the disk image"
+echo "    ./tools/build_macos_app.sh --install    put it in /Applications and open it"
+echo "    ./tools/make_dmg.sh                     build the disk image"
 echo

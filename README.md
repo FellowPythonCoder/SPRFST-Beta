@@ -57,10 +57,12 @@ To use it from anywhere:
 sudo make install          # /usr/local/bin/sprfst + /usr/local/lib/sprfst/std
 ```
 
-On a Mac with the Xcode command line tools, this also builds the editor:
+On a Mac with the Xcode command line tools, one target builds the
+editor, installs it and opens it:
 
 ```
-make app                   # dist/SPRFST Studio.app
+make studio                # /Applications/SPRFST Studio.app, launched
+make app                   # dist/SPRFST Studio.app, without installing
 make dmg                   # dist/SPRFST-Studio.dmg, mountable and verified
 make stage                 # lay both out without a Mac, to check them
 ```

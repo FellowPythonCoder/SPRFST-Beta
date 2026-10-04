@@ -366,75 +366,81 @@ debugger`. That is normal — it means the program did not run to the end.
 
 ---
 
-## 10. Build SPRFST Studio, the editor (macOS only)
+## 10. SPRFST Studio — the app
 
-Studio is a native AppKit application. Building it needs Swift, which
-comes with Xcode or the command line tools:
+Studio is a real native Mac application, not a window with a website in
+it. Three commands build it, put it in `/Applications` and open it, and
+after that you never need the terminal again.
 
 ```
-swiftc --version
+cd ~/Downloads/SPRFST-Beta
+git pull
+make studio
 ```
 
-If that answers, build everything:
+That is `./tools/build_macos_app.sh --install` underneath: it builds the
+compiler, runs the test suite, checks the Swift, draws the icons, writes
+`Info.plist`, compiles the editor for `arm64-apple-macos12.0`, signs it,
+copies it to `/Applications`, removes the quarantine flag, registers it
+with the Finder and launches it.
+
+From then on, open it like any other app:
+
+- Launchpad, or
+- Spotlight — `⌘Space`, type `SPRFST`, or
+- the Dock — right click its icon, Options, Keep in Dock, or
+- double click any `.spf` file: they carry the SPRFST icon and open in
+  Studio.
+
+Everything the language can do is inside the app. There is a real shell
+in the bottom panel if you ever want one, but running, building,
+testing, debugging, formatting and the guidebook are all buttons and
+keys:
+
+`⌘P` command palette, `⌘R` run, `⌘B` build, `⌘U` test, `⌘D` debug,
+`⌘\` toggle breakpoint, `⌃⌘F` format, `⌃⌘J` go to definition,
+`⌃⌘E` rename, `⇧⌘O` open folder, `` ⌃` `` terminal, `⌘0` guidebook.
+
+The app carries its own copy of the compiler, the standard library, the
+examples and the guidebook inside the bundle, so it works even if
+`sprfst` is not installed anywhere else on the machine.
+
+To rebuild after a change, run `make studio` again — it quits the
+running copy, replaces it and reopens it.
+
+**Be honest with yourself about this step.** Studio's 3,300 lines of
+Swift were written on Linux, where `swiftc` does not exist, so the first
+build on a Mac is their first real compile. `tools/check_swift.sh`
+checks brackets, selectors, AppKit initialisers and the entry point
+before `swiftc` runs, but it is not a compiler. If `swiftc` prints
+errors, they are printed in full — send them over. None of this affects
+the language itself: sections 1 to 9 are tested on every change.
+
+Other ways to run the same script:
 
 ```
 ./tools/build_macos_app.sh
 ```
 
-It builds the compiler, runs the test suite, checks the Swift sources,
-draws the icons, writes `Info.plist`, compiles the editor for
-`arm64-apple-macos12.0`, and signs it. The result:
-
-```
-dist/SPRFST Studio.app
-```
-
-Run it from the terminal:
-
-```
-open "dist/SPRFST Studio.app"
-```
-
-Install it properly:
-
-```
-cp -R "dist/SPRFST Studio.app" /Applications/
-open "/Applications/SPRFST Studio.app"
-```
-
-After that, `.spf` files show the SPRFST icon and open in Studio when
-double clicked.
-
-Inside Studio: `⌘P` command palette, `⌘R` run, `⌘B` build, `⌘U` test,
-`⌘D` debug, `⌘\` toggle breakpoint, `⌃\`` terminal, `⌘0` guidebook.
-
-**Be honest with yourself about this step.** Studio's 3,300 lines of
-Swift have never been through a compiler — this project was developed on
-Linux, where `swiftc` does not exist. `tools/check_swift.sh` checks
-brackets, selectors, AppKit initialisers and the entry point, and it
-passes, but the first `swiftc` run will be the first real compile and
-may well find mistakes. The language, the compiler and everything in
-sections 1 to 9 are not affected by this: they are tested on every
-change.
-
-If the test suite fails on your machine, the script stops before
-packaging and prints which checks failed. Run them yourself to see
-everything:
-
-```
-./tests/run_tests.sh
-```
-
-To build the app anyway, knowing it is unverified:
+builds `dist/SPRFST Studio.app` without installing it, and
 
 ```
 ./tools/build_macos_app.sh --skip-tests
 ```
 
-If you only want to see the bundle layout without a Mac:
+builds even if the test suite fails, while
 
 ```
 ./tools/build_macos_app.sh --stage
+```
+
+lays the bundle out on a machine with no Swift, to inspect it.
+
+For a disk image you can hand to someone else:
+
+```
+./tools/make_dmg.sh
+open dist/SPRFST-0.1.0-beta.dmg
 ```
 
 ---
@@ -447,6 +453,8 @@ make test         the whole test suite, 54 checks
 make docs         regenerate docs/
 make guidebook    compile every code block in the guidebook
 make pdf          typeset guidebook/pdf — 30 chapters and the book
+make studio       build the editor, install it in /Applications
+                  and open it                   (needs a Mac)
 make app          dist/SPRFST Studio.app        (needs a Mac)
 make dmg          dist/SPRFST-0.1.0-beta.dmg
 make stage        lay out the app and image contents without building them
@@ -554,11 +562,9 @@ cd myapp
 sprfst run .
 ```
 
-And on a Mac with Xcode installed, the editor:
+And the editor, as an app in `/Applications`:
 
 ```
 cd ~/Downloads/SPRFST-Beta
-./tools/build_macos_app.sh
-cp -R "dist/SPRFST Studio.app" /Applications/
-open "/Applications/SPRFST Studio.app"
+make studio
 ```
