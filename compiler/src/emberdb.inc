@@ -369,7 +369,7 @@ static int db_parse_where(SqlLex *L, DbTable *t, DbCond *conds) {
         DbCond c;
         memset(&c, 0, sizeof c);
         c.lhs = db_operand(L, t);
-        if (L->kind == 4) { snprintf(c.op, sizeof c.op, "%s", L->tok); sql_next(L); }
+        if (L->kind == 4) { snprintf(c.op, sizeof c.op, "%.3s", L->tok); sql_next(L); }
         else if (sql_is(L, "like")) { snprintf(c.op, sizeof c.op, "~"); sql_next(L); }
         else if (sql_is(L, "is")) { snprintf(c.op, sizeof c.op, "="); sql_next(L); sql_eat(L, "not"); }
         else snprintf(c.op, sizeof c.op, "=");

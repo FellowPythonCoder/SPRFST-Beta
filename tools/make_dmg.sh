@@ -76,7 +76,7 @@ else
     mkdir -p "$FOLDER"
     # everything a Mac needs to build the whole thing, and nothing else
     for item in compiler std examples guidebook docs ide tools assets tests \
-                Makefile README.md project.sprfst .gitignore; do
+                Makefile README.md RUNNING.md project.sprfst .gitignore; do
         [ -e "$item" ] && cp -R "$item" "$FOLDER/"
     done
     rm -rf "$FOLDER/build" "$FOLDER/dist"
@@ -162,6 +162,10 @@ If macOS refuses to open the installer because it came from the
 internet, either right click it and choose Open, or run it yourself:
 
     bash "/Volumes/SPRFST/Install SPRFST.command"
+
+EVERY COMMAND, STEP BY STEP
+"SPRFST $VERSION/RUNNING.md" is the terminal guide: build it, run it,
+install it, debug it, and build Studio, with the output of each step.
 
 TO LOOK AROUND FIRST
 Everything is readable as it sits. The guidebook is in

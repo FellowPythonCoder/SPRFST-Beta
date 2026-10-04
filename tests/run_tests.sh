@@ -229,6 +229,25 @@ else
     report "disk image written" no "no file"
 fi
 
+# the formatter must never break a file, and must settle after one pass
+fmtdir="$tmp/fmt"
+mkdir -p "$fmtdir"
+cp "$ROOT"/examples/*.spf "$ROOT"/std/*.spf "$ROOT"/tools/*.spf "$fmtdir/" 2>/dev/null
+broke=0; moved=0; count=0
+for f in "$fmtdir"/*.spf; do
+    count=$((count + 1))
+    (cd "$ROOT" && "$SPRFST" fmt "$f" >/dev/null 2>&1)
+    (cd "$ROOT" && "$SPRFST" check "$f" >/dev/null 2>&1) || broke=$((broke + 1))
+    cp "$f" "$f.once"
+    (cd "$ROOT" && "$SPRFST" fmt "$f" >/dev/null 2>&1)
+    cmp -s "$f" "$f.once" || moved=$((moved + 1))
+done
+if [ "$broke" = 0 ] && [ "$moved" = 0 ]; then
+    report "formatter round trip ($count files still compile, and settle in one pass)" ok
+else
+    report "formatter round trip" no "$broke files broken, $moved still moving"
+fi
+
 # the guidebook as PDF, typeset and then read back
 (cd "$ROOT" && "$SPRFST" run tools/make_pdf.spf -- "$tmp/pdf" >/dev/null 2>&1)
 if [ -f "$tmp/pdf/SPRFST-Guidebook.pdf" ]; then

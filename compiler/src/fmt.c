@@ -109,8 +109,11 @@ static void fmt_line(const char *in, StrBuf *out, int depth) {
 
         /* operator runs get one space on each side, with sensible exceptions */
         if (strchr("=+-*/%<>!&|^?", c)) {
+            /* every two character operator the lexer knows; one missing here
+               would be split in half and the file would stop compiling */
             static const char *ops[] = { "==", "!=", "<=", ">=", "**", "<<", ">>",
-                                         "??", "=>", "->", "+=", "-=", "*=", "/=", NULL };
+                                         "??", "=>", "->", "|>", "+=", "-=", "*=",
+                                         "/=", "%=", NULL };
             char run[4] = { c, 0, 0, 0 };
             size_t j = i + 1;
             for (int k = 0; ops[k]; k++)

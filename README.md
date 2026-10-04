@@ -85,6 +85,9 @@ is opened on. The image writer is `tools/make_iso.spf` and the reader
 that checks it, which shares no code with the writer, is
 `tools/verify_iso.spf` — both written in SPRFST.
 
+Every command, step by step, with the output of each one:
+[RUNNING.md](RUNNING.md).
+
 ## The language in one page
 
 ```sprfst
@@ -259,10 +262,11 @@ that are not finished. They are listed here rather than hidden.
   still uses `hdiutil` and HFS+, which is the better image.
 
 Everything else in this README was run on the machine that wrote it.
-`make test` is the proof: 53 checks covering the language suite, all
+`make test` is the proof: 54 checks covering the language suite, all
 twenty one examples, every command line verb, Forge digests, the Studio
-service, the debugger, the disk image and the PDFs written and read back, and
-all 100 guidebook code blocks.
+service, the debugger, the disk image and the PDFs written and read back, the
+formatter round tripped over every file, and all 100 guidebook code
+blocks.
 
 The collector is checked as well as the compiler: `SPRFST_GC_STRESS=1`
 makes the runtime collect garbage on every single allocation, and every

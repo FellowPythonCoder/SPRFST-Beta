@@ -1129,7 +1129,8 @@ static Value native_dispatch(VM *vm, int id, Value *args, int nargs, bool *ok) {
 
     /* ------------------------------------------------------------- fs */
     case NF_FS_READ: { size_t n = 0; char *s = read_file(txt(A(0)), &n);
-        if (!s) return v_nil(); Value v = mktextn(vm, s, (int)n); free(s); return v; }
+        if (!s) return v_nil();
+        Value v = mktextn(vm, s, (int)n); free(s); return v; }
     case NF_FS_WRITE: { const char *p = txt(A(0)); const char *d = txt(A(1));
         return v_bool(write_file_bytes(p, d, strlen(d))); }
     case NF_FS_APPEND: { FILE *f = fopen(txt(A(0)), "ab"); if (!f) return v_bool(false);

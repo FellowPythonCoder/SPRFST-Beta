@@ -213,7 +213,7 @@ static void dbg_prompt(Debugger *d, const char *file, int line) {
             }
             case 'w':
                 if (d->nwatch < MAX_WATCH && *arg) {
-                    snprintf(d->watches[d->nwatch++], 128, "%s", arg);
+                    snprintf(d->watches[d->nwatch++], 128, "%.127s", arg);
                     fprintf(stderr, "  %swatching%s %s\n", C_GREEN, C_RESET, arg);
                 }
                 break;

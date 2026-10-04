@@ -55,7 +55,7 @@ static char *digest_tree(const char *dir) {
         char rel[1600];
         snprintf(rel, sizeof rel, "%.*s", (int)len, p);
         char full[1700];
-        snprintf(full, sizeof full, "%s/%s", dir, rel);
+        snprintf(full, sizeof full, "%.99s/%.1599s", dir, rel);
         size_t fn = 0;
         char *data = read_file(full, &fn);
         sb_puts(&all, rel);
@@ -268,7 +268,7 @@ static int make_bundle(const char *root) {
         snprintf(rel, sizeof rel, "%.*s", (int)len, q);
         if (strcmp(rel, "forge.lock") != 0 && strncmp(rel, "build/", 6) != 0) {
             char full[1700];
-            snprintf(full, sizeof full, "%s/%s", root, rel);
+            snprintf(full, sizeof full, "%.99s/%.1599s", root, rel);
             size_t fn = 0;
             char *data = read_file(full, &fn);
             if (data) {

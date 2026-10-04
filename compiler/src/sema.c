@@ -2294,7 +2294,6 @@ static void declare_members(Sema *s, Module *m) {
 static void check_module_bodies(Sema *s, Module *m) {
     s->module = m;
     s->scope = m->scope;
-    TypeTable *tt = s->tt;
 
     /* global initialisers */
     vec_foreach(i, &m->decls) {

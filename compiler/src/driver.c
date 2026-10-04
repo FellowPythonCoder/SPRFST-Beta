@@ -70,25 +70,25 @@ Project project_load(const char *dir) {
         if (buf[0] == '[') {
             char *end = strchr(buf, ']');
             if (end) *end = 0;
-            snprintf(section, sizeof section, "%s", buf + 1);
+            snprintf(section, sizeof section, "%.*s", (int)sizeof section - 1, buf + 1);
             continue;
         }
         char *eq = strchr(buf, '=');
         if (!eq) continue;
         *eq = 0;
         char key[128], val[512];
-        snprintf(key, sizeof key, "%s", buf);
-        snprintf(val, sizeof val, "%s", eq + 1);
+        snprintf(key, sizeof key, "%.*s", (int)sizeof key - 1, buf);
+        snprintf(val, sizeof val, "%.*s", (int)sizeof val - 1, eq + 1);
         trim_inplace(key);
         trim_inplace(val);
         if (strcmp(section, "package") == 0 || !*section) {
-            if (strcmp(key, "name") == 0) snprintf(p.name, sizeof p.name, "%s", val);
-            else if (strcmp(key, "version") == 0) snprintf(p.version, sizeof p.version, "%s", val);
-            else if (strcmp(key, "entry") == 0) snprintf(p.entry, sizeof p.entry, "%s", val);
-            else if (strcmp(key, "author") == 0) snprintf(p.author, sizeof p.author, "%s", val);
-            else if (strcmp(key, "description") == 0) snprintf(p.description, sizeof p.description, "%s", val);
+            if (strcmp(key, "name") == 0) snprintf(p.name, sizeof p.name, "%.*s", (int)sizeof p.name - 1, val);
+            else if (strcmp(key, "version") == 0) snprintf(p.version, sizeof p.version, "%.*s", (int)sizeof p.version - 1, val);
+            else if (strcmp(key, "entry") == 0) snprintf(p.entry, sizeof p.entry, "%.*s", (int)sizeof p.entry - 1, val);
+            else if (strcmp(key, "author") == 0) snprintf(p.author, sizeof p.author, "%.*s", (int)sizeof p.author - 1, val);
+            else if (strcmp(key, "description") == 0) snprintf(p.description, sizeof p.description, "%.*s", (int)sizeof p.description - 1, val);
         } else if (strcmp(section, "packages") == 0 && p.ndeps < 32) {
-            snprintf(p.deps[p.ndeps++], 160, "%s=%s", key, val);
+            snprintf(p.deps[p.ndeps++], 160, "%.79s=%.79s", key, val);
         }
     }
     free(text);
@@ -193,7 +193,7 @@ static bool resolve_import(Build *b, Module *m, Decl *d) {
     snprintf(pkgdir, sizeof pkgdir, "%s/packages/%s", root, p->items[0]);
     Project pkg = project_load(pkgdir);
     if (pkg.found && pkg.entry[0])
-        snprintf(cand[n++], sizeof cand[0], "%s/%s", pkgdir, pkg.entry);
+        snprintf(cand[n++], sizeof cand[0], "%.1000s/%.380s", pkgdir, pkg.entry);
     snprintf(cand[n++], sizeof cand[0], "%s/packages/%s/src/%s.spf", root, rel.data, last);
     snprintf(cand[n++], sizeof cand[0], "%s/packages/%s/src/main.spf", root, rel.data);
     snprintf(cand[n++], sizeof cand[0], "%s/packages/%s/%s.spf", root, rel.data, last);
