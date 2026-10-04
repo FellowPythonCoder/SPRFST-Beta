@@ -22,6 +22,21 @@ else
     AMBER=""; GREEN=""; RED=""; DIM=""; BOLD=""; OFF=""
 fi
 
+# BSD grep refuses to match inside data that is not valid text in the
+# current locale, and a PNG header starts with the byte 0x89.  Ask every
+# tool for bytes.
+export LC_ALL=C
+
+# the first bytes of a file as hex — od is the same program everywhere,
+# unlike grep on binary input, and unlike wc it needs no whitespace nursing
+magic() {   # magic <file> <count>
+    od -An -tx1 -N "$2" "$1" 2>/dev/null | tr -d ' \n'
+}
+
+# BSD wc pads its answer with spaces; arithmetic and printed sizes both hate that
+size_of() { wc -c < "$1" | tr -d '[:space:]'; }
+count_of() { wc -l | tr -d '[:space:]'; }
+
 # macOS has no timeout(1), so bring our own: run a command, kill it if it
 # overstays.  Used so one hung example cannot hang the whole run.
 limit() {   # limit <seconds> <command...>
@@ -208,18 +223,22 @@ fn main() {
 SPF
 (cd "$tmp" && "$SPRFST" run png.spf >/dev/null 2>&1)
 if [ -f "$tmp/shot.png" ]; then
-    size=$(wc -c < "$tmp/shot.png")
-    head -c 8 "$tmp/shot.png" | grep -q PNG && [ "$size" -lt 65536 ] \
-        && report "png written and compressed (${size} bytes for 256x256)" ok \
-        || report "png compression" no "${size} bytes — compression is not working"
+    size=$(size_of "$tmp/shot.png")
+    if [ "$(magic "$tmp/shot.png" 8)" != "89504e470d0a1a0a" ]; then
+        report "png written" no "the file does not start with the PNG signature"
+    elif [ "$size" -ge 65536 ]; then
+        report "png compression" no "${size} bytes for 256x256 — compression is not working"
+    else
+        report "png written and compressed (${size} bytes for 256x256)" ok
+    fi
 else
     report "png written" no "no file"
 fi
 
 # the macOS icon file, written by SPRFST itself
 (cd "$ROOT" && "$SPRFST" run assets/logo/make_icns.spf -- "$tmp/SPRFST.icns" >/dev/null 2>&1)
-if [ -f "$tmp/SPRFST.icns" ] && head -c 4 "$tmp/SPRFST.icns" | grep -q icns; then
-    report "icns icon generated ($(( $(wc -c < "$tmp/SPRFST.icns") / 1024 )) KB)" ok
+if [ -f "$tmp/SPRFST.icns" ] && [ "$(magic "$tmp/SPRFST.icns" 4)" = "69636e73" ]; then
+    report "icns icon generated ($(( $(size_of "$tmp/SPRFST.icns") / 1024 )) KB)" ok
 else
     report "icns icon generated" no "no icns file"
 fi
@@ -233,12 +252,12 @@ printf 'deep\n' > "$img/Folder With A Long Name/inner/deep.txt"
 (cd "$ROOT" && "$SPRFST" run tools/make_iso.spf -- "$img" "$tmp/out.dmg" "TEST IMAGE" >/dev/null 2>&1)
 if [ -f "$tmp/out.dmg" ]; then
     if vi=$(cd "$ROOT" && "$SPRFST" run tools/verify_iso.spf -- "$tmp/out.dmg" "$img" 2>&1); then
-        report "disk image ($(( $(wc -c < "$tmp/out.dmg") / 1024 )) KB, 3 files, read back and compared)" ok
+        report "disk image ($(( $(size_of "$tmp/out.dmg") / 1024 )) KB, 3 files, read back and compared)" ok
     else
         report "disk image verifies" no "$(printf '%s' "$vi" | tail -4)"
     fi
     # the Finder looks for CD001 at this exact spot before it will mount anything
-    if [ "$(dd if="$tmp/out.dmg" bs=1 skip=32769 count=5 2>/dev/null)" = "CD001" ]; then
+    if [ "$(dd if="$tmp/out.dmg" bs=1 skip=32769 count=5 2>/dev/null | od -An -tx1 | tr -d ' \n')" = "4344303031" ]; then
         report "disk image is mountable (CD001 at 0x8001)" ok
     else
         report "disk image is mountable" no "no CD001 signature"
@@ -269,7 +288,7 @@ fi
 # the guidebook as PDF, typeset and then read back
 (cd "$ROOT" && "$SPRFST" run tools/make_pdf.spf -- "$tmp/pdf" >/dev/null 2>&1)
 if [ -f "$tmp/pdf/SPRFST-Guidebook.pdf" ]; then
-    chapters=$(ls "$tmp/pdf"/*.pdf | wc -l)
+    chapters=$(ls "$tmp/pdf"/*.pdf | count_of)
     if vp=$(cd "$ROOT" && "$SPRFST" run tools/verify_pdf.spf -- "$tmp/pdf/SPRFST-Guidebook.pdf" 2>&1); then
         report "guidebook pdfs ($chapters files, $(printf '%s' "$vp" | grep -oE '[0-9]+ pages' | head -1), table checked)" ok
     else

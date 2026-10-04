@@ -8,6 +8,8 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SPRFST="$ROOT/build/bin/sprfst"
 export SPRFST_HOME="$ROOT"
 
+export LC_ALL=C
+
 # macOS has no timeout(1), so bring our own: run a command, kill it if it
 # overstays.  Used so one hung example cannot hang the whole run.
 limit() {   # limit <seconds> <command...>

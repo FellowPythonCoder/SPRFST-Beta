@@ -239,10 +239,12 @@ that are not finished. They are listed here rather than hidden.
 - **The move checker is simple.** A name is treated as moved from the
   line the move appears on, so moving inside one branch of an `if`
   counts for everything after it.
-- **The test suite needs no GNU tools.** It used `timeout`, which does
-  not exist on macOS, so every example and every guidebook block was
-  reported as failing there and `build_macos_app.sh` refused to
-  package. The scripts now carry their own time limit.
+- **The test suite needs no GNU tools and no text locale.** It used
+  `timeout`, which macOS does not have, and `grep` on binary data,
+  which BSD grep refuses to match in a UTF-8 locale — so on a Mac the
+  examples, the guidebook and the PNG check all reported failure and
+  `build_macos_app.sh` refused to package. The scripts now carry their
+  own time limit, read signatures with `od`, and run under `LC_ALL=C`.
 - **SPRFST Studio has never been compiled.** The whole editor is
   written — 3,300 lines of Swift and AppKit in `ide/macos/Sources/` —
   and so are the bundle and disk image scripts, but this repository was

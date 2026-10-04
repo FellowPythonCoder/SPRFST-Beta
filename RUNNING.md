@@ -34,24 +34,56 @@ If `cc` answers, you are ready. (On Linux: `sudo apt install build-essential`.)
 
 ---
 
-## 2. Open the project in a terminal
+## 2. Get the project
 
-If you downloaded a zip, unzip it and go in:
+The work is on the branch `arena/01a1082b-sprfst-beta`, not on `main`,
+so both ways below name it.
+
+### With git, if you want to pull later updates
 
 ```
 cd ~/Downloads
-unzip SPRFST-Beta.zip
+git clone --branch arena/01a1082b-sprfst-beta https://github.com/FellowPythonCoder/SPRFST-Beta.git
 cd SPRFST-Beta
 ```
 
-Or clone it:
+That folder is a real checkout. To pick up later fixes:
 
 ```
-git clone https://github.com/FellowPythonCoder/SPRFST-Beta.git
-cd SPRFST-Beta
+git pull
 ```
 
-Check you are in the right place:
+If `git pull` complains that you have local changes, either keep them
+aside and pull:
+
+```
+git stash
+git pull
+git stash pop
+```
+
+or throw yours away and take what is on the branch:
+
+```
+git reset --hard origin/arena/01a1082b-sprfst-beta
+```
+
+If git says `fatal: not a git repository`, you downloaded a zip rather
+than cloning; use the zip steps below instead.
+
+### Without git, as a zip
+
+```
+cd ~/Downloads
+curl -L -o sprfst.zip https://github.com/FellowPythonCoder/SPRFST-Beta/archive/refs/heads/arena/01a1082b-sprfst-beta.zip
+unzip -q sprfst.zip
+cd SPRFST-Beta-arena-01a1082b-sprfst-beta
+```
+
+A zip has no history, so "updating" means downloading it again. Delete
+the old folder first, or you will end up with two.
+
+### Either way, check you are in the right place
 
 ```
 ls
@@ -63,8 +95,8 @@ examples   guidebook  ide         std     tests     tools
 ```
 
 If you see `Makefile` in that list, you are in the project folder. If
-instead you see a single folder name, go into it first — unzipping
-sometimes makes a folder inside a folder.
+instead you see one folder name, go into it first — unzipping sometimes
+makes a folder inside a folder.
 
 ---
 
@@ -498,6 +530,12 @@ exactly what broke:
 ./tests/run_tests.sh
 ```
 
+**One test fails and the rest pass** — tell me which line, and paste
+it. Two have been fixed that way already: `timeout` not existing on
+macOS, and the PNG check using `grep` on binary data, which BSD grep
+refuses to match in a UTF-8 locale. Both were faults in the tests, not
+in what they were testing.
+
 **`sprfst debug` exits with 1** — that is what quitting the debugger
 does. Nothing is wrong.
 
@@ -506,9 +544,21 @@ does. Nothing is wrong.
 ## The two minute version
 
 ```
+git clone --branch arena/01a1082b-sprfst-beta https://github.com/FellowPythonCoder/SPRFST-Beta.git
 cd SPRFST-Beta
 make
 ./build/bin/sprfst run examples/01-hello.spf
 sudo make install
-sprfst new myapp && cd myapp && sprfst run .
+sprfst new myapp
+cd myapp
+sprfst run .
+```
+
+And on a Mac with Xcode installed, the editor:
+
+```
+cd ~/Downloads/SPRFST-Beta
+./tools/build_macos_app.sh
+cp -R "dist/SPRFST Studio.app" /Applications/
+open "/Applications/SPRFST Studio.app"
 ```
