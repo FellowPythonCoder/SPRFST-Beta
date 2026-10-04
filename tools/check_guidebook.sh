@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # =====================================================================
-#  Extracts every ```sprfst block from the guidebook and compiles it,
-#  so no chapter can drift away from the language.
+#  Extracts every ```sprfst block from the guidebook and the README
+#  and runs it, so no chapter can drift away from the language.
 # =====================================================================
 set -u
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -16,7 +16,7 @@ else GREEN=""; RED=""; DIM=""; OFF=""; fi
 ok=0; bad=0
 mode="${1:-run}"            # run | check
 
-for chapter in "$ROOT"/guidebook/*.md; do
+for chapter in "$ROOT"/guidebook/*.md "$ROOT"/README.md; do
     name=$(basename "$chapter")
     block=0
     python3 - "$chapter" "$TMP" <<'PY'
