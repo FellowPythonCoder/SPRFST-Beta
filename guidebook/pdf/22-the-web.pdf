@@ -1,0 +1,508 @@
+%PDF-1.4
+%\342\343\317\323
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 4 /Kids [8 0 R 10 0 R 12 0 R 14 0 R] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
+endobj
+6 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >>
+endobj
+7 0 obj
+<< /Type /Outlines /Count 0 >>
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612.0 792.0] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> >> /Contents 9 0 R >>
+endobj
+9 0 obj
+<< /Length 10172 >>
+stream
+BT /F2 21.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 714.0 Tm (The web) Tj ET
+0.961 0.541 0.149 rg 72.0 703.0 46.0 2.4 re f
+0.961 0.961 0.969 rg 71.0 678.5 47.6 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 72.0 681.0 Tm (std.http) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 123.16 681.0 Tm (has) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 142.06 681.0 Tm (two) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 160.4 681.0 Tm (halves:) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 194.86 681.0 Tm (fetching) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 232.66 681.0 Tm (things,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 264.9 681.0 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 284.36 681.0 Tm (serving) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 319.37 681.0 Tm (them.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 347.16 681.0 Tm (Both) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 370.51 681.0 Tm (are) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 387.74 681.0 Tm (built) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 408.86 681.0 Tm (on) Tj ET
+0.961 0.961 0.969 rg 424.54 678.5 41.9 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 425.54 681.0 Tm (std.net) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 468.22 681.0 Tm (,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 473.78 681.0 Tm (which) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 502.12 681.0 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 512.12 681.0 Tm (plain) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 666.4 Tm (sockets) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 108.68 666.4 Tm (if) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 116.46 666.4 Tm (you) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 135.36 666.4 Tm (ever) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 157.59 666.4 Tm (need) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 182.61 666.4 Tm (to) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 193.73 666.4 Tm (go) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 207.63 666.4 Tm (lower.) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 632.8 Tm (Serving) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 615.8 Tm (A) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 81.45 615.8 Tm (server) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 112.01 615.8 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 122.01 615.8 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 130.35 615.8 Tm (port) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 150.36 615.8 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 169.82 615.8 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 178.16 615.8 Tm (function.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 218.74 615.8 Tm (The) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 238.75 615.8 Tm (function) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 276.55 615.8 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 286.55 615.8 Tm (handed) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 322.69 615.8 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 331.03 615.8 Tm (request) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 367.16 615.8 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 386.62 615.8 Tm (gives) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 412.74 615.8 Tm (back) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 436.64 615.8 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 444.98 615.8 Tm (reply.) Tj ET
+0.961 0.961 0.969 rg 72.0 459.8 468.0 139.4 re f
+0.961 0.541 0.149 rg 72.0 459.8 2.2 139.4 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 590.2 Tm (use std.io) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 578.8 Tm (use std.http) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 556 Tm (fn handle\(request: Map<Text, Any>\) -> Map<Text, Any> {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 544.6 Tm (    give ["status": 200, "type": "text/plain", "body": "hello from SPRFST"]) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 533.2 Tm (}) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 510.4 Tm (fn main\(\) {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 499 Tm (    io.say\("listening on http://localhost:8080"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 487.6 Tm (    http.serve\(8080, handle\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 476.2 Tm (}) Tj ET
+0.961 0.961 0.969 rg 71.0 448.3 59.0 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 72.0 450.8 Tm (http.serve) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 134.56 450.8 Tm (does) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 159.02 450.8 Tm (not) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 175.7 450.8 Tm (come) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 202.93 450.8 Tm (back) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 226.83 450.8 Tm (\227) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 232.94 450.8 Tm (it) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 240.72 450.8 Tm (accepts) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 277.96 450.8 Tm (connections) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 334.1 450.8 Tm (until) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 355.22 450.8 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 371.9 450.8 Tm (program) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 411.91 450.8 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 421.91 450.8 Tm (stopped,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 463.05 450.8 Tm (or) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 474.72 450.8 Tm (until) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 495.84 450.8 Tm (some) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 436.2 Tm (other) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 97.57 436.2 Tm (part) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 117.58 436.2 Tm (of) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 128.7 436.2 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 145.38 436.2 Tm (program) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 185.39 436.2 Tm (calls) Tj ET
+0.961 0.961 0.969 rg 209.95 433.7 64.7 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 210.95 436.2 Tm (http.stop\(\)) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 276.43 436.2 Tm (.) Tj ET
+BT /F2 10.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 406.6 Tm (What is in a request) Tj ET
+0.93 0.93 0.95 rg 72.0 379.6 246.38 18.0 re f
+BT /F2 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 80.0 384.6 Tm (Key) Tj ET
+BT /F2 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 133.8 384.6 Tm (Example) Tj ET
+0.88 0.88 0.90 rg 72.0 361.6 246.38 0.4 re f
+BT /F3 9.0 Tf 0.20 0.20 0.24 rg 1 0 0 1 80.0 366.6 Tm (method) Tj ET
+BT /F3 9.0 Tf 0.20 0.20 0.24 rg 1 0 0 1 133.8 366.6 Tm (GET) Tj ET
+0.88 0.88 0.90 rg 72.0 343.6 246.38 0.4 re f
+BT /F3 9.0 Tf 0.20 0.20 0.24 rg 1 0 0 1 80.0 348.6 Tm (path) Tj ET
+BT /F3 9.0 Tf 0.20 0.20 0.24 rg 1 0 0 1 133.8 348.6 Tm (/notes/3) Tj ET
+0.88 0.88 0.90 rg 72.0 325.6 246.38 0.4 re f
+BT /F3 9.0 Tf 0.20 0.20 0.24 rg 1 0 0 1 80.0 330.6 Tm (query) Tj ET
+BT /F3 9.0 Tf 0.20 0.20 0.24 rg 1 0 0 1 133.8 330.6 Tm (tag=work&sort=new) Tj ET
+0.88 0.88 0.90 rg 72.0 307.6 246.38 0.4 re f
+BT /F3 9.0 Tf 0.20 0.20 0.24 rg 1 0 0 1 80.0 312.6 Tm (headers) Tj ET
+BT /F1 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 133.8 312.6 Tm (a map of lowercase header names to values) Tj ET
+0.88 0.88 0.90 rg 72.0 289.6 246.38 0.4 re f
+BT /F3 9.0 Tf 0.20 0.20 0.24 rg 1 0 0 1 80.0 294.6 Tm (body) Tj ET
+BT /F1 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 133.8 294.6 Tm (the request body as text) Tj ET
+0.88 0.88 0.90 rg 72.0 277.6 246.38 0.4 re f
+BT /F2 10.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 256.6 Tm (What a reply may contain) Tj ET
+0.93 0.93 0.95 rg 72.0 229.6 274.044 18.0 re f
+BT /F2 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 80.0 234.6 Tm (Key) Tj ET
+BT /F2 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 128.4 234.6 Tm (Default) Tj ET
+BT /F2 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 274.0 234.6 Tm (Meaning) Tj ET
+0.88 0.88 0.90 rg 72.0 211.6 274.044 0.4 re f
+BT /F3 9.0 Tf 0.20 0.20 0.24 rg 1 0 0 1 80.0 216.6 Tm (status) Tj ET
+BT /F3 9.0 Tf 0.20 0.20 0.24 rg 1 0 0 1 128.4 216.6 Tm (200) Tj ET
+BT /F1 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 274.0 216.6 Tm (the status code) Tj ET
+0.88 0.88 0.90 rg 72.0 193.6 274.044 0.4 re f
+BT /F3 9.0 Tf 0.20 0.20 0.24 rg 1 0 0 1 80.0 198.6 Tm (type) Tj ET
+BT /F3 9.0 Tf 0.20 0.20 0.24 rg 1 0 0 1 128.4 198.6 Tm (text/html; charset=utf-8) Tj ET
+BT /F1 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 274.0 198.6 Tm (the content type) Tj ET
+0.88 0.88 0.90 rg 72.0 175.6 274.044 0.4 re f
+BT /F3 9.0 Tf 0.20 0.20 0.24 rg 1 0 0 1 80.0 180.6 Tm (body) Tj ET
+BT /F1 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 128.4 180.6 Tm (empty) Tj ET
+BT /F1 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 274.0 180.6 Tm (the text to send) Tj ET
+0.88 0.88 0.90 rg 72.0 163.6 274.044 0.4 re f
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 152.6 Tm (A) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 81.45 152.6 Tm (plain) Tj ET
+0.961 0.961 0.969 rg 107.13 150.1 24.8 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 108.13 152.6 Tm (Text) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 136.49 152.6 Tm (reply) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 160.94 152.6 Tm (also) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 182.06 152.6 Tm (works,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 213.73 152.6 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 233.19 152.6 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 243.19 152.6 Tm (treated) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 277.1 152.6 Tm (as) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 290.44 152.6 Tm (HTML) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 320.44 152.6 Tm (with) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 341 152.6 Tm (status) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 370.46 152.6 Tm (200.) Tj ET
+0.87 0.87 0.89 rg 72.0 62.0 468.0 0.6 re f
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 72.0 48.0 Tm (SPRFST Guidebook) Tj ET
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 535.552 48.0 Tm (1) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612.0 792.0] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> >> /Contents 11 0 R >>
+endobj
+11 0 obj
+<< /Length 9045 >>
+stream
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 710.0 Tm (Routing is just code) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 693.0 Tm (Because) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 113.69 693.0 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 130.37 693.0 Tm (handler) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 166.5 693.0 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 176.5 693.0 Tm (an) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 190.4 693.0 Tm (ordinary) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 229.3 693.0 Tm (function,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 269.88 693.0 Tm (you) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 288.78 693.0 Tm (can) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 307.68 693.0 Tm (call) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 325.46 693.0 Tm (it) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 333.24 693.0 Tm (directly) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 367.69 693.0 Tm (\227) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 373.8 693.0 Tm (which) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 402.14 693.0 Tm (means) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 434.93 693.0 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 443.27 693.0 Tm (web) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 464.39 693.0 Tm (application) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 514.97 693.0 Tm (can) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 678.4 Tm (be) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 85.9 678.4 Tm (tested) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 115.92 678.4 Tm (without) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 150.38 678.4 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 158.72 678.4 Tm (socket) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 190.4 678.4 Tm (in) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 200.96 678.4 Tm (sight.) Tj ET
+0.961 0.961 0.969 rg 72.0 283 468.0 378.8 re f
+0.961 0.541 0.149 rg 72.0 283 2.2 378.8 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 652.8 Tm (use std.io) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 641.4 Tm (use std.json) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 618.6 Tm (fn handle\(request: Map<Text, Any>\) -> Map<Text, Any> {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 607.2 Tm (    let path = request.get\("path"\) ?? "/") Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 595.8 Tm (    let method = request.get\("method"\) ?? "GET") Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 573.0 Tm (    if path == "/" {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 561.6 Tm (        give ["status": 200, "body": "<h1>SPRFST</h1>"]) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 550.2 Tm (    }) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 538.8 Tm (    if path == "/health" {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 527.4 Tm (        give ["status": 200, "type": "application/json",) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 516.0 Tm (              "body": json.write\(["ok": true, "version": "0.1.0"]\)]) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 504.6 Tm (    }) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 493.2 Tm (    if path == "/echo" and method == "POST" {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 481.8 Tm (        give ["status": 200, "type": "text/plain",) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 470.4 Tm (              "body": request.get\("body"\) ?? ""]) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 459 Tm (    }) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 447.6 Tm (    give ["status": 404, "type": "text/plain", "body": "no page at {path}"]) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 436.2 Tm (}) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 413.4 Tm (fn try_it\(method: Text, path: Text, body: Text\) {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 402 Tm (    let reply = handle\(["method": method, "path": path, "body": body]\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 390.6 Tm (    io.say\("{method} {path} -> {reply.get\("status"\)}  {reply.get\("body"\)}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 379.2 Tm (}) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 356.4 Tm (fn main\(\) {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 345 Tm (    try_it\("GET", "/", ""\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 333.6 Tm (    try_it\("GET", "/health", ""\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 322.2 Tm (    try_it\("POST", "/echo", "ping"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 310.8 Tm (    try_it\("GET", "/nowhere", ""\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 299.4 Tm (}) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 274 Tm (Run) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 93.12 274 Tm (that) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 112.58 274 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 132.04 274 Tm (you) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 150.94 274 Tm (have) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 175.4 274 Tm (tested) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 205.42 274 Tm (four) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 225.43 274 Tm (routes) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 256.0 274 Tm (in) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 266.56 274 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 274.9 274 Tm (few) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 293.24 274 Tm (milliseconds.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 353.25 274 Tm (The) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 373.26 274 Tm (same) Tj ET
+0.961 0.961 0.969 rg 402.27 271.5 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 403.27 274 Tm (handle) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 443.03 274 Tm (passed) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 478.05 274 Tm (to) Tj ET
+0.961 0.961 0.969 rg 71.0 256.9 59.0 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 72.0 259.4 Tm (http.serve) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 134.56 259.4 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 144.56 259.4 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 161.24 259.4 Tm (live) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 179.02 259.4 Tm (site.) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 225.8 Tm (Building pages) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 208.8 Tm (There) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 100.9 208.8 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 110.9 208.8 Tm (no) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 124.8 208.8 Tm (template) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 165.93 208.8 Tm (language.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 212.63 208.8 Tm (Text) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 234.86 208.8 Tm (interpolation) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 292.11 208.8 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 302.11 208.8 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 318.79 208.8 Tm (template) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 359.92 208.8 Tm (language,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 406.62 208.8 Tm (and) Tj ET
+0.961 0.961 0.969 rg 427.86 206.3 13.4 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 428.86 208.8 Tm ({{) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 445.82 208.8 Tm (and) Tj ET
+0.961 0.961 0.969 rg 467.06 206.3 13.4 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 468.06 208.8 Tm (}}) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 485.02 208.8 Tm (give) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 506.14 208.8 Tm (you) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 194.2 Tm (literal) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 98.67 194.2 Tm (braces) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 131.46 194.2 Tm (for) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 145.91 194.2 Tm (CSS:) Tj ET
+0.961 0.961 0.969 rg 72.0 95.2 468.0 82.4 re f
+0.961 0.541 0.149 rg 72.0 95.2 2.2 82.4 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 168.6 Tm (use std.io) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 145.8 Tm (fn page\(title: Text, body: Text\) -> Text {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 134.4 Tm (    give "<!doctype html><meta charset=\\"utf-8\\"><title>{title}</title>" +) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 123 Tm (         "<style>body{{background:#0b0b0d;color:#f2f2f0;font:16px system-ui}}" +) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 111.6 Tm (         "h1{{color:#ffa136}}</style>" + body) Tj ET
+0.87 0.87 0.89 rg 72.0 62.0 468.0 0.6 re f
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 72.0 48.0 Tm (SPRFST Guidebook) Tj ET
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 535.552 48.0 Tm (2) Tj ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612.0 792.0] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> >> /Contents 13 0 R >>
+endobj
+13 0 obj
+<< /Length 9032 >>
+stream
+0.961 0.961 0.969 rg 72.0 650.6 468.0 82.4 re f
+0.961 0.541 0.149 rg 72.0 650.6 2.2 82.4 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 724.0 Tm (}) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 701.2 Tm (fn main\(\) {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 689.8 Tm (    io.say\(page\("Notes", "<h1>Notes</h1><p>Nothing yet.</p>"\).len\(\).to_text\(\) + " byte) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 678.4 Tm (  s"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 667.0 Tm (}) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 627.6 Tm (Fetching) Tj ET
+0.961 0.961 0.969 rg 72.0 462.8 468.0 150.8 re f
+0.961 0.541 0.149 rg 72.0 462.8 2.2 150.8 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 604.6 Tm (use std.io) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 593.2 Tm (use std.http) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 581.8 Tm (use std.json) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 559.0 Tm (fn main\(\) {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 547.6 Tm (    let text = http.get\("http://example.com/api/items"\) ?? "") Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 536.2 Tm (    let data = json.parse\(text\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 524.8 Tm (    io.say\("{data}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 502.0 Tm (    let reply = http.post\("http://example.com/api/items", json.write\(["name": "pen"]\)\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 490.6 Tm (    io.say\("{reply ?? "no reply"}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 479.2 Tm (}) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 453.8 Tm (Both) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 95.35 453.8 Tm (give) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 116.47 453.8 Tm (back) Tj ET
+0.961 0.961 0.969 rg 142.15 451.3 19.1 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 143.15 453.8 Tm (nil) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 165.81 453.8 Tm (when) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 192.49 453.8 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 209.17 453.8 Tm (request) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 245.3 453.8 Tm (fails,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 268.64 453.8 Tm (so) Tj ET
+0.961 0.961 0.969 rg 283.76 451.3 13.4 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 284.76 453.8 Tm (??) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 301.72 453.8 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 311.72 453.8 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 328.4 453.8 Tm (natural) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 361.75 453.8 Tm (way) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 382.31 453.8 Tm (to) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 393.43 453.8 Tm (carry) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 418.43 453.8 Tm (on.) Tj ET
+BT /F2 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 434.2 Tm (A) Tj ET
+BT /F2 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 82.0 434.2 Tm (limitation) Tj ET
+BT /F2 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 129.23 434.2 Tm (worth) Tj ET
+BT /F2 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 159.23 434.2 Tm (knowing.) Tj ET
+0.961 0.961 0.969 rg 209.91 431.7 47.6 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 210.91 434.2 Tm (http.get) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 262.07 434.2 Tm (and) Tj ET
+0.961 0.961 0.969 rg 283.31 431.7 53.3 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 284.31 434.2 Tm (http.post) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 341.17 434.2 Tm (speak) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 370.63 434.2 Tm (plain) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 394.53 434.2 Tm (HTTP.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 426.2 434.2 Tm (There) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 455.1 434.2 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 465.1 434.2 Tm (no) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 479 434.2 Tm (TLS,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 502.9 434.2 Tm (so) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 516.24 434.2 Tm (an) Tj ET
+0.961 0.961 0.969 rg 71.0 417.1 47.6 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 72.0 419.6 Tm (https://) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 123.16 419.6 Tm (address) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 161.51 419.6 Tm (returns) Tj ET
+0.961 0.961 0.969 rg 197.19 417.1 19.1 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 198.19 419.6 Tm (nil) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 218.07 419.6 Tm (.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 223.63 419.6 Tm (Until) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 246.41 419.6 Tm (that) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 265.87 419.6 Tm (lands,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 295.33 419.6 Tm (fetch) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 319.79 419.6 Tm (through) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 356.48 419.6 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 364.82 419.6 Tm (local) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 388.16 419.6 Tm (proxy) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 415.39 419.6 Tm (or) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 427.06 419.6 Tm (use) Tj ET
+0.961 0.961 0.969 rg 447.74 417.1 76.1 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 448.74 419.6 Tm (sys.run\("curl) Tj ET
+0.961 0.961 0.969 rg 71.0 402.5 19.1 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 72.0 405 Tm (\205"\)) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 91.88 405 Tm (.) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 371.4 Tm (Query strings and encoding) Tj ET
+0.961 0.961 0.969 rg 72.0 172.4 468.0 185.0 re f
+0.961 0.541 0.149 rg 72.0 172.4 2.2 185.0 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 348.4 Tm (use std.io) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 337 Tm (use std.http) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 314.2 Tm (fn main\(\) {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 302.8 Tm (    let q = http.url_encode\("tag=work & urgent"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 291.4 Tm (    io.say\("encoded {q}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 280 Tm (    io.say\("decoded {http.url_decode\(q\)}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 257.2 Tm (    var fields: Map<Text, Text> = [:]) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 245.8 Tm (    for pair in "tag=work&sort=new".split\("&"\) {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 234.4 Tm (        let bits = pair.split\("="\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 223 Tm (        if bits.len\(\) == 2 { fields.set\(bits[0], http.url_decode\(bits[1]\)\) }) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 211.6 Tm (    }) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 200.2 Tm (    io.say\("{fields}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 188.8 Tm (}) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 149.4 Tm (The example to read next) Tj ET
+0.961 0.961 0.969 rg 71.0 129.9 150.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 72.0 132.4 Tm (examples/19-web-server.spf) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 225.76 132.4 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 235.76 132.4 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 244.1 132.4 Tm (complete) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 287.45 132.4 Tm (site:) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 308.57 132.4 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 316.91 132.4 Tm (styled) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 345.81 132.4 Tm (home) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 373.6 132.4 Tm (page,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 401.4 132.4 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 409.74 132.4 Tm (JSON) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 439.19 132.4 Tm (health) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 469.21 132.4 Tm (endpoint,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 513.13 132.4 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 117.8 Tm (clock,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 100.34 117.8 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 119.8 117.8 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 128.14 117.8 Tm (404) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 147.6 117.8 Tm (page,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 175.4 117.8 Tm (in) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 185.96 117.8 Tm (sixty) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 208.74 117.8 Tm (lines.) Tj ET
+0.87 0.87 0.89 rg 72.0 62.0 468.0 0.6 re f
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 72.0 48.0 Tm (SPRFST Guidebook) Tj ET
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 535.552 48.0 Tm (3) Tj ET
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612.0 792.0] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> >> /Contents 15 0 R >>
+endobj
+15 0 obj
+<< /Length 3372 >>
+stream
+0.961 0.961 0.969 rg 72.0 707.6 468.0 25.4 re f
+0.961 0.541 0.149 rg 72.0 707.6 2.2 25.4 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 724.0 Tm (sprfst run examples/19-web-server.spf) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 684.6 Tm (Exercise) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 667.6 Tm (Add) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 92.57 667.6 Tm (a) Tj ET
+0.961 0.961 0.969 rg 102.69 665.1 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 103.69 667.6 Tm (/notes) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 143.45 667.6 Tm (route) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 169.02 667.6 Tm (to) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 180.14 667.6 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 196.82 667.6 Tm (routing) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 230.17 667.6 Tm (example) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 270.74 667.6 Tm (that) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 290.2 667.6 Tm (gives) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 316.32 667.6 Tm (back) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 340.22 667.6 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 348.56 667.6 Tm (JSON) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 378.01 667.6 Tm (list,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 395.79 667.6 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 415.25 667.6 Tm (a) Tj ET
+0.961 0.961 0.969 rg 425.37 665.1 24.8 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 426.37 667.6 Tm (POST) Tj ET
+0.961 0.961 0.969 rg 450.95 665.1 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 451.95 667.6 Tm (/notes) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 491.71 667.6 Tm (that) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 511.17 667.6 Tm (adds) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 653.0 Tm (to) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 83.12 653.0 Tm (it.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 93.68 653.0 Tm (Keep) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 119.81 653.0 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 136.49 653.0 Tm (notes) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 163.73 653.0 Tm (in) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 174.29 653.0 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 182.63 653.0 Tm (module) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 218.2 653.0 Tm (level) Tj ET
+0.961 0.961 0.969 rg 243.32 650.5 19.1 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 244.32 653.0 Tm (var) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 266.98 653.0 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 286.44 653.0 Tm (test) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 305.34 653.0 Tm (both) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 327.58 653.0 Tm (by) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 340.92 653.0 Tm (calling) Tj ET
+0.961 0.961 0.969 rg 373.82 650.5 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 374.82 653.0 Tm (handle) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 414.58 653.0 Tm (directly.) Tj ET
+0.87 0.87 0.89 rg 72.0 62.0 468.0 0.6 re f
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 72.0 48.0 Tm (SPRFST Guidebook) Tj ET
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 535.552 48.0 Tm (4) Tj ET
+endstream
+endobj
+xref
+0 16
+0000000000 65535 f 
+0000000027 00000 n 
+0000000076 00000 n 
+0000000154 00000 n 
+0000000251 00000 n 
+0000000353 00000 n 
+0000000448 00000 n 
+0000000553 00000 n 
+0000000599 00000 n 
+0000000759 00000 n 
+0000010984 00000 n 
+0000011146 00000 n 
+0000020244 00000 n 
+0000020406 00000 n 
+0000029491 00000 n 
+0000029653 00000 n 
+trailer
+<< /Size 16 /Root 1 0 R /Info << /Title (The web) /Producer (SPRFST 0.1.0-beta) /CreationDate (D:20261004224426Z) >> >>
+startxref
+33078
+%%EOF

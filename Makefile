@@ -40,7 +40,7 @@ SRCS := $(wildcard $(SRCDIR)/*.c)
 OBJS := $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRCS))
 DEPS := $(OBJS:.o=.d)
 
-.PHONY: all clean test install dirs app dmg stage docs guidebook
+.PHONY: all clean test install dirs app dmg pdf stage docs guidebook
 
 all: dirs $(BIN)/sprfst
 
@@ -81,8 +81,13 @@ app: all
 
 # on a Mac this wraps the built app; anywhere else it writes the
 # installer image, which carries the project and builds it on arrival
-dmg: all
+dmg: all pdf
 	./tools/make_dmg.sh
+
+# the guidebook as PDFs: one per chapter and one book, typeset by sprfst
+pdf: all
+	./build/bin/sprfst run tools/make_pdf.spf -- guidebook/pdf
+	./build/bin/sprfst run tools/verify_pdf.spf -- guidebook/pdf/SPRFST-Guidebook.pdf
 
 # lay out the bundle and the disk image contents anywhere, to check them
 stage: all

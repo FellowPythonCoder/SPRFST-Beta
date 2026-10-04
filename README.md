@@ -65,6 +65,18 @@ make dmg                   # dist/SPRFST-Studio.dmg, mountable and verified
 make stage                 # lay both out without a Mac, to check them
 ```
 
+```
+make pdf                   # guidebook/pdf — 30 chapters and the whole book
+```
+
+The PDFs are typeset by `tools/make_pdf.spf`: it reads the Markdown,
+measures every line with the real Helvetica and Courier metrics, and
+writes PDF 1.4 by hand — objects, cross reference table, trailer, and
+an outline so Preview lists the thirty chapters down the side. No
+library, no LaTeX, no browser. `tools/verify_pdf.spf` reads the result
+back and checks that every entry in the cross reference table lands on
+the object it names and that every stream is as long as it claims.
+
 `make dmg` works away from a Mac too. With no `swiftc` there is no
 application to wrap, so instead of an empty bundle it writes
 `dist/SPRFST-0.1.0-beta.dmg`: a real ISO 9660 image with Joliet names,
@@ -236,6 +248,10 @@ that are not finished. They are listed here rather than hidden.
   initialisers and the single entry point. The first `make dmg` on a
   Mac is still the first time that code will be compiled.
 
+- **The PDFs use the base fonts, not an embedded one.** Helvetica and
+  Courier are what every reader already has, so the files stay small
+  and need no licence. Characters outside those fonts — box drawing,
+  the Mac modifier keys — are spelled out instead.
 - **The disk image is ISO 9660, not HFS+.** `hdiutil` only exists on a
   Mac, so away from one the image is written by `tools/make_iso.spf`.
   macOS mounts ISO 9660 by double click, and files on such a volume are
@@ -243,10 +259,10 @@ that are not finished. They are listed here rather than hidden.
   still uses `hdiutil` and HFS+, which is the better image.
 
 Everything else in this README was run on the machine that wrote it.
-`make test` is the proof: 52 checks covering the language suite, all
+`make test` is the proof: 53 checks covering the language suite, all
 twenty one examples, every command line verb, Forge digests, the Studio
-service, the debugger, the disk image written and read back, and all 100
-guidebook code blocks.
+service, the debugger, the disk image and the PDFs written and read back, and
+all 100 guidebook code blocks.
 
 The collector is checked as well as the compiler: `SPRFST_GC_STRESS=1`
 makes the runtime collect garbage on every single allocation, and every

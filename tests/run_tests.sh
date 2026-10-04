@@ -229,6 +229,19 @@ else
     report "disk image written" no "no file"
 fi
 
+# the guidebook as PDF, typeset and then read back
+(cd "$ROOT" && "$SPRFST" run tools/make_pdf.spf -- "$tmp/pdf" >/dev/null 2>&1)
+if [ -f "$tmp/pdf/SPRFST-Guidebook.pdf" ]; then
+    chapters=$(ls "$tmp/pdf"/*.pdf | wc -l)
+    if vp=$(cd "$ROOT" && "$SPRFST" run tools/verify_pdf.spf -- "$tmp/pdf/SPRFST-Guidebook.pdf" 2>&1); then
+        report "guidebook pdfs ($chapters files, $(printf '%s' "$vp" | grep -oE '[0-9]+ pages' | head -1), table checked)" ok
+    else
+        report "guidebook pdf verifies" no "$(printf '%s' "$vp" | tail -4)"
+    fi
+else
+    report "guidebook pdf written" no "no file"
+fi
+
 # the Swift editor, as far as a machine with no Swift can tell
 if sw=$("$ROOT/tools/check_swift.sh" 2>&1); then
     report "studio sources ($(printf '%s' "$sw" | grep -oE '[0-9]+ Swift files'))" ok

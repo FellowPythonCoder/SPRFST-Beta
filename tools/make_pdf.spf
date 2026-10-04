@@ -1,0 +1,834 @@
+~~ =====================================================================
+~~  make_pdf.spf — the guidebook as PDFs, typeset by SPRFST itself
+~~
+~~      sprfst run tools/make_pdf.spf -- <out folder>
+~~
+~~  No library, no LaTeX, no headless browser. This reads the Markdown,
+~~  lays it out with the real Helvetica and Courier metrics, and writes
+~~  PDF 1.4 by hand: objects, cross reference table, trailer, and an
+~~  outline so Preview shows the thirty chapters down the side.
+~~
+~~  It produces one PDF per chapter and one book with everything in it.
+~~ =====================================================================
+
+use std.io
+use std.fs
+use std.path
+use std.sys
+use std.math
+use std.time
+
+~~ ------------------------------------------------------------ the page
+
+let PAGE_W = 612.0      ~~ US Letter, in points
+let PAGE_H = 792.0
+let LEFT = 72.0
+let RIGHT = 540.0
+let TOP = 724.0
+let BOTTOM = 76.0
+let COLUMN = 468.0      ~~ RIGHT - LEFT
+
+~~ the brand: near black text, one warm orange
+let ORANGE = "0.961 0.541 0.149"
+let INK = "0.102 0.102 0.118"
+let SOFT = "0.42 0.42 0.46"
+let PANEL = "0.961 0.961 0.969"
+
+~~ font slots in the page resources
+let F_REG = 1
+let F_BOLD = 2
+let F_MONO = 3
+let F_ITAL = 4
+
+~~ -------------------------------------------------- Helvetica metrics
+~~ Widths per 1000 units for characters 32 to 126, from the Adobe metrics.
+~~ Without these the text would be wrapped by guesswork.
+
+let W_REG: [Int] = [278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,
+                    556,556,556,556,556,556,556,556,556,556,278,278,584,584,584,556,
+                    1015,667,667,722,722,667,611,778,722,278,500,667,556,833,722,778,
+                    667,778,722,667,611,722,667,944,667,667,611,278,278,278,469,556,
+                    333,556,556,500,556,556,278,556,556,222,222,500,222,833,556,556,
+                    556,556,333,500,278,556,500,722,500,500,500,334,260,334,584]
+
+let W_BOLD: [Int] = [278,333,474,556,556,889,722,238,333,333,389,584,278,333,278,278,
+                     556,556,556,556,556,556,556,556,556,556,333,333,584,584,584,611,
+                     975,722,722,722,722,667,611,778,722,278,556,722,611,833,722,778,
+                     667,778,722,667,611,722,667,944,667,667,611,333,278,333,584,556,
+                     333,556,611,556,611,556,333,611,611,278,278,556,278,889,611,611,
+                     611,611,389,556,333,611,556,778,556,556,500,389,280,389,584]
+
+~~ ---------------------------------------------------------- characters
+~~ The guidebook uses box drawing, arrows and the Mac modifier keys.
+~~ PDF base fonts cannot show them, so they are spelled out instead.
+
+fn fold(ch: Text) -> Text {
+    if ch == "─" or ch == "━" or ch == "–" { give "-" }
+    if ch == "│" { give "|" }
+    if ch == "┌" or ch == "┐" or ch == "└" or ch == "┘" { give "+" }
+    if ch == "├" or ch == "┤" or ch == "┬" or ch == "┴" or ch == "╰" or ch == "╭" { give "+" }
+    if ch == "→" { give "->" }
+    if ch == "←" { give "<-" }
+    if ch == "—" { give "\\227" }        ~~ em dash, WinAnsi 0x97
+    if ch == "…" { give "\\205" }        ~~ ellipsis
+    if ch == "•" { give "\\225" }        ~~ bullet
+    if ch == "·" { give "\\267" }        ~~ middle dot
+    if ch == "▸" { give ">" }
+    if ch == "✓" { give "v" }
+    if ch == "⌘" { give "Cmd-" }
+    if ch == "⌃" { give "Ctrl-" }
+    if ch == "⇧" { give "Shift-" }
+    if ch == "⌥" { give "Alt-" }
+    if ch == "≈" { give "~" }
+    if ch == "×" { give "x" }
+    give "?"
+}
+
+~~ what a character is worth on the page, folded the same way
+fn fold_plain(ch: Text) -> Text {
+    if ch == "—" { give "-" }
+    if ch == "…" { give "..." }
+    if ch == "•" { give "-" }
+    if ch == "·" { give "." }
+    give fold(ch)
+}
+
+fn escape(raw: Text) -> Text {
+    var out = ""
+    for ch in raw.chars() {
+        if ch == "(" { out = out + "\\(" }
+        else { if ch == ")" { out = out + "\\)" }
+        else { if ch == "\\" { out = out + "\\\\" }
+        else {
+            let c = ch.code_at(0)
+            if c < 127 and c >= 32 { out = out + ch }
+            else { if c == 9 { out = out + "    " } else { out = out + fold(ch) } }
+        } } }
+    }
+    give out
+}
+
+fn char_width(ch: Text, font: Int) -> Num {
+    if font == F_MONO { give 600.0 }
+    let c = ch.code_at(0)
+    if c >= 32 and c < 127 {
+        if font == F_BOLD { give to_num(W_BOLD[c - 32]) }
+        give to_num(W_REG[c - 32])
+    }
+    ~~ a folded character costs what its replacement costs
+    var w = 0.0
+    let rep = fold_plain(ch)
+    if rep == ch { give 500.0 }
+    for r in rep.chars() { w = w + char_width(r, font) }
+    give w
+}
+
+fn text_width(t: Text, font: Int, size: Num) -> Num {
+    var total = 0.0
+    for ch in t.chars() { total = total + char_width(ch, font) }
+    give total * size / 1000.0
+}
+
+~~ ------------------------------------------------------------ the book
+
+object Run {
+    text: Text
+    style: Int
+}
+
+object Block {
+    kind: Text        ~~ h1 h2 h3 p li num code rule quote
+    text: Text
+    lines: [Text]
+    marker: Text
+}
+
+object Doc {
+    pages: [Text]
+    cur: [Text]
+    y: Num
+    first_page: Int   ~~ the number printed on the first page
+    chapter: Text
+    starts: [Int]
+    titles: [Text]
+}
+
+fn new_doc(first_page: Int) -> Doc {
+    give Doc { pages: [], cur: [], y: TOP, first_page: first_page,
+               chapter: "", starts: [], titles: [] }
+}
+
+fn page_number(d: Doc) -> Int { give d.first_page + d.pages.len() }
+
+fn put(d: Doc, line: Text) { d.cur.push(line) }
+
+fn show(d: Doc, x: Num, y: Num, t: Text, font: Int, size: Num, colour: Text) {
+    if t == "" { give }
+    put(d, "BT /F{font} {size} Tf {colour} rg 1 0 0 1 {x} {y} Tm ({escape(t)}) Tj ET")
+}
+
+fn box(d: Doc, x: Num, y: Num, w: Num, h: Num, colour: Text) {
+    put(d, "{colour} rg {x} {y} {w} {h} re f")
+}
+
+fn footer(d: Doc) {
+    let n = page_number(d)
+    box(d, LEFT, BOTTOM - 14.0, COLUMN, 0.6, "0.87 0.87 0.89")
+    show(d, LEFT, BOTTOM - 28.0, d.chapter, F_REG, 8.0, SOFT)
+    let label = "{n}"
+    show(d, RIGHT - text_width(label, F_REG, 8.0), BOTTOM - 28.0, label, F_REG, 8.0, SOFT)
+}
+
+fn end_page(d: Doc) {
+    if d.cur.len() == 0 { give }
+    footer(d)
+    d.pages.push(d.cur.join("\n"))
+    d.cur = []
+    d.y = TOP
+}
+
+fn need(d: Doc, height: Num) {
+    if d.y - height < BOTTOM { end_page(d) }
+}
+
+~~ ------------------------------------------------------- inline pieces
+
+fn split_runs(raw: Text) -> [Run] {
+    var runs: [Run] = []
+    var piece = ""
+    var style = 0
+    var i = 0
+    let n = raw.len()
+    while i < n {
+        let two = if i + 2 <= n { raw.slice(i, i + 2) } else { "" }
+        let one = raw.slice(i, i + 1)
+        if one == "`" {
+            if piece != "" { runs.push(Run { text: piece, style: style }) }
+            piece = ""
+            style = if style == 2 { 0 } else { 2 }
+            i = i + 1
+            skip
+        }
+        if two == "**" and style != 2 {
+            if piece != "" { runs.push(Run { text: piece, style: style }) }
+            piece = ""
+            style = if style == 1 { 0 } else { 1 }
+            i = i + 2
+            skip
+        }
+        piece = piece + one
+        i = i + 1
+    }
+    if piece != "" { runs.push(Run { text: piece, style: style }) }
+    give runs
+}
+
+fn style_font(style: Int) -> Int {
+    if style == 1 { give F_BOLD }
+    if style == 2 { give F_MONO }
+    if style == 3 { give F_ITAL }
+    give F_REG
+}
+
+~~ words left to right, wrapping at the column edge
+fn flow(d: Doc, runs: [Run], x0: Num, indent: Num, size: Num, leading: Num, colour: Text) {
+    var x = x0
+    let right = RIGHT
+    var started = false
+    for run in runs {
+        let font = style_font(run.style)
+        let fsize = if run.style == 2 { size - 0.5 } else { size }
+        let words = run.text.split(" ")
+        var first = true
+        for word in words {
+            if word == "" and not first { x = x + text_width(" ", F_REG, size)  skip }
+            first = false
+            let w = text_width(word, font, fsize)
+            if x + w > right and started {
+                d.y = d.y - leading
+                need(d, leading)
+                x = x0 + indent
+            }
+            if not started { need(d, leading)  started = true }
+            if run.style == 2 {
+                box(d, x - 1.0, d.y - 2.5, w + 2.0, fsize + 2.0, PANEL)
+                show(d, x, d.y, word, font, fsize, "0.20 0.20 0.24")
+            } else {
+                show(d, x, d.y, word, font, fsize, colour)
+            }
+            x = x + w + text_width(" ", F_REG, size)
+        }
+    }
+    d.y = d.y - leading
+}
+
+~~ how many lines a run list needs, without drawing anything
+fn flow_lines(runs: [Run], x0: Num, size: Num) -> Int {
+    var x = x0
+    var lines = 1
+    var started = false
+    for run in runs {
+        let font = style_font(run.style)
+        let fsize = if run.style == 2 { size - 0.5 } else { size }
+        for word in run.text.split(" ") {
+            if word == "" { skip }
+            let w = text_width(word, font, fsize)
+            if x + w > RIGHT and started {
+                lines = lines + 1
+                x = x0
+            }
+            started = true
+            x = x + w + text_width(" ", F_REG, size)
+        }
+    }
+    give lines
+}
+
+~~ keep a paragraph whole when only its last line would be left behind
+fn room_for(d: Doc, runs: [Run], x0: Num, size: Num, leading: Num) {
+    let wanted = flow_lines(runs, x0, size)
+    let fits = math.floor((d.y - BOTTOM) / leading)
+    if fits < 2 { end_page(d)  give }
+    if wanted > fits and wanted - fits <= 1 { end_page(d) }
+}
+
+~~ ------------------------------------------------------- block drawing
+
+fn draw_heading(d: Doc, text: Text, level: Int) {
+    if level == 1 {
+        need(d, 104.0)
+        d.y = d.y - 10.0
+        show(d, LEFT, d.y, text, F_BOLD, 21.0, INK)
+        d.y = d.y - 11.0
+        box(d, LEFT, d.y, 46.0, 2.4, ORANGE)
+        d.y = d.y - 22.0
+        give
+    }
+    if level == 2 {
+        need(d, 76.0)
+        d.y = d.y - 14.0
+        show(d, LEFT, d.y, text, F_BOLD, 13.5, INK)
+        d.y = d.y - 17.0
+        give
+    }
+    need(d, 64.0)
+    d.y = d.y - 10.0
+    show(d, LEFT, d.y, text, F_BOLD, 10.5, INK)
+    d.y = d.y - 14.0
+}
+
+fn wrap_code(line: Text, room: Int) -> [Text] {
+    if line.len() <= room { give [line] }
+    var out: [Text] = []
+    var rest = line
+    while rest.len() > room {
+        out.push(rest.slice(0, room))
+        rest = "  " + rest.slice(room, rest.len())
+    }
+    if rest != "" { out.push(rest) }
+    give out
+}
+
+fn draw_code(d: Doc, lines: [Text]) {
+    let size = 8.6
+    let leading = 11.4
+    let room = math.floor((COLUMN - 24.0) / (size * 0.6))
+    var all: [Text] = []
+    for line in lines {
+        for part in wrap_code(line, room) { all.push(part) }
+    }
+    d.y = d.y - 6.0
+    var i = 0
+    while i < all.len() {
+        ~~ how much of the block fits on what is left of this page
+        var room_here = math.floor((d.y - BOTTOM - 14.0) / leading)
+        if room_here < 3 {
+            end_page(d)
+            room_here = math.floor((d.y - BOTTOM - 14.0) / leading)
+        }
+        var take = all.len() - i
+        if take > room_here { take = room_here }
+        let height = to_num(take) * leading + 14.0
+        box(d, LEFT, d.y + 9.0 - height, COLUMN, height, PANEL)
+        box(d, LEFT, d.y + 9.0 - height, 2.2, height, ORANGE)
+        var k = 0
+        while k < take {
+            show(d, LEFT + 12.0, d.y - to_num(k) * leading, all[i + k], F_MONO, size, "0.18 0.18 0.22")
+            k = k + 1
+        }
+        d.y = d.y - to_num(take) * leading - 8.0
+        i = i + take
+    }
+    d.y = d.y - 6.0
+}
+
+fn wrap_words(t: Text, font: Int, size: Num, room: Num) -> [Text] {
+    var out: [Text] = []
+    var line = ""
+    for word in t.split(" ") {
+        if word == "" { skip }
+        let candidate = if line == "" { word } else { line + " " + word }
+        if text_width(candidate, font, size) > room and line != "" {
+            out.push(line)
+            line = word
+        } else {
+            line = candidate
+        }
+    }
+    if line != "" { out.push(line) }
+    if out.len() == 0 { out.push("") }
+    give out
+}
+
+fn cell_is_code(cell: Text) -> Bool {
+    give cell.starts_with("`") and cell.ends_with("`") and cell.len() > 1
+}
+
+fn clean_cell(cell: Text) -> Text {
+    give cell.replace("`", "").replace("**", "").trim()
+}
+
+fn is_rule_row(cells: [Text]) -> Bool {
+    for c in cells {
+        let t = c.trim().replace("-", "").replace(":", "")
+        if t != "" { give false }
+    }
+    give true
+}
+
+fn split_row(row: Text) -> [Text] {
+    var body = row.trim()
+    if body.starts_with("|") { body = body.slice(1, body.len()) }
+    if body.ends_with("|") { body = body.slice(0, body.len() - 1) }
+    var cells: [Text] = []
+    for c in body.split("|") { cells.push(c.trim()) }
+    give cells
+}
+
+fn draw_table(d: Doc, rows: [Text]) {
+    let size = 9.0
+    let leading = 12.0
+    let pad = 8.0
+
+    var grid: [[Text]] = []
+    for row in rows {
+        let cells = split_row(row)
+        if is_rule_row(cells) { skip }
+        grid.push(cells)
+    }
+    if grid.len() == 0 { give }
+
+    var columns = 0
+    for row in grid { if row.len() > columns { columns = row.len() } }
+
+    ~~ natural width of each column, then squeezed to fit the page
+    var widths: [Num] = []
+    var c = 0
+    while c < columns {
+        var w = 40.0
+        for row in grid {
+            if c < row.len() {
+                let font = if cell_is_code(row[c]) { F_MONO } else { F_REG }
+                let cw = text_width(clean_cell(row[c]), font, size) + pad * 2.0
+                if cw > w { w = cw }
+            }
+        }
+        widths.push(w)
+        c = c + 1
+    }
+    var total = 0.0
+    for w in widths { total = total + w }
+    if total > COLUMN {
+        var scaled: [Num] = []
+        for w in widths { scaled.push(w * COLUMN / total) }
+        widths = scaled
+        total = COLUMN
+    }
+
+    d.y = d.y - 8.0
+    var r = 0
+    while r < grid.len() {
+        let row = grid[r]
+        let head = r == 0
+
+        ~~ wrap every cell first, so the row knows how tall it is
+        var wrapped: [[Text]] = []
+        var tallest = 1
+        var k = 0
+        while k < columns {
+            let raw = if k < row.len() { clean_cell(row[k]) } else { "" }
+            let font = if head { F_BOLD } else { if k < row.len() and cell_is_code(row[k]) { F_MONO } else { F_REG } }
+            let lines = wrap_words(raw, font, size, widths[k] - pad * 2.0)
+            if lines.len() > tallest { tallest = lines.len() }
+            wrapped.push(lines)
+            k = k + 1
+        }
+        let height = to_num(tallest) * leading + 6.0
+        need(d, height + 6.0)
+
+        if head {
+            box(d, LEFT, d.y - 5.0, total, height, "0.93 0.93 0.95")
+        } else {
+            box(d, LEFT, d.y - 5.0, total, 0.4, "0.88 0.88 0.90")
+        }
+
+        var x = LEFT
+        k = 0
+        while k < columns {
+            let font = if head { F_BOLD } else { if k < row.len() and cell_is_code(row[k]) { F_MONO } else { F_REG } }
+            let colour = if head { INK } else { if font == F_MONO { "0.20 0.20 0.24" } else { INK } }
+            var line_no = 0
+            for line in wrapped[k] {
+                show(d, x + pad, d.y - to_num(line_no) * leading, line, font, size, colour)
+                line_no = line_no + 1
+            }
+            x = x + widths[k]
+            k = k + 1
+        }
+        d.y = d.y - height
+        r = r + 1
+    }
+    box(d, LEFT, d.y + 1.0, total, 0.4, "0.88 0.88 0.90")
+    d.y = d.y - 10.0
+}
+
+fn draw_block(d: Doc, b: Block) {
+    if b.kind == "table" { draw_table(d, b.lines)  give }
+    if b.kind == "h1" { draw_heading(d, b.text, 1)  give }
+    if b.kind == "h2" { draw_heading(d, b.text, 2)  give }
+    if b.kind == "h3" { draw_heading(d, b.text, 3)  give }
+    if b.kind == "code" { draw_code(d, b.lines)  give }
+    if b.kind == "rule" {
+        need(d, 24.0)
+        d.y = d.y - 10.0
+        box(d, LEFT, d.y, COLUMN, 0.6, "0.85 0.85 0.87")
+        d.y = d.y - 14.0
+        give
+    }
+    if b.kind == "quote" {
+        need(d, 24.0)
+        box(d, LEFT, d.y - 4.0, 2.0, 16.0, ORANGE)
+        flow(d, split_runs(b.text), LEFT + 14.0, 0.0, 10.0, 14.6, SOFT)
+        d.y = d.y - 4.0
+        give
+    }
+    if b.kind == "li" or b.kind == "num" {
+        let runs = split_runs(b.text)
+        room_for(d, runs, LEFT + 22.0, 10.0, 14.6)
+        show(d, LEFT + 6.0, d.y, b.marker, F_REG, 10.0, ORANGE)
+        flow(d, runs, LEFT + 22.0, 0.0, 10.0, 14.6, INK)
+        give
+    }
+    let runs = split_runs(b.text)
+    room_for(d, runs, LEFT, 10.0, 14.6)
+    flow(d, runs, LEFT, 0.0, 10.0, 14.6, INK)
+    d.y = d.y - 5.0
+}
+
+~~ -------------------------------------------------------------- markdown
+
+fn parse_markdown(source: Text) -> [Block] {
+    var blocks: [Block] = []
+    var para = ""
+    var in_code = false
+    var code: [Text] = []
+    var number = 0
+
+    for raw in source.lines() {
+        let line = raw
+        let trimmed = line.trim()
+
+        if in_code {
+            if trimmed.starts_with("```") {
+                blocks.push(Block { kind: "code", text: "", lines: code, marker: "" })
+                code = []
+                in_code = false
+            } else {
+                code.push(line)
+            }
+            skip
+        }
+
+        if trimmed.starts_with("```") {
+            if para != "" { blocks.push(Block { kind: "p", text: para, lines: [], marker: "" })  para = "" }
+            in_code = true
+            code = []
+            skip
+        }
+
+        if trimmed == "" {
+            if para != "" { blocks.push(Block { kind: "p", text: para, lines: [], marker: "" })  para = "" }
+            number = 0
+            skip
+        }
+
+        if trimmed.starts_with("|") and trimmed.ends_with("|") and trimmed.len() > 2 {
+            if para != "" { blocks.push(Block { kind: "p", text: para, lines: [], marker: "" })  para = "" }
+            let last = blocks.len() - 1
+            if last >= 0 and blocks[last].kind == "table" {
+                blocks[last].lines.push(trimmed)
+            } else {
+                blocks.push(Block { kind: "table", text: "", lines: [trimmed], marker: "" })
+            }
+            skip
+        }
+
+        if trimmed.starts_with("### ") {
+            if para != "" { blocks.push(Block { kind: "p", text: para, lines: [], marker: "" })  para = "" }
+            blocks.push(Block { kind: "h3", text: trimmed.slice(4, trimmed.len()), lines: [], marker: "" })
+            skip
+        }
+        if trimmed.starts_with("## ") {
+            if para != "" { blocks.push(Block { kind: "p", text: para, lines: [], marker: "" })  para = "" }
+            blocks.push(Block { kind: "h2", text: trimmed.slice(3, trimmed.len()), lines: [], marker: "" })
+            skip
+        }
+        if trimmed.starts_with("# ") {
+            if para != "" { blocks.push(Block { kind: "p", text: para, lines: [], marker: "" })  para = "" }
+            blocks.push(Block { kind: "h1", text: trimmed.slice(2, trimmed.len()), lines: [], marker: "" })
+            skip
+        }
+        if trimmed == "---" or trimmed == "***" {
+            if para != "" { blocks.push(Block { kind: "p", text: para, lines: [], marker: "" })  para = "" }
+            blocks.push(Block { kind: "rule", text: "", lines: [], marker: "" })
+            skip
+        }
+        if trimmed.starts_with("> ") {
+            if para != "" { blocks.push(Block { kind: "p", text: para, lines: [], marker: "" })  para = "" }
+            blocks.push(Block { kind: "quote", text: trimmed.slice(2, trimmed.len()), lines: [], marker: "" })
+            skip
+        }
+        if trimmed.starts_with("- ") or trimmed.starts_with("* ") {
+            if para != "" { blocks.push(Block { kind: "p", text: para, lines: [], marker: "" })  para = "" }
+            blocks.push(Block { kind: "li", text: trimmed.slice(2, trimmed.len()), lines: [], marker: "\\225" })
+            skip
+        }
+        if trimmed.len() > 3 and trimmed.slice(1, 3) == ". " and trimmed.slice(0, 1).to_int() != nil {
+            if para != "" { blocks.push(Block { kind: "p", text: para, lines: [], marker: "" })  para = "" }
+            number = number + 1
+            blocks.push(Block { kind: "num", text: trimmed.slice(3, trimmed.len()), lines: [],
+                                marker: "{number}." })
+            skip
+        }
+
+        if para == "" { para = trimmed } else { para = para + " " + trimmed }
+    }
+    if para != "" { blocks.push(Block { kind: "p", text: para, lines: [], marker: "" }) }
+    if in_code and code.len() > 0 { blocks.push(Block { kind: "code", text: "", lines: code, marker: "" }) }
+    give blocks
+}
+
+~~ ------------------------------------------------------------ PDF file
+
+fn octal(n: Int) -> Text {
+    give "{math.floor(n / 64) % 8}{math.floor(n / 8) % 8}{n % 8}"
+}
+
+fn pdf_text(chapter_starts: [Int], chapter_titles: [Text], pages: [Text],
+            title: Text) -> Text {
+    let nchap = chapter_titles.len()
+    let first_page_obj = 8 + nchap
+    var objects: [Text] = []     ~~ objects[i] is object number i + 1
+
+    ~~ 1 catalog
+    if nchap > 0 {
+        objects.push("<< /Type /Catalog /Pages 2 0 R /Outlines 7 0 R /PageMode /UseOutlines >>")
+    } else {
+        objects.push("<< /Type /Catalog /Pages 2 0 R >>")
+    }
+
+    ~~ 2 the page tree
+    var kids = ""
+    var i = 0
+    while i < pages.len() {
+        kids = kids + "{first_page_obj + 2 * i} 0 R "
+        i = i + 1
+    }
+    objects.push("<< /Type /Pages /Count {pages.len()} /Kids [{kids.trim()}] >>")
+
+    ~~ 3..6 the four base fonts
+    objects.push("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>")
+    objects.push("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>")
+    objects.push("<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>")
+    objects.push("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >>")
+
+    ~~ 7 the outline, then one object per chapter
+    if nchap > 0 {
+        objects.push("<< /Type /Outlines /First 8 0 R /Last {7 + nchap} 0 R /Count {nchap} >>")
+        var c = 0
+        while c < nchap {
+            let me = 8 + c
+            var links = ""
+            if c > 0 { links = links + " /Prev {me - 1} 0 R" }
+            if c + 1 < nchap { links = links + " /Next {me + 1} 0 R" }
+            let page_obj = first_page_obj + 2 * chapter_starts[c]
+            objects.push("<< /Title ({escape(chapter_titles[c])}) /Parent 7 0 R{links} " +
+                         "/Dest [{page_obj} 0 R /XYZ 0 {PAGE_H} 0] >>")
+            c = c + 1
+        }
+    } else {
+        objects.push("<< /Type /Outlines /Count 0 >>")
+        var c = 0
+        while c < nchap { c = c + 1 }
+    }
+
+    ~~ the pages themselves
+    var p = 0
+    while p < pages.len() {
+        let me = first_page_obj + 2 * p
+        objects.push("<< /Type /Page /Parent 2 0 R /MediaBox [0 0 {PAGE_W} {PAGE_H}] " +
+                     "/Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> >> " +
+                     "/Contents {me + 1} 0 R >>")
+        let stream = pages[p]
+        objects.push("<< /Length {stream.len()} >>\nstream\n{stream}\nendstream")
+        p = p + 1
+    }
+
+    ~~ assemble, remembering where every object begins
+    let header = "%PDF-1.4\n%\\342\\343\\317\\323\n"
+    var body = ""
+    var offsets: [Int] = []
+    var at = header.len()
+    var k = 0
+    while k < objects.len() {
+        let chunk = "{k + 1} 0 obj\n{objects[k]}\nendobj\n"
+        offsets.push(at)
+        at = at + chunk.len()
+        body = body + chunk
+        k = k + 1
+    }
+
+    var xref = "xref\n0 {objects.len() + 1}\n0000000000 65535 f \n"
+    for off in offsets {
+        xref = xref + "{"{off}".pad_left(10, "0")} 00000 n \n"
+    }
+    let made_at = time.format(time.now(), "%Y%m%d%H%M%S")
+    let info = "trailer\n<< /Size {objects.len() + 1} /Root 1 0 R " +
+               "/Info << /Title ({escape(title)}) /Producer (SPRFST 0.1.0-beta) " +
+               "/CreationDate (D:{made_at}Z) >> >>\nstartxref\n{at}\n%%EOF\n"
+    give header + body + xref + info
+}
+
+~~ ------------------------------------------------------------- covers
+
+fn title_page(d: Doc, title: Text, subtitle: Text, note: Text) {
+    box(d, 0.0, 0.0, PAGE_W, PAGE_H, "0.043 0.043 0.055")
+    box(d, 72.0, 470.0, 52.0, 3.0, ORANGE)
+    show(d, 72.0, 500.0, title, F_BOLD, 42.0, "0.98 0.98 0.99")
+    show(d, 72.0, 430.0, subtitle, F_REG, 15.0, ORANGE)
+    show(d, 72.0, 150.0, note, F_REG, 9.5, "0.55 0.55 0.60")
+    show(d, 72.0, 132.0, "Typeset by SPRFST. No library was used to write this file.",
+         F_REG, 9.5, "0.38 0.38 0.44")
+    d.pages.push(d.cur.join("\n"))
+    d.cur = []
+    d.y = TOP
+}
+
+fn contents_page(d: Doc, titles: [Text], starts: [Int], first: Int) {
+    show(d, LEFT, TOP - 10.0, "Contents", F_BOLD, 21.0, INK)
+    box(d, LEFT, TOP - 22.0, 46.0, 2.4, ORANGE)
+    var y = TOP - 54.0
+    var i = 0
+    while i < titles.len() {
+        let page = "{first + starts[i]}"
+        show(d, LEFT, y, titles[i], F_REG, 10.0, INK)
+        show(d, RIGHT - text_width(page, F_REG, 10.0), y, page, F_REG, 10.0, SOFT)
+        box(d, LEFT + text_width(titles[i], F_REG, 10.0) + 6.0, y + 3.0,
+            COLUMN - text_width(titles[i], F_REG, 10.0) - text_width(page, F_REG, 10.0) - 12.0,
+            0.4, "0.85 0.85 0.87")
+        y = y - 18.0
+        i = i + 1
+    }
+    d.pages.push(d.cur.join("\n"))
+    d.cur = []
+    d.y = TOP
+}
+
+~~ ---------------------------------------------------------------- main
+
+fn chapter_title(source: Text, fallback: Text) -> Text {
+    for line in source.lines() {
+        if line.trim().starts_with("# ") { give line.trim().slice(2, line.trim().len()) }
+    }
+    give fallback
+}
+
+fn main() {
+    let args = sys.args()
+    let out_dir = if args.len() > 0 { args[0] } else { "guidebook/pdf" }
+    let book_dir = "guidebook"
+
+    if not fs.is_dir(book_dir) {
+        io.warn("no guidebook folder here")
+        sys.exit(1)
+    }
+    fs.mkdir(out_dir)
+
+    var names: [Text] = []
+    for entry in fs.list(book_dir) {
+        if entry.ends_with(".md") { names.push(entry) }
+    }
+    names = names.sort()
+    if names.len() == 0 {
+        io.warn("no chapters found")
+        sys.exit(1)
+    }
+
+    io.say("")
+    io.say("  typesetting {names.len()} chapters")
+
+    ~~ one PDF per chapter
+    var made = 0
+    var total_pages = 0
+    for name in names {
+        let source = fs.read(path.join(book_dir, name)) ?? ""
+        let title = chapter_title(source, name)
+        let d = new_doc(1)
+        d.chapter = "SPRFST Guidebook"
+        for b in parse_markdown(source) { draw_block(d, b) }
+        end_page(d)
+        let stem = name.replace(".md", "")
+        let out = path.join(out_dir, stem + ".pdf")
+        let text = pdf_text([], [], d.pages, title)
+        fs.write(out, text)
+        made = made + 1
+        total_pages = total_pages + d.pages.len()
+    }
+    io.say("  {made} chapter files, {total_pages} pages")
+
+    ~~ and the whole book, with contents and an outline
+    let front = 2
+    let book = new_doc(front + 1)
+    var titles: [Text] = []
+    var starts: [Int] = []
+    for name in names {
+        let source = fs.read(path.join(book_dir, name)) ?? ""
+        let title = chapter_title(source, name)
+        titles.push(title)
+        starts.push(book.pages.len())
+        book.chapter = title
+        for b in parse_markdown(source) { draw_block(book, b) }
+        end_page(book)
+    }
+
+    let cover = new_doc(1)
+    title_page(cover, "SPRFST", "The Guidebook",
+               "Version 0.1.0-beta  {time.format(time.now(), "%d %B %Y")}")
+    contents_page(cover, titles, starts, front + 1)
+    if cover.pages.len() != front {
+        io.warn("  the front matter is {cover.pages.len()} pages, not {front}; numbering will be off")
+    }
+
+    var all: [Text] = []
+    for p in cover.pages { all.push(p) }
+    for p in book.pages { all.push(p) }
+    var shifted: [Int] = []
+    for s in starts { shifted.push(s + front) }
+
+    let book_path = path.join(out_dir, "SPRFST-Guidebook.pdf")
+    fs.write(book_path, pdf_text(shifted, titles, all, "SPRFST - The Guidebook"))
+
+    let size = fs.size(book_path)
+    io.say("  {book_path}  {all.len()} pages, {math.floor(size / 1024)} KB")
+    io.say("")
+}
