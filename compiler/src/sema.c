@@ -1602,6 +1602,9 @@ static Type *check_expr(Sema *s, Expr *e) {
         case EX_COALESCE: {
             Type *a = check_expr(s, e->as.coalesce.value);
             Type *b = check_expr(s, e->as.coalesce.fallback);
+            /* an empty [] or [:] fallback takes the type of the left side */
+            Type *inner = a->kind == TY_MAYBE || a->kind == TY_RESULT ? a->elem : NULL;
+            if (inner && b && type_assignable(inner, b)) b = inner;
             if (a->kind == TY_MAYBE) t = type_common(tt, a->elem, b);
             else if (a->kind == TY_RESULT) t = type_common(tt, a->elem, b);
             else {

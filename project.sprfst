@@ -1,0 +1,7 @@
+[package]
+name = "sprfst"
+version = "0.1.0-beta"
+entry = "examples/01-hello.spf"
+description = "The SPRFST language, toolchain and Studio"
+
+[packages]

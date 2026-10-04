@@ -388,6 +388,32 @@ static void parse_call_args(Parser *P, ExprVec *args, NameVec *names) {
     expect(P, T_RPAREN, "an argument list");
 }
 
+/* `{ name: value, shorthand }` after a type name */
+static void parse_struct_fields(Parser *P, Expr *e) {
+    int save = P->no_struct;
+    P->no_struct = 0;
+    expect(P, T_LBRACE, "a struct literal");
+    skip_newlines(P);
+    while (!at(P, T_RBRACE) && !at(P, T_EOF)) {
+        FieldInit fi = { 0 };
+        fi.span = cur(P)->span;
+        fi.name = ident_of(P, "a field initialiser");
+        if (accept(P, T_COLON)) fi.value = parse_expr(P);
+        else {                                  /* shorthand  Point { x, y } */
+            Expr *id = ex_new(P, EX_IDENT, fi.span);
+            id->as.ident.name = fi.name;
+            fi.value = id;
+        }
+        vec_push(&e->as.strct.fields, fi);
+        skip_newlines(P);
+        if (!accept(P, T_COMMA)) { skip_newlines(P); if (at(P, T_RBRACE)) break; }
+        skip_newlines(P);
+    }
+    expect(P, T_RBRACE, "a struct literal");
+    e->span = span_join(e->span, P->toks[P->pos - 1].span);
+    P->no_struct = save;
+}
+
 static Expr *parse_primary(Parser *P) {
     Token *t = cur(P);
     Span sp = t->span;
@@ -452,24 +478,7 @@ static Expr *parse_primary(Parser *P) {
                 ty->name = t->name;
                 e->as.strct.type = ty;
                 vec_init(&e->as.strct.fields);
-                advance(P);
-                skip_newlines(P);
-                while (!at(P, T_RBRACE) && !at(P, T_EOF)) {
-                    FieldInit fi = { 0 };
-                    fi.span = cur(P)->span;
-                    fi.name = ident_of(P, "a field initialiser");
-                    if (accept(P, T_COLON)) fi.value = parse_expr(P);
-                    else { /* shorthand  Point { x, y } */
-                        Expr *id = ex_new(P, EX_IDENT, fi.span);
-                        id->as.ident.name = fi.name;
-                        fi.value = id;
-                    }
-                    vec_push(&e->as.strct.fields, fi);
-                    skip_newlines(P);
-                    if (!accept(P, T_COMMA)) { skip_newlines(P); if (at(P, T_RBRACE)) break; }
-                    skip_newlines(P);
-                }
-                expect(P, T_RBRACE, "a struct literal");
+                parse_struct_fields(P, e);
                 e->span = span_join(sp, P->toks[P->pos - 1].span);
                 return e;
             }
@@ -604,6 +613,14 @@ static Expr *parse_primary(Parser *P) {
             return e;
         }
         default: {
+            if (!P->panic && tok_is_keyword(t->kind)) {
+                Diag *d = diag_new(P->diags, DIAG_ERROR, "E0013",
+                                   "`%s` is a keyword, so it cannot be used as a name", tok_name(t->kind));
+                diag_label(P->diags, d, sp, true, "reserved by the language");
+                diag_fix(P->diags, d, "pick another name, such as `%s_value`", tok_name(t->kind));
+                P->panic = 1;
+                return ex_new(P, EX_NIL, sp);
+            }
             if (!P->panic) {
                 Diag *d = diag_new(P->diags, DIAG_ERROR, "E0012", "Expected a value");
                 diag_label(P->diags, d, sp, true, "`%s` cannot start an expression",
@@ -635,6 +652,18 @@ static Expr *parse_postfix(Parser *P, Expr *e) {
                 parse_call_args(P, &m->as.method.args, NULL);
                 m->span = span_join(e->span, P->toks[P->pos - 1].span);
                 e = m;
+            } else if (at(P, T_LBRACE) && !P->no_struct && isupper((unsigned char)name[0]) &&
+                       e->kind == EX_IDENT) {
+                /* qualified struct literal:  shapes.Circle { radius: 2.0 } */
+                Expr *lit = ex_new(P, EX_STRUCT, span_join(e->span, nsp));
+                TypeExpr *ty = te_new(P, TE_NAME, lit->span);
+                vec_push(&ty->path, e->as.ident.name);
+                vec_push(&ty->path, name);
+                ty->name = name;
+                lit->as.strct.type = ty;
+                vec_init(&lit->as.strct.fields);
+                parse_struct_fields(P, lit);
+                e = lit;
             } else {
                 Expr *f = ex_new(P, EX_FIELD, span_join(e->span, nsp));
                 f->as.field.obj = e;

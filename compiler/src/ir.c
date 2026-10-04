@@ -1227,6 +1227,7 @@ IRProgram *ir_lower(Arena *a, Sema *sema, SourceMap *sm, DiagBag *db) {
 
     /* 4. the <start> function: global initialisers, then main */
     IRFunc *start = new_func(&L, "<start>", NULL);
+    if (sema->modules.len) start->file_id = sema->modules.items[0]->file_id;
     int start_idx = p->funcs.len - 1;
     L.fn = start;
     L.next_reg = 0; L.max_reg = 2;

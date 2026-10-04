@@ -5,9 +5,13 @@
 #include "sprfst/driver.h"
 #include "sprfst/parser.h"
 #include "sprfst/lexer.h"
+#include "sprfst/natives.h"
 #include <ctype.h>
 #include <unistd.h>
 #include <errno.h>
+#if defined(__APPLE__)
+#include <mach-o/dyld.h>
+#endif
 
 void build_init(Build *b, int opt_level) {
     memset(b, 0, sizeof *b);
@@ -111,15 +115,38 @@ char *project_find_root(Arena *a, const char *start) {
 }
 
 /* --------------------------------------------------------- module load */
+/* Where the standard library lives: $SPRFST_HOME, else next to the binary,
+   else the usual install locations. */
 static const char *sprfst_home(void) {
     const char *h = getenv("SPRFST_HOME");
     if (h && *h) return h;
     static char guess[1024];
     if (guess[0]) return guess;
-    /* fall back to the directory holding the running binary, then ../ */
+
+    char exe[1024] = { 0 };
+#if defined(__APPLE__)
+    uint32_t sz = sizeof exe;
+    if (_NSGetExecutablePath(exe, &sz) != 0) exe[0] = 0;
+#else
+    ssize_t n = readlink("/proc/self/exe", exe, sizeof exe - 1);
+    if (n > 0) exe[n] = 0; else exe[0] = 0;
+#endif
+
+    char probe[1400];
+    if (exe[0]) {
+        char *slash = strrchr(exe, '/');
+        if (slash) *slash = 0;                       /* .../build/bin */
+        const char *rel[] = { "/..", "/../..", "/../lib/sprfst", "/../Resources", "/../share/sprfst" };
+        for (size_t i = 0; i < sizeof rel / sizeof *rel; i++) {
+            snprintf(probe, sizeof probe, "%s%s/std/core.spf", exe, rel[i]);
+            if (file_exists(probe)) {
+                snprintf(guess, sizeof guess, "%s%s", exe, rel[i]);
+                return guess;
+            }
+        }
+    }
     const char *candidates[] = { "/usr/local/lib/sprfst", "/opt/sprfst", "." };
     for (size_t i = 0; i < sizeof candidates / sizeof *candidates; i++) {
-        char probe[1200];
         snprintf(probe, sizeof probe, "%s/std/core.spf", candidates[i]);
         if (file_exists(probe)) { snprintf(guess, sizeof guess, "%s", candidates[i]); return guess; }
     }
@@ -138,7 +165,14 @@ static bool load_recursive(Build *b, const char *path, Span from, bool is_entry)
 static bool resolve_import(Build *b, Module *m, Decl *d) {
     NameVec *p = &d->as.use.path;
     if (!p->len) return true;
-    if (strcmp(p->items[0], "std") == 0) return true;      /* native modules */
+    /* `use std.io` is built into the runtime; `use std.ai` is a source file */
+    if (strcmp(p->items[0], "std") == 0 && p->len >= 2) {
+        int nmods = 0;
+        const char **mods = natives_module_names(&nmods);
+        const char *last = p->items[p->len - 1];
+        for (int i = 0; i < nmods; i++)
+            if (strcmp(mods[i], last) == 0) return true;
+    }
 
     /* build a relative path from the dotted name */
     StrBuf rel; sb_init(&rel);
@@ -151,7 +185,10 @@ static bool resolve_import(Build *b, Module *m, Decl *d) {
     snprintf(cand[1], sizeof cand[1], "%s/%s/mod.spf", dir ? dir : ".", rel.data);
     snprintf(cand[2], sizeof cand[2], "%s/packages/%s/src/%s.spf",
              b->root ? b->root : (dir ? dir : "."), rel.data, p->items[p->len - 1]);
-    snprintf(cand[3], sizeof cand[3], "%s/std/%s.spf", home, rel.data);
+    /* `use std.ai` lives at $SPRFST_HOME/std/ai.spf */
+    const char *tail = rel.data;
+    if (strncmp(tail, "std/", 4) == 0) tail += 4;
+    snprintf(cand[3], sizeof cand[3], "%s/std/%s.spf", home, tail);
     sb_free(&rel);
 
     for (int i = 0; i < 4; i++)

@@ -1,0 +1,113 @@
+~~ The language test suite. Run with:  sprfst test
+use std.io
+use std.testing
+use std.collections
+use std.core
+
+test "arithmetic follows the usual rules" {
+    testing.same(2 + 3 * 4, 14, "precedence")
+    testing.same((2 + 3) * 4, 20, "brackets")
+    testing.same(7 % 3, 1, "remainder")
+    testing.same(2 ** 10, 1024.0, "powers")
+    testing.close(10 / 4, 2.5, 0.0001, "division gives a Num")
+}
+
+test "text behaves" {
+    testing.same("abc".upper(), "ABC", "upper")
+    testing.same("  pad  ".trim(), "pad", "trim")
+    testing.same("a,b,c".split(",").len(), 3, "split")
+    testing.same("abc".reverse(), "cba", "reverse")
+    testing.yes("hello".contains("ell"), "contains")
+    testing.same("{1 + 1} fish", "2 fish", "interpolation")
+}
+
+test "lists keep their order" {
+    var xs = [3, 1, 2]
+    testing.same(xs.sort(), [1, 2, 3], "sort")
+    testing.same(xs.len(), 3, "length")
+    testing.same([1, 2, 3].map(fn(n) => n * 2), [2, 4, 6], "map")
+    testing.same([1, 2, 3, 4].filter(fn(n) => n % 2 == 0), [2, 4], "filter")
+    testing.same([1, 2, 3] |> sum, 6, "pipeline into a builtin")
+}
+
+test "maps look things up" {
+    let ages = ["ada": 36, "alan": 41]
+    testing.same(ages.get("ada") ?? 0, 36, "get")
+    testing.same(ages.get("nobody") ?? -1, -1, "missing key")
+    testing.yes(ages.has("alan"), "has")
+    testing.same(ages.len(), 2, "size")
+}
+
+object Counter {
+    value: Int = 0
+    fn bump(self) { self.value = self.value + 1 }
+    fn doubled(self) -> Int => self.value * 2
+}
+
+test "objects hold state" {
+    var c = Counter { }
+    c.bump()
+    c.bump()
+    testing.same(c.value, 2, "field updates")
+    testing.same(c.doubled(), 4, "method result")
+}
+
+enum Light { Red  Amber  Green }
+
+fn next(l: Light) -> Light {
+    give match l {
+        when Red -> Green
+        when Green -> Amber
+        when Amber -> Red
+    }
+}
+
+test "enums and matching" {
+    testing.same(next(Red), Green, "red to green")
+    testing.same(next(Green), Amber, "green to amber")
+    testing.same(next(Amber), Red, "amber to red")
+}
+
+fn halve(n: Int) -> Result<Num> {
+    if n % 2 != 0 { give Err("{n} is odd") }
+    give Ok(n / 2)
+}
+
+test "results carry failures" {
+    match halve(8) {
+        when Ok(v) -> testing.close(v, 4.0, 0.0001, "ok branch")
+        when Err(e) -> testing.yes(false, "should not fail")
+    }
+    match halve(7) {
+        when Ok(v) -> testing.yes(false, "should not succeed")
+        when Err(e) -> testing.yes(e.contains("odd"), "error text")
+    }
+}
+
+test "closures capture their surroundings" {
+    let base = 10
+    let add_base = fn(n: Int) => n + base
+    testing.same(add_base(5), 15, "capture by value")
+
+    var total = 0
+    for n in [1, 2, 3] { total = total + n }
+    testing.same(total, 6, "loop accumulation")
+}
+
+test "the standard library modules work" {
+    testing.same(collections.unique([1, 1, 2, 2, 3]), [1, 2, 3], "unique")
+    testing.same(collections.chunks([1, 2, 3, 4, 5], 2).len(), 3, "chunks")
+    testing.close(collections.mean([2.0, 4.0, 6.0]), 4.0, 0.0001, "mean")
+    testing.same(core.sign(-4.0), 0 - 1, "sign")
+    testing.same(core.human_size(2048), "2.0 KB", "human size")
+    testing.yes(core.between(5.0, 1.0, 10.0), "between")
+}
+
+bench "list building" {
+    var xs: [Int] = []
+    var i = 0
+    while i < 1000 {
+        xs.push(i)
+        i = i + 1
+    }
+}

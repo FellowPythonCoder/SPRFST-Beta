@@ -221,6 +221,19 @@ static void dbg_prompt(Debugger *d, const char *file, int line) {
                 if (!*arg) { fprintf(stderr, "  usage: b <line> [if <cond>]\n"); break; }
                 int ln = atoi(arg);
                 const char *ifp = strstr(arg, " if ");
+                /* snap forward to a line that has code */
+                int best = 0;
+                vec_foreach(fi, &d->build->prog->funcs) {
+                    IRFunc *f = d->build->prog->funcs.items[fi];
+                    vec_foreach(ii, &f->code) {
+                        int l = f->code.items[ii].line;
+                        if (l >= ln && (best == 0 || l < best)) best = l;
+                    }
+                }
+                if (best && best != ln) {
+                    fprintf(stderr, "  %sline %d has no code, using line %d%s\n", C_DIM, ln, best, C_RESET);
+                    ln = best;
+                }
                 if (d->nbps < MAX_BP && ln > 0) {
                     Breakpoint *bp = &d->bps[d->nbps++];
                     memset(bp, 0, sizeof *bp);
