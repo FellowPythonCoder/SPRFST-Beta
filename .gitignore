@@ -1,0 +1,5 @@
+build/
+*.o
+*.spb
+packages/
+.DS_Store
