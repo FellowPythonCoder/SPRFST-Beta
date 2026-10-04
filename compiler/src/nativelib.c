@@ -519,7 +519,19 @@ static int g_ncounters = 0;
 /* ======================================================================= */
 /*  dispatch                                                               */
 /* ======================================================================= */
+static Value native_dispatch(VM *vm, int id, Value *args, int nargs, bool *ok);
+
+/* Every native runs inside a scope that holds on to whatever it allocates,
+   so a collection triggered half way through cannot sweep its own workings
+   out from under it. See vm_native_enter in vm.c. */
 Value vm_native_call(VM *vm, int id, Value *args, int nargs, bool *ok) {
+    int mark = vm_native_enter(vm);
+    Value r = native_dispatch(vm, id, args, nargs, ok);
+    vm_native_leave(vm, mark, r);
+    return r;
+}
+
+static Value native_dispatch(VM *vm, int id, Value *args, int nargs, bool *ok) {
     *ok = true;
     switch (id) {
     /* ------------------------------------------------------------- io */

@@ -209,6 +209,9 @@ struct VM {
     double     start_time;
     ValueVec   task_queue;
     int        gc_runs;
+    /* anything a native allocates stays reachable until the native returns */
+    ValueVec   temp_roots;
+    int        in_native;
 };
 
 VM   *vm_new(IRProgram *p, SourceMap *sm, Arena *a);
@@ -232,6 +235,8 @@ ObjChan     *vm_chan(VM *vm, int cap);
 ObjResult   *vm_result(VM *vm, bool ok, Value v);
 void         vm_gc(VM *vm);
 void         vm_root_add(Value v);   /* pin a value against collection */
+int          vm_native_enter(VM *vm);                      /* open a scope of temporaries */
+void         vm_native_leave(VM *vm, int mark, Value result); /* close it, keeping the result */
 char        *vm_value_text(VM *vm, Value v, bool quote_text);
 bool         vm_values_equal(Value a, Value b);
 uint64_t     vm_value_hash(Value v);

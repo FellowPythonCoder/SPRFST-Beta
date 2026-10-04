@@ -65,6 +65,14 @@ make dmg                   # dist/SPRFST-Studio.dmg, mountable and verified
 make stage                 # lay both out without a Mac, to check them
 ```
 
+`make dmg` works away from a Mac too. With no `swiftc` there is no
+application to wrap, so instead of an empty bundle it writes
+`dist/SPRFST-0.1.0-beta.dmg`: a real ISO 9660 image with Joliet names,
+carrying the whole project and an installer that builds it on the Mac it
+is opened on. The image writer is `tools/make_iso.spf` and the reader
+that checks it, which shares no code with the writer, is
+`tools/verify_iso.spf` — both written in SPRFST.
+
 ## The language in one page
 
 ```sprfst
@@ -228,10 +236,25 @@ that are not finished. They are listed here rather than hidden.
   initialisers and the single entry point. The first `make dmg` on a
   Mac is still the first time that code will be compiled.
 
+- **The disk image is ISO 9660, not HFS+.** `hdiutil` only exists on a
+  Mac, so away from one the image is written by `tools/make_iso.spf`.
+  macOS mounts ISO 9660 by double click, and files on such a volume are
+  mode 555, so the installer inside it is runnable. On a Mac `make dmg`
+  still uses `hdiutil` and HFS+, which is the better image.
+
 Everything else in this README was run on the machine that wrote it.
-`make test` is the proof: 48 checks covering the language suite, all
+`make test` is the proof: 52 checks covering the language suite, all
 twenty one examples, every command line verb, Forge digests, the Studio
-service, the debugger, and all 98 guidebook code blocks.
+service, the debugger, the disk image written and read back, and all 100
+guidebook code blocks.
+
+The collector is checked as well as the compiler: `SPRFST_GC_STRESS=1`
+makes the runtime collect garbage on every single allocation, and every
+example and tool is run that way under AddressSanitizer. That is how the
+one real bug of this round was found — a native that allocated a list,
+then allocated its contents, could have the half built list collected
+underneath it. Natives now hold a scope of temporaries that lasts until
+they return.
 
 ## Licence
 

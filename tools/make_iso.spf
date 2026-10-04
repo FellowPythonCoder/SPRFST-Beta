@@ -1,0 +1,443 @@
+~~ =====================================================================
+~~  make_iso — writes a real ISO 9660 disk image, with Joliet long
+~~  names, out of a folder.
+~~
+~~  macOS mounts an ISO 9660 image by double click whatever the file is
+~~  called, so this is how a .dmg gets built on a machine that has no
+~~  hdiutil. On a Mac, tools/make_dmg.sh uses hdiutil and HFS+ instead,
+~~  which is the better image; this is the fallback that works
+~~  everywhere, and it is written in SPRFST because it can be.
+~~
+~~      sprfst run tools/make_iso.spf -- <folder> <out.dmg> "VOLUME NAME"
+~~ =====================================================================
+use std.io
+use std.fs
+use std.path
+use std.sys
+use std.time
+use std.math
+
+const SECTOR = 2048
+
+object Node {
+    name: Text = ""          ~~ the real name
+    src: Text = ""           ~~ where it is on disk
+    is_dir: Bool = false
+    size: Int = 0
+    kids: [Node] = []        ~~ sorted for the primary tree
+    kids_j: [Node] = []      ~~ sorted for the Joliet tree
+    short: Text = ""         ~~ the name the primary tree uses
+    number: Int = 1          ~~ path table number (directories)
+    parent_no: Int = 1
+    lba_p: Int = 0
+    len_p: Int = 0
+    lba_j: Int = 0
+    len_j: Int = 0
+    lba_f: Int = 0           ~~ file data, shared by both trees
+}
+
+~~ ------------------------------------------------------------- bytes
+fn u8(out: [Int], v: Int) { out.push(v % 256) }
+
+fn u16le(out: [Int], v: Int) {
+    out.push(v % 256)
+    out.push(math.floor(v / 256) % 256)
+}
+
+fn u16be(out: [Int], v: Int) {
+    out.push(math.floor(v / 256) % 256)
+    out.push(v % 256)
+}
+
+fn u32le(out: [Int], v: Int) {
+    out.push(v % 256)
+    out.push(math.floor(v / 256) % 256)
+    out.push(math.floor(v / 65536) % 256)
+    out.push(math.floor(v / 16777216) % 256)
+}
+
+fn u32be(out: [Int], v: Int) {
+    out.push(math.floor(v / 16777216) % 256)
+    out.push(math.floor(v / 65536) % 256)
+    out.push(math.floor(v / 256) % 256)
+    out.push(v % 256)
+}
+
+~~ ISO 9660 stores the important numbers twice, once each way round.
+fn both16(out: [Int], v: Int) { u16le(out, v)  u16be(out, v) }
+fn both32(out: [Int], v: Int) { u32le(out, v)  u32be(out, v) }
+
+fn zeros(out: [Int], count: Int) {
+    var i = 0
+    while i < count { out.push(0)  i = i + 1 }
+}
+
+fn pad_to_sector(out: [Int]) {
+    while out.len() % SECTOR != 0 { out.push(0) }
+}
+
+~~ ASCII text in a fixed width field.
+fn put_pad(out: [Int], text: Text, width: Int, pad: Int) {
+    var n = 0
+    for b in text.bytes() {
+        if n < width { out.push(b)  n = n + 1 }
+    }
+    while n < width { out.push(pad)  n = n + 1 }
+}
+
+~~ The same, as UCS-2 big endian, which is what Joliet speaks.
+fn put_ucs2(out: [Int], text: Text, width: Int) {
+    var n = 0
+    for b in text.bytes() {
+        if n + 2 <= width { out.push(0)  out.push(b)  n = n + 2 }
+    }
+    while n + 2 <= width { out.push(0)  out.push(32)  n = n + 2 }
+    while n < width { out.push(0)  n = n + 1 }   ~~ odd width fields exist
+}
+
+fn ucs2_bytes(text: Text) -> [Int] {
+    var out: [Int] = []
+    for b in text.bytes() { out.push(0)  out.push(b) }
+    give out
+}
+
+fn sectors_for(bytes: Int) -> Int {
+    if bytes <= 0 { give 0 }
+    give math.floor((bytes + SECTOR - 1) / SECTOR)
+}
+
+~~ ------------------------------------------------------------- names
+~~ The primary tree only allows A-Z 0-9 and _ , so everything else is
+~~ folded. Joliet carries the real name, and that is the one macOS uses.
+fn fold(name: Text) -> Text {
+    var out = ""
+    for ch in name.upper().chars() {
+        let ok = (ch >= "A" and ch <= "Z") or (ch >= "0" and ch <= "9") or ch == "_"
+        if ok { out = out + ch } else { out = out + "_" }
+    }
+    if out == "" { out = "_" }
+    give out
+}
+
+fn short_name(name: Text, is_dir: Bool) -> Text {
+    if is_dir { give fold(name).slice(0, 30) }
+    let dot = name.index_of(".")
+    if dot < 0 { give fold(name).slice(0, 26) + ".;1" }
+    let stem = fold(name.slice(0, dot)).slice(0, 22)
+    let ext = fold(name.slice(dot + 1, name.len())).slice(0, 3)
+    give stem + "." + ext + ";1"
+}
+
+~~ -------------------------------------------------------------- scan
+fn scan(where_at: Text, name: Text) -> Node {
+    var n = Node { name: name, src: where_at, is_dir: fs.is_dir(where_at) }
+    if n.is_dir {
+        var kids: [Node] = []
+        for item in fs.list(where_at) {
+            if item == "." or item == ".." { skip }
+            kids.push(scan(path.join(where_at, item), item))
+        }
+        ~~ names must be unique inside one directory in the primary tree
+        var seen: Map<Text, Int> = [:]
+        for k in kids {
+            var s = short_name(k.name, k.is_dir)
+            if seen.has(s) {
+                let n2 = (seen.get(s) ?? 1) + 1
+                seen.set(s, n2)
+                let dot = s.index_of(".")
+                if dot < 0 { s = s.slice(0, 28) + "_" + n2.to_text() }
+                else { s = s.slice(0, dot).slice(0, 24) + "_" + n2.to_text() + s.slice(dot, s.len()) }
+            } else {
+                seen.set(s, 1)
+            }
+            k.short = s
+        }
+        n.kids = kids.sort_by(fn(a, b) => a.short < b.short)
+        n.kids_j = kids.sort_by(fn(a, b) => a.name < b.name)
+    } else {
+        n.size = fs.size(where_at)
+    }
+    give n
+}
+
+~~ ------------------------------------------------- sizes and places
+fn record_len(name_bytes: Int) -> Int {
+    var n = 33 + name_bytes
+    if n % 2 == 1 { n = n + 1 }
+    give n
+}
+
+~~ A directory record may not straddle a sector, so the packing decides
+~~ how many sectors a directory needs.
+fn dir_bytes(lens: [Int]) -> Int {
+    var used = 0
+    var count = 1
+    for len in lens {
+        if used + len > SECTOR { count = count + 1  used = 0 }
+        used = used + len
+    }
+    give count * SECTOR
+}
+
+fn dir_lengths(d: Node, joliet: Bool) -> [Int] {
+    var lens = [record_len(1), record_len(1)]      ~~ "." and ".."
+    let kids = if joliet { d.kids_j } else { d.kids }
+    for k in kids {
+        if joliet { lens.push(record_len(k.name.len() * 2)) }
+        else { lens.push(record_len(k.short.len())) }
+    }
+    give lens
+}
+
+~~ Directories come out in path table order: by level, then by parent.
+fn order_dirs(root: Node) -> [Node] {
+    var out: [Node] = [root]
+    root.number = 1
+    root.parent_no = 1
+    var i = 0
+    while i < out.len() {
+        let d = out[i]
+        for k in d.kids {
+            if k.is_dir {
+                k.number = out.len() + 1
+                k.parent_no = d.number
+                out.push(k)
+            }
+        }
+        i = i + 1
+    }
+    give out
+}
+
+fn collect_files(d: Node, into: [Node]) {
+    for k in d.kids {
+        if k.is_dir { collect_files(k, into) } else { into.push(k) }
+    }
+}
+
+fn path_table_bytes(dirs: [Node], joliet: Bool) -> Int {
+    var total = 0
+    for d in dirs {
+        var name_len = 1
+        if d.number > 1 {
+            name_len = if joliet { d.name.len() * 2 } else { d.short.len() }
+        }
+        var len = 8 + name_len
+        if len % 2 == 1 { len = len + 1 }
+        total = total + len
+    }
+    give total
+}
+
+~~ ----------------------------------------------------------- writing
+fn put_dir_record(out: [Int], ident: [Int], lba: Int, length: Int, is_dir: Bool, stamp: [Int]) {
+    let len = record_len(ident.len())
+    u8(out, len)
+    u8(out, 0)                      ~~ extended attribute length
+    both32(out, lba)
+    both32(out, length)
+    for b in stamp { out.push(b) }  ~~ 7 byte date
+    u8(out, if is_dir { 2 } else { 0 })   ~~ flags
+    u8(out, 0)                      ~~ file unit size
+    u8(out, 0)                      ~~ interleave gap
+    both16(out, 1)                  ~~ volume sequence number
+    u8(out, ident.len())
+    for b in ident { out.push(b) }
+    if (33 + ident.len()) % 2 == 1 { out.push(0) }
+}
+
+fn write_dir(out: [Int], d: Node, parent: Node, joliet: Bool, stamp: [Int]) {
+    let start = out.len()
+    let self_lba = if joliet { d.lba_j } else { d.lba_p }
+    let self_len = if joliet { d.len_j } else { d.len_p }
+    let up_lba = if joliet { parent.lba_j } else { parent.lba_p }
+    let up_len = if joliet { parent.len_j } else { parent.len_p }
+
+    put_dir_record(out, [0], self_lba, self_len, true, stamp)
+    put_dir_record(out, [1], up_lba, up_len, true, stamp)
+
+    let kids = if joliet { d.kids_j } else { d.kids }
+    for k in kids {
+        var ident: [Int] = []
+        if joliet { ident = ucs2_bytes(k.name) } else { ident = k.short.bytes() }
+        let len = record_len(ident.len())
+        let used = (out.len() - start) % SECTOR
+        if used + len > SECTOR {
+            while (out.len() - start) % SECTOR != 0 { out.push(0) }
+        }
+        if k.is_dir {
+            let kl = if joliet { k.lba_j } else { k.lba_p }
+            let kn = if joliet { k.len_j } else { k.len_p }
+            put_dir_record(out, ident, kl, kn, true, stamp)
+        } else {
+            put_dir_record(out, ident, k.lba_f, k.size, false, stamp)
+        }
+    }
+    while out.len() - start < self_len { out.push(0) }
+}
+
+fn write_path_table(out: [Int], dirs: [Node], joliet: Bool, big: Bool) {
+    for d in dirs {
+        var ident: [Int] = [0]
+        if d.number > 1 {
+            if joliet { ident = ucs2_bytes(d.name) } else { ident = d.short.bytes() }
+        }
+        u8(out, ident.len())
+        u8(out, 0)
+        let dl = if joliet { d.lba_j } else { d.lba_p }
+        if big {
+            u32be(out, dl)
+            u16be(out, d.parent_no)
+        } else {
+            u32le(out, dl)
+            u16le(out, d.parent_no)
+        }
+        for b in ident { out.push(b) }
+        if ident.len() % 2 == 1 { out.push(0) }
+    }
+    pad_to_sector(out)
+}
+
+fn write_volume_descriptor(out: [Int], kind: Int, volume: Text, total_sectors: Int,
+                           pt_size: Int, pt_l: Int, pt_m: Int,
+                           root: Node, joliet: Bool, stamp: [Int], long_stamp: Text) {
+    let start = out.len()
+    u8(out, kind)
+    put_pad(out, "CD001", 5, 32)
+    u8(out, 1)                                   ~~ version
+    u8(out, 0)                                   ~~ unused / volume flags
+    if joliet { put_ucs2(out, "SPRFST", 32) } else { put_pad(out, "SPRFST", 32, 32) }
+    if joliet { put_ucs2(out, volume, 32) } else { put_pad(out, volume, 32, 32) }
+    zeros(out, 8)
+    both32(out, total_sectors)
+    if joliet {
+        out.push(37)  out.push(47)  out.push(69)  ~~ "%/E" — UCS-2 level 3
+        zeros(out, 29)
+    } else {
+        zeros(out, 32)
+    }
+    both16(out, 1)                               ~~ volume set size
+    both16(out, 1)                               ~~ volume sequence number
+    both16(out, SECTOR)
+    both32(out, pt_size)
+    u32le(out, pt_l)
+    u32le(out, 0)
+    u32be(out, pt_m)
+    u32be(out, 0)
+    let root_lba = if joliet { root.lba_j } else { root.lba_p }
+    let root_len = if joliet { root.len_j } else { root.len_p }
+    put_dir_record(out, [0], root_lba, root_len, true, stamp)
+    if joliet {
+        put_ucs2(out, volume, 128)               ~~ volume set
+        put_ucs2(out, "SPRFST", 128)             ~~ publisher
+        put_ucs2(out, "SPRFST", 128)             ~~ data preparer
+        put_ucs2(out, "SPRFST", 128)             ~~ application
+        put_ucs2(out, "", 37)  put_ucs2(out, "", 37)  put_ucs2(out, "", 37)
+    } else {
+        put_pad(out, volume, 128, 32)
+        put_pad(out, "SPRFST", 128, 32)
+        put_pad(out, "SPRFST", 128, 32)
+        put_pad(out, "SPRFST", 128, 32)
+        put_pad(out, "", 37, 32)  put_pad(out, "", 37, 32)  put_pad(out, "", 37, 32)
+    }
+    ~~ four 17 byte timestamps: made, changed, expires, good from
+    put_pad(out, long_stamp, 16, 48)  u8(out, 0)
+    put_pad(out, long_stamp, 16, 48)  u8(out, 0)
+    put_pad(out, "0000000000000000", 16, 48)  u8(out, 0)
+    put_pad(out, long_stamp, 16, 48)  u8(out, 0)
+    u8(out, 1)                                   ~~ file structure version
+    u8(out, 0)
+    zeros(out, 512)                              ~~ application area
+    while out.len() - start < SECTOR { out.push(0) }
+}
+
+fn main() {
+    let args = sys.args()
+    if args.len() < 2 {
+        io.warn("usage: sprfst run tools/make_iso.spf -- <folder> <out.dmg> [volume name]")
+        sys.exit(1)
+    }
+    let folder = args[0]
+    let out_path = args[1]
+    let volume = if args.len() > 2 { args[2] } else { "SPRFST" }
+
+    if not fs.is_dir(folder) {
+        io.warn("{folder} is not a folder")
+        sys.exit(1)
+    }
+    ~~ the Joliet volume name field holds sixteen characters, and that is
+    ~~ the name the Finder shows, so say so rather than silently cutting it
+    if volume.len() > 16 {
+        io.warn("  note  the volume name is longer than 16 characters, so the")
+        io.warn("        Finder will show \"{volume.slice(0, 16)}\"")
+    }
+
+    ~~ when it was made, in both shapes the format wants
+    let parts = time.parts(time.now())
+    var stamp: [Int] = [(parts.get("year") ?? 2026) - 1900, parts.get("month") ?? 1,
+                        parts.get("day") ?? 1, parts.get("hour") ?? 0,
+                        parts.get("minute") ?? 0, parts.get("second") ?? 0, 0]
+    let long_stamp = time.format(time.now(), "%Y%m%d%H%M%S") + "00"
+
+    var root = scan(folder, "")
+    let dirs = order_dirs(root)
+    var files: [Node] = []
+    collect_files(root, files)
+
+    for d in dirs {
+        d.len_p = dir_bytes(dir_lengths(d, false))
+        d.len_j = dir_bytes(dir_lengths(d, true))
+    }
+
+    let pt_p = path_table_bytes(dirs, false)
+    let pt_j = path_table_bytes(dirs, true)
+
+    ~~ 0-15 nothing, 16 primary, 17 Joliet, 18 end of descriptors
+    var lba = 19
+    let pt_pl = lba   lba = lba + sectors_for(pt_p)
+    let pt_pm = lba   lba = lba + sectors_for(pt_p)
+    let pt_jl = lba   lba = lba + sectors_for(pt_j)
+    let pt_jm = lba   lba = lba + sectors_for(pt_j)
+    for d in dirs { d.lba_p = lba   lba = lba + math.floor(d.len_p / SECTOR) }
+    for d in dirs { d.lba_j = lba   lba = lba + math.floor(d.len_j / SECTOR) }
+    for f in files { f.lba_f = lba  lba = lba + sectors_for(f.size) }
+    let total_sectors = lba
+
+    io.say("  {dirs.len()} folders, {files.len()} files, {total_sectors} sectors")
+
+    var out: [Int] = []
+    zeros(out, 16 * SECTOR)
+    write_volume_descriptor(out, 1, volume, total_sectors, pt_p, pt_pl, pt_pm, root, false, stamp, long_stamp)
+    write_volume_descriptor(out, 2, volume, total_sectors, pt_j, pt_jl, pt_jm, root, true, stamp, long_stamp)
+    u8(out, 255)
+    put_pad(out, "CD001", 5, 32)
+    u8(out, 1)
+    pad_to_sector(out)
+
+    write_path_table(out, dirs, false, false)
+    write_path_table(out, dirs, false, true)
+    write_path_table(out, dirs, true, false)
+    write_path_table(out, dirs, true, true)
+
+    for d in dirs { write_dir(out, d, find_parent(dirs, d), false, stamp) }
+    for d in dirs { write_dir(out, d, find_parent(dirs, d), true, stamp) }
+
+    for f in files {
+        let bytes = fs.read_bytes(f.src) ?? []
+        for b in bytes { out.push(b) }
+        pad_to_sector(out)
+    }
+
+    if fs.write_bytes(out_path, out) {
+        io.say("  wrote {out_path}  {math.floor(out.len() / 1024)} KB")
+    } else {
+        io.warn("could not write {out_path}")
+        sys.exit(1)
+    }
+}
+
+fn find_parent(dirs: [Node], d: Node) -> Node {
+    if d.number <= 1 { give d }
+    for p in dirs { if p.number == d.parent_no { give p } }
+    give d
+}

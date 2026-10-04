@@ -28,9 +28,11 @@ static void vm_unregister(VM *vm) {
 }
 
 /* ------------------------------------------------------------ allocation */
+static bool g_gc_stress = false;   /* SPRFST_GC_STRESS=1: collect on every allocation */
+
 static Obj *alloc_obj(VM *vm, size_t size, ObjKind kind) {
     VM *root = g_root ? g_root : vm;
-    if (root->bytes_allocated > root->next_gc) vm_gc(vm);
+    if (g_gc_stress || root->bytes_allocated > root->next_gc) vm_gc(vm);
     Obj *o = calloc(1, size);
     if (!o) { fprintf(stderr, "sprfst: out of memory\n"); exit(70); }
     o->kind = kind;
@@ -40,7 +42,24 @@ static Obj *alloc_obj(VM *vm, size_t size, ObjKind kind) {
     root->bytes_allocated += size;
     if (root->bytes_allocated > root->peak_bytes) root->peak_bytes = root->bytes_allocated;
     root->obj_count++;
+    /* A native builds its answer out of several objects. Half built, they are
+       not referenced from any register yet, so a collection in the middle of
+       the native would sweep them away. Hold on to everything allocated
+       while a native is running; the scope is dropped when it returns. */
+    if (vm && vm->in_native > 0) vec_push(&vm->temp_roots, v_obj(o));
     return o;
+}
+
+int vm_native_enter(VM *vm) {
+    vm->in_native++;
+    return vm->temp_roots.len;
+}
+
+void vm_native_leave(VM *vm, int mark, Value result) {
+    if (mark < vm->temp_roots.len) vm->temp_roots.len = mark;
+    vm->in_native--;
+    /* the answer itself is still only a C local in the caller: keep it */
+    if (vm->in_native > 0 && result.tag == V_OBJ) vec_push(&vm->temp_roots, result);
 }
 
 ObjText *vm_text(VM *vm, const char *s, int len) {
@@ -127,7 +146,8 @@ static void mark_obj(Obj *o) {
         case O_SET:   { ObjSet *s = (ObjSet *)o; vec_foreach(i, &s->items) mark_value(s->items.items[i]); break; }
         case O_MAP:   { ObjMap *m = (ObjMap *)o;
                         vec_foreach(i, &m->keys) mark_value(m->keys.items[i]);
-                        vec_foreach(i, &m->vals) mark_value(m->vals.items[i]); break; }
+                        vec_foreach(i, &m->vals) mark_value(m->vals.items[i]);
+                        break; }
         case O_CLOSURE: { ObjClosure *c = (ObjClosure *)o; vec_foreach(i, &c->caps) mark_value(c->caps.items[i]); break; }
         case O_INSTANCE: { ObjInstance *n = (ObjInstance *)o; vec_foreach(i, &n->fields) mark_value(n->fields.items[i]); break; }
         case O_VARIANT: { ObjVariant *n = (ObjVariant *)o; vec_foreach(i, &n->payload) mark_value(n->payload.items[i]); break; }
@@ -135,7 +155,8 @@ static void mark_obj(Obj *o) {
         case O_ITER: { ObjIter *it = (ObjIter *)o; mark_value(it->src); mark_value(it->key); break; }
         case O_CHAN: { ObjChan *c = (ObjChan *)o; vec_foreach(i, &c->buffer) mark_value(c->buffer.items[i]); break; }
         case O_FUTURE: { ObjFuture *f = (ObjFuture *)o; mark_value(f->result);
-                         vec_foreach(i, &f->args) mark_value(f->args.items[i]); break; }
+                         vec_foreach(i, &f->args) mark_value(f->args.items[i]);
+                         break; }
         default: break;
     }
 }
@@ -179,6 +200,7 @@ void vm_gc(VM *vm) {
         }
         for (int r = 0; r < top && r < v->stack_size; r++) mark_value(v->stack[r]);
         vec_foreach(k, &v->task_queue) mark_value(v->task_queue.items[k]);
+        vec_foreach(k, &v->temp_roots) mark_value(v->temp_roots.items[k]);
     }
     vec_foreach(i, &g_pinned) mark_value(g_pinned.items[i]);
     vec_foreach(i, &root->prog->globals) mark_value(root->prog->globals.items[i]);
@@ -517,8 +539,14 @@ Value vm_call_function(VM *vm, int fn_index, Value *args, int nargs) {
     TryStack trys = { .len = 0 };
     int saved = vm->nframes;
     if (!push_frame(vm, fn_index, args, nargs, NULL, -1)) return v_nil();
+    /* SPRFST code called back from a native roots itself through its frame,
+       so step out of the native scope while it runs */
+    int native = vm->in_native;
+    vm->in_native = 0;
     Value r = run_frame(vm, &trys);
+    vm->in_native = native;
     vm->nframes = saved;
+    if (native > 0 && r.tag == V_OBJ) vec_push(&vm->temp_roots, r);
     return r;
 }
 
@@ -528,8 +556,12 @@ Value vm_call_value(VM *vm, Value callable, Value *args, int nargs) {
         TryStack trys = { .len = 0 };
         int saved = vm->nframes;
         if (!push_frame(vm, c->fn, args, nargs, c, -1)) return v_nil();
+        int native = vm->in_native;
+        vm->in_native = 0;
         Value r = run_frame(vm, &trys);
+        vm->in_native = native;
         vm->nframes = saved;
+        if (native > 0 && r.tag == V_OBJ) vec_push(&vm->temp_roots, r);
         return r;
     }
     return v_nil();
@@ -1120,6 +1152,9 @@ VM *vm_new(IRProgram *p, SourceMap *sm, Arena *a) {
     vm->next_gc = 4u << 20;
     vm->start_time = now_seconds();
     vec_init(&vm->task_queue);
+    vec_init(&vm->temp_roots);
+    { const char *st = getenv("SPRFST_GC_STRESS");
+      if (st && *st && *st != '0') g_gc_stress = true; }
     vm_register(vm);
     return vm;
 }
@@ -1134,6 +1169,7 @@ void vm_free(VM *vm) {
         g_root = NULL;
     }
     vec_free(&vm->task_queue);
+    vec_free(&vm->temp_roots);
     free(vm->stack);
     free(vm);
 }

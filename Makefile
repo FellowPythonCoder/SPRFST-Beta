@@ -79,7 +79,9 @@ guidebook: all
 app: all
 	./tools/build_macos_app.sh
 
-dmg: app
+# on a Mac this wraps the built app; anywhere else it writes the
+# installer image, which carries the project and builds it on arrival
+dmg: all
 	./tools/make_dmg.sh
 
 # lay out the bundle and the disk image contents anywhere, to check them

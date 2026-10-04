@@ -206,6 +206,29 @@ else
     report "icns icon generated" no "no icns file"
 fi
 
+# a disk image, written and then read back by a parser that shares no code
+img="$tmp/image"
+mkdir -p "$img/Folder With A Long Name/inner"
+printf 'first file\n' > "$img/Read me.txt"
+head -c 5000 "$ROOT/README.md" > "$img/Folder With A Long Name/long.md"
+printf 'deep\n' > "$img/Folder With A Long Name/inner/deep.txt"
+(cd "$ROOT" && "$SPRFST" run tools/make_iso.spf -- "$img" "$tmp/out.dmg" "TEST IMAGE" >/dev/null 2>&1)
+if [ -f "$tmp/out.dmg" ]; then
+    if vi=$(cd "$ROOT" && "$SPRFST" run tools/verify_iso.spf -- "$tmp/out.dmg" "$img" 2>&1); then
+        report "disk image ($(( $(wc -c < "$tmp/out.dmg") / 1024 )) KB, 3 files, read back and compared)" ok
+    else
+        report "disk image verifies" no "$(printf '%s' "$vi" | tail -4)"
+    fi
+    # the Finder looks for CD001 at this exact spot before it will mount anything
+    if [ "$(dd if="$tmp/out.dmg" bs=1 skip=32769 count=5 2>/dev/null)" = "CD001" ]; then
+        report "disk image is mountable (CD001 at 0x8001)" ok
+    else
+        report "disk image is mountable" no "no CD001 signature"
+    fi
+else
+    report "disk image written" no "no file"
+fi
+
 # the Swift editor, as far as a machine with no Swift can tell
 if sw=$("$ROOT/tools/check_swift.sh" 2>&1); then
     report "studio sources ($(printf '%s' "$sw" | grep -oE '[0-9]+ Swift files'))" ok
