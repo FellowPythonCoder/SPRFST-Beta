@@ -131,7 +131,7 @@ static int remove_self_moves(IRFunc *f) {
     return removed;
 }
 
-static int dead_code(IRFunc *f) {
+static int dead_code(IRProgram *p, IRFunc *f) {
     int removed = 0;
     int nregs = f->nregs + 4;
     bool *read = calloc((size_t)nregs, 1);
@@ -139,7 +139,18 @@ static int dead_code(IRFunc *f) {
     vec_foreach(i, &f->code) {
         Instr *in = &f->code.items[i];
         switch (in->op) {
-            case OP_CONST: case OP_NIL: case OP_GETGLOBAL: case OP_GETCAP: case OP_CLOSURE:
+            case OP_CLOSURE: {
+                /* a closure reads the registers it captures from this frame */
+                if (p && in->b >= 0 && in->b < p->funcs.len) {
+                    IRFunc *tf = p->funcs.items[in->b];
+                    for (int k = 0; k < tf->ncaps; k++) {
+                        int src = tf->cap_src ? tf->cap_src[k] : k;
+                        if (src >= 0 && src < nregs) read[src] = true;
+                    }
+                }
+                break;
+            }
+            case OP_CONST: case OP_NIL: case OP_GETGLOBAL: case OP_GETCAP:
                 break;
             case OP_MOVE: case OP_NEG: case OP_NOT: case OP_TOTEXT: case OP_TYPEOF:
             case OP_ISOK: case OP_ISNIL: case OP_UNWRAP: case OP_GETTAG: case OP_LEN:
@@ -238,7 +249,7 @@ OptStats ir_optimize(IRProgram *p, int level) {
         for (int pass = 0; pass < (level >= 2 ? 3 : 1); pass++) {
             st.folded        += fold_function(f);
             st.moves_removed += remove_self_moves(f);
-            st.dead_removed  += dead_code(f);
+            st.dead_removed  += dead_code(p, f);
             st.jumps_threaded+= thread_jumps(f);
             st.blocks_removed+= compact(f);
         }

@@ -140,6 +140,13 @@ static Type *sig_atom(SigP *q) {
         if (*q->p == ']') q->p++;
         return type_list(tt, a);
     }
+    if (*q->p == '{') {
+        q->p++;
+        Type *a = sig_type(q);
+        sig_ws(q);
+        if (*q->p == '}') q->p++;
+        return type_set(tt, a);
+    }
     if (strncmp(q->p, "fn(", 3) == 0) {
         q->p += 3;
         TypeVec ps; vec_init(&ps);
@@ -399,6 +406,8 @@ static Type *check_binary(Sema *s, Expr *e) {
             if (l->kind == TY_LIST && r->kind == TY_LIST) return l;
             /* fall through */
         case T_MINUS: case T_STAR: case T_SLASH: case T_PERCENT: case T_POW: {
+            if (l->kind == TY_GENERIC || r->kind == TY_GENERIC)
+                return l->kind == TY_GENERIC ? l : r;
             /* `Any` stays dynamic: the runtime checks it */
             if (l->kind == TY_ANY || r->kind == TY_ANY) {
                 if (type_numeric(l) || type_numeric(r) || (l->kind == TY_ANY && r->kind == TY_ANY))
@@ -429,6 +438,8 @@ static Type *check_binary(Sema *s, Expr *e) {
         case T_LT: case T_LE: case T_GT: case T_GE: {
             bool ok = (type_numeric(l) && type_numeric(r)) || (l->kind == TY_TEXT && r->kind == TY_TEXT);
             if (!ok) {
+                if (l->kind == TY_GENERIC || r->kind == TY_GENERIC || l->kind == TY_ANY || r->kind == TY_ANY)
+                    return tt->t_bool;
                 Diag *d = diag_new(s->db, DIAG_ERROR, "E0205", "Cannot order %s and %s",
                                    type_text(s->arena, l), type_text(s->arena, r));
                 diag_label(s->db, d, e->span, true, "`%s` works on numbers and text", op_text(op));
@@ -510,6 +521,13 @@ static void seed_env_from_recv(GenericEnv *env, Sema *s, Type *recv) {
 static Type *check_call_args(Sema *s, Span sp, const char *what, TypeVec *params, ExprVec *args,
                              Type *ret, GenericEnv *env, bool variadic_ok) {
     int np = params->len, na = args->len;
+    /* trailing parameters written `T?` may be left out */
+    if (na < np) {
+        int required = np;
+        while (required > na && params->items[required - 1] &&
+               params->items[required - 1]->kind == TY_MAYBE) required--;
+        if (required <= na) np = na;
+    }
     if (na != np && !variadic_ok) {
         Diag *d = diag_new(s->db, DIAG_ERROR, "E0210", "%s takes %d argument%s, but %d %s given",
                            what, np, np == 1 ? "" : "s", na, na == 1 ? "was" : "were");
@@ -767,6 +785,18 @@ static Type *check_method(Sema *s, Expr *e) {
             sb_free(&b);
         }
         return tt->t_error;
+    }
+    if (!m->body && !m->expr_body) {
+        /* declared by a trait with no default: decide at runtime */
+        e->as.method.resolved = NULL;
+        e->as.method.builtin = -3;
+        TypeVec aps; vec_init(&aps);
+        vec_foreach(i, &m->params) if (!m->params.items[i].is_self)
+            vec_push(&aps, m->params.items[i].type ? resolve_type(s, m->params.items[i].type) : tt->t_any);
+        Type *ar = check_call_args(s, e->span, name, &aps, &e->as.method.args,
+                                   m->ret ? resolve_type(s, m->ret) : tt->t_nil, NULL, false);
+        vec_free(&aps);
+        return was_optional ? type_maybe(tt, ar ? ar : tt->t_nil) : (ar ? ar : tt->t_nil);
     }
     e->as.method.resolved = m;
     TypeVec params; vec_init(&params);
@@ -2048,6 +2078,17 @@ static void app_check_state(Sema *s, UiNode *n) {
     vec_foreach(i, &n->children) app_check_state(s, n->children.items[i]);
 }
 
+/* Bring a type's own generic parameters into scope. */
+static void push_type_generics(Sema *s, TypeDecl *td) {
+    scope_push(s, s->cur_fn);
+    vec_foreach(i, &td->generics) {
+        GenericParam *g = &td->generics.items[i];
+        Symbol *gs = sym_new(s, SYM_GENERIC, g->name, type_generic(s->tt, g->name, i), g->span);
+        gs->used = true;
+        vec_push(&s->scope->syms, gs);
+    }
+}
+
 static void declare_members(Sema *s, Module *m) {
     s->module = m;
     s->scope = m->scope;
@@ -2059,6 +2100,7 @@ static void declare_members(Sema *s, Module *m) {
         TypeDecl *td = d->as.type;
         if (td->kind == TD_ALIAS) continue;
         s->cur_type = td;
+        push_type_generics(s, td);
         /* base class link stored in type->ret */
         if (td->base) {
             Symbol *b = sema_lookup(s, td->base);
@@ -2082,6 +2124,12 @@ static void declare_members(Sema *s, Module *m) {
             vec_foreach(j, &td->variants.items[k].payload)
                 resolve_type(s, td->variants.items[k].payload.items[j]);
         }
+        vec_foreach(k, &td->methods) {
+            FnDecl *fn = td->methods.items[k];
+            fn->owner = td;
+            vec_push(&s->all_fns, fn);
+        }
+        scope_pop(s);
         /* variants can be written bare:  Circle(2.0)  as well as  Shape.Circle(2.0) */
         if (td->kind == TD_ENUM) {
             vec_foreach(k, &td->variants) {
@@ -2092,11 +2140,6 @@ static void declare_members(Sema *s, Module *m) {
                 vs->variant_tag = v->tag;
                 vs->used = true;
             }
-        }
-        vec_foreach(k, &td->methods) {
-            FnDecl *fn = td->methods.items[k];
-            fn->owner = td;
-            vec_push(&s->all_fns, fn);
         }
         s->cur_type = NULL;
     }
@@ -2117,6 +2160,21 @@ static void declare_members(Sema *s, Module *m) {
             vec_foreach(k, &target->decl->traits)
                 if (strcmp(target->decl->traits.items[k], im->trait_name) == 0) already = true;
             if (!already) vec_push(&target->decl->traits, im->trait_name);
+            /* a trait's default methods become methods of the type unless the
+               type (or this impl block) provides its own */
+            Symbol *trsym = sema_lookup(s, im->trait_name);
+            if (trsym && trsym->td) {
+                vec_foreach(k, &trsym->td->methods) {
+                    FnDecl *def = trsym->td->methods.items[k];
+                    if (!def->body && !def->expr_body) continue;       /* abstract */
+                    bool have = false;
+                    vec_foreach(j, &target->decl->methods)
+                        if (strcmp(target->decl->methods.items[j]->name, def->name) == 0) have = true;
+                    vec_foreach(j, &im->methods)
+                        if (strcmp(im->methods.items[j]->name, def->name) == 0) have = true;
+                    if (!have) vec_push(&target->decl->methods, def);
+                }
+            }
         }
         vec_foreach(k, &im->methods) {
             FnDecl *fn = im->methods.items[k];
@@ -2132,10 +2190,18 @@ static void declare_members(Sema *s, Module *m) {
         Decl *d = m->decls.items[i];
         if (d->kind == D_FN) {
             FnDecl *fn = d->as.fn;
+            scope_push(s, s->cur_fn);
+            vec_foreach(gi, &fn->generics) {
+                GenericParam *g = &fn->generics.items[gi];
+                Symbol *gs = sym_new(s, SYM_GENERIC, g->name, type_generic(tt, g->name, gi), g->span);
+                gs->used = true;
+                vec_push(&s->scope->syms, gs);
+            }
             TypeVec ps; vec_init(&ps);
             vec_foreach(k, &fn->params)
                 vec_push(&ps, fn->params.items[k].type ? resolve_type(s, fn->params.items[k].type) : tt->t_any);
             Type *ret = fn->ret ? resolve_type(s, fn->ret) : tt->t_nil;
+            scope_pop(s);
             Type *ft = type_fn(tt, ps, ret);
             ft->fndecl = fn;
             ft->is_task = fn->is_task;
@@ -2193,6 +2259,7 @@ static void check_module_bodies(Sema *s, Module *m) {
             TypeDecl *td = d->as.type;
             if (td->kind == TD_ALIAS) continue;
             s->cur_type = td;
+            push_type_generics(s, td);
             vec_foreach(k, &td->fields) {
                 FieldDecl *f = &td->fields.items[k];
                 if (f->deflt) {
@@ -2201,7 +2268,13 @@ static void check_module_bodies(Sema *s, Module *m) {
                     if (f->type) expect_type(s, f->deflt->span, ft, vt, NULL);
                 }
             }
-            vec_foreach(k, &td->methods) check_fn_body(s, td->methods.items[k], td->type);
+            vec_foreach(k, &td->methods) {
+                FnDecl *mth = td->methods.items[k];
+                /* a default method borrowed from a trait is checked once,
+                   with `self` typed as the trait */
+                if (mth->owner && mth->owner != td) continue;
+                check_fn_body(s, mth, td->type);
+            }
             /* trait conformance */
             vec_foreach(k, &td->traits) {
                 Symbol *tr = sema_lookup(s, td->traits.items[k]);
@@ -2227,6 +2300,7 @@ static void check_module_bodies(Sema *s, Module *m) {
                     }
                 }
             }
+            scope_pop(s);
             s->cur_type = NULL;
         } else if (d->kind == D_IMPL) {
             Type *target = resolve_type(s, d->as.impl->target);

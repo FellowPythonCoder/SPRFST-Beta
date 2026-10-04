@@ -238,6 +238,8 @@ static Expr *parse_interp(Parser *P, Token *t) {
     size_t n = strlen(s);
     StrBuf chunk; sb_init(&chunk);
     for (size_t i = 0; i < n; i++) {
+        if (s[i] == '{' && i + 1 < n && s[i + 1] == '{') { sb_putc(&chunk, '{'); i++; continue; }
+        if (s[i] == '}' && i + 1 < n && s[i + 1] == '}') { sb_putc(&chunk, '}'); i++; continue; }
         if (s[i] == '{') {
             /* find matching } */
             size_t j = i + 1, depth = 1;
@@ -412,6 +414,36 @@ static Expr *parse_primary(Parser *P) {
         }
         case T_IDENT: {
             advance(P);
+            /* explicit type arguments:  Stack<Int> { }  — look ahead and
+               rewind if the `<` turns out to be a comparison */
+            if (at(P, T_LT) && !P->no_struct && isupper((unsigned char)t->name[0])) {
+                int save = P->pos;
+                int saved_panic = P->panic;
+                int depth = 0;
+                bool looks_generic = false;
+                for (int k = P->pos; k < P->ntok && k < P->pos + 64; k++) {
+                    TokKind kk = P->toks[k].kind;
+                    if (kk == T_LT) depth++;
+                    else if (kk == T_GT) {
+                        depth--;
+                        if (depth == 0) {
+                            looks_generic = (k + 1 < P->ntok && P->toks[k + 1].kind == T_LBRACE);
+                            break;
+                        }
+                    } else if (kk == T_IDENT || kk == T_COMMA || kk == T_LBRACKET ||
+                               kk == T_RBRACKET || kk == T_QUESTION || kk == T_COLON ||
+                               tok_is_keyword(kk)) continue;
+                    else break;
+                }
+                if (looks_generic) {
+                    advance(P);                       /* `<` */
+                    while (!at(P, T_GT) && !at(P, T_EOF)) {
+                        parse_type(P);
+                        if (!accept(P, T_COMMA)) break;
+                    }
+                    expect(P, T_GT, "type arguments");
+                } else { P->pos = save; P->panic = saved_panic; }
+            }
             /* struct literal:  Point { x: 1 } */
             if (at(P, T_LBRACE) && !P->no_struct && isupper((unsigned char)t->name[0])) {
                 Expr *e = ex_new(P, EX_STRUCT, sp);
@@ -970,6 +1002,8 @@ static Block *parse_block(Parser *P) {
     expect(P, T_LBRACE, "a block");
     skip_newlines(P);
     while (!at(P, T_RBRACE) && !at(P, T_EOF)) {
+        /* a `~~` note inside a body is a comment, nothing to compile */
+        if (at(P, T_DOC)) { advance(P); skip_newlines(P); continue; }
         Stmt *s = parse_stmt(P);
         if (s) vec_push(&b->stmts, s);
         if (P->panic) sync_statement(P);
@@ -1247,6 +1281,7 @@ static void parse_ui_body(Parser *P, UiNode *n) {
     expect(P, T_LBRACE, "a UI block");
     skip_newlines(P);
     while (!at(P, T_RBRACE) && !at(P, T_EOF)) {
+        if (at(P, T_DOC)) { advance(P); skip_newlines(P); continue; }
         if (at(P, T_ON)) {
             advance(P);
             const char *ev = ident_of(P, "an event name");

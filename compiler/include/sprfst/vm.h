@@ -124,6 +124,7 @@ typedef struct {
     InstrVec    code;
     ValueVec    consts;
     int        *cap_src;        /* outer frame slot for every capture */
+    int        *cap_slot;       /* local slot the capture is copied into */
     bool        is_task, is_method, is_test, is_bench;
     FnDecl     *decl;
     int         file_id;

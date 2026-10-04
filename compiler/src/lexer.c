@@ -71,9 +71,22 @@ char *lex_decode_text(Arena *a, Str raw, bool *has_interp) {
                 default: sb_putc(&b, e);
             }
         } else {
+            /* `{{` and `}}` are literal braces, not interpolation */
+            if (c == '{' && i + 1 < raw.n && raw.p[i + 1] == '{') { sb_puts(&b, "{{"); i++; continue; }
+            if (c == '}' && i + 1 < raw.n && raw.p[i + 1] == '}') { sb_puts(&b, "}}"); i++; continue; }
             if (c == '{') interp = true;
             sb_putc(&b, c);
         }
+    }
+    if (!interp && b.data) {
+        /* no holes: collapse the doubled braces here, the parser never sees it */
+        size_t w = 0;
+        for (size_t i = 0; i < b.len; i++) {
+            if ((b.data[i] == '{' || b.data[i] == '}') && i + 1 < b.len && b.data[i + 1] == b.data[i]) i++;
+            b.data[w++] = b.data[i];
+        }
+        b.len = w;
+        b.data[w] = 0;
     }
     if (has_interp) *has_interp = interp;
     char *out = arena_strndup(a, b.data ? b.data : "", b.len);
@@ -117,7 +130,15 @@ Token *lex_file(Arena *a, Interner *in, DiagBag *db, SourceFile *f, int *out_cou
                 }
                 continue;
             }
-            bool doc = (L.p + 1 < L.end && L.p[1] == '~');
+            /* `~~` only documents when it starts its own line; after code
+               on the same line it is an ordinary trailing comment */
+            bool own_line = true;
+            for (const char *q = L.p; q > L.start; q--) {
+                char pc = q[-1];
+                if (pc == '\n') break;
+                if (pc != ' ' && pc != '\t' && pc != '\r') { own_line = false; break; }
+            }
+            bool doc = own_line && (L.p + 1 < L.end && L.p[1] == '~');
             const char *cs = L.p + (doc ? 2 : 1);
             while (L.p < L.end && *L.p != '\n') L.p++;
             if (doc) {
@@ -213,9 +234,15 @@ Token *lex_file(Arena *a, Interner *in, DiagBag *db, SourceFile *f, int *out_cou
             } else {
                 L.p++;
                 body = L.p;
-                while (L.p < L.end && *L.p != '"') {
-                    if (*L.p == '\\' && L.p + 1 < L.end) L.p++;
-                    else if (*L.p == '\n') break;
+                int hole = 0;            /* quotes may nest inside {holes} */
+                while (L.p < L.end) {
+                    if (*L.p == '\\' && L.p + 1 < L.end) { L.p += 2; continue; }
+                    if (*L.p == '\n') break;
+                    if (*L.p == '{' && L.p + 1 < L.end && L.p[1] == '{') { L.p += 2; continue; }
+                    if (*L.p == '}' && L.p + 1 < L.end && L.p[1] == '}') { L.p += 2; continue; }
+                    if (*L.p == '{') hole++;
+                    else if (*L.p == '}' && hole > 0) hole--;
+                    else if (*L.p == '"' && hole == 0) break;
                     L.p++;
                 }
                 if (L.p >= L.end || *L.p != '"') {

@@ -95,6 +95,7 @@ static void set_line(Lower *L, Span sp) {
 static int lower_expr(Lower *L, Expr *e);
 static void lower_expr_to(Lower *L, Expr *e, int dest);
 static void lower_block(Lower *L, Block *b);
+static void lower_block_value(Lower *L, Block *b, int dest);
 static void lower_stmt(Lower *L, Stmt *st);
 
 /* ------------------------------------------------------- symbol access */
@@ -105,7 +106,8 @@ static void load_symbol(Lower *L, Symbol *sym, int dest) {
             if (sym->slot != dest) emit(L, OP_MOVE, dest, sym->slot, 0);
             break;
         case SYM_CAPTURE:
-            emit(L, OP_GETCAP, dest, sym->slot, 0);
+            /* the prologue copied the captured value into a local slot */
+            if (sym->slot != dest) emit(L, OP_MOVE, dest, sym->slot, 0);
             break;
         case SYM_GLOBAL: case SYM_CONST:
             emit(L, OP_GETGLOBAL, dest, sym->slot, 0);
@@ -210,20 +212,33 @@ static OpCode binop_of(TokKind k) {
 static void lower_match(Lower *L, Expr *e, int dest);
 static void lower_if_expr(Lower *L, Expr *e, int dest);
 
+/* Fields in layout order: a type's own fields first, then its base's.
+   find_field in the analyser uses exactly this order. */
+static int collect_fields(TypeDecl *td, FieldDecl **out, int cap) {
+    int n = 0, guard = 0;
+    for (TypeDecl *d = td; d && guard++ < 64; ) {
+        vec_foreach(i, &d->fields) if (n < cap) out[n++] = &d->fields.items[i];
+        if (!d->type || !d->type->ret || !d->type->ret->decl) break;
+        d = d->type->ret->decl;
+    }
+    return n;
+}
+
 static void lower_struct_literal(Lower *L, Expr *e, int dest) {
     Type *t = e->type;
     int tid = type_id_of(L, t);
     TypeDecl *td = t ? t->decl : NULL;
-    int n = td ? td->fields.len : 0;
+    FieldDecl *flds[128];
+    int n = td ? collect_fields(td, flds, 128) : 0;
     int base = L->next_reg;
     for (int i = 0; i < n; i++) {
         int r = reg_alloc(L);
         Expr *init = NULL;
         vec_foreach(k, &e->as.strct.fields)
-            if (strcmp(e->as.strct.fields.items[k].name, td->fields.items[i].name) == 0)
+            if (strcmp(e->as.strct.fields.items[k].name, flds[i]->name) == 0)
                 init = e->as.strct.fields.items[k].value;
         if (init) lower_expr_to(L, init, r);
-        else if (td->fields.items[i].deflt) lower_expr_to(L, td->fields.items[i].deflt, r);
+        else if (flds[i]->deflt) lower_expr_to(L, flds[i]->deflt, r);
         else emit(L, OP_NIL, r, 0, 0);
     }
     emit(L, OP_NEWOBJ, dest, tid, (base << 8) | (n & 0xff));
@@ -534,12 +549,26 @@ static void lower_expr_to(Lower *L, Expr *e, int dest) {
         case EX_NEW:    lower_new(L, e, dest); break;
         case EX_LAMBDA: {
             FnDecl *fn = e->as.lambda.fn;
+            if (fn->ir_index >= 0) {
+                IRFunc *tf = L->p->funcs.items[fn->ir_index];
+                int ncap = e->as.lambda.captures.len;
+                if (ncap > 0 && tf->ncaps == 0) {
+                    tf->ncaps = ncap;
+                    tf->cap_src  = arena_alloc(L->p->arena, sizeof(int) * (size_t)ncap);
+                    tf->cap_slot = arena_alloc(L->p->arena, sizeof(int) * (size_t)ncap);
+                    for (int ci = 0; ci < ncap; ci++) {
+                        Symbol *cs = e->as.lambda.captures.items[ci];
+                        tf->cap_src[ci]  = cs->variant_tag;   /* register in this frame */
+                        tf->cap_slot[ci] = cs->slot;          /* local slot over there  */
+                    }
+                }
+            }
             emit(L, OP_CLOSURE, dest, fn->ir_index, 0);
             break;
         }
         case EX_IF:    lower_if_expr(L, e, dest); break;
         case EX_MATCH: lower_match(L, e, dest); break;
-        case EX_BLOCK: lower_block(L, e->as.block.block); emit(L, OP_NIL, dest, 0, 0); break;
+        case EX_BLOCK: lower_block_value(L, e->as.block.block, dest); break;
         case EX_RANGE: {
             int mark = reg_mark(L);
             int a = reg_alloc(L), b = reg_alloc(L);
@@ -656,16 +685,20 @@ static void lower_if_expr(Lower *L, Expr *e, int dest) {
     lower_expr_to(L, e->as.iff.cond, c);
     int br = emit(L, OP_BRFALSE, 0, c, 0);
     reg_release(L, mark);
-    lower_block(L, e->as.iff.then_b);
+    lower_block_value(L, e->as.iff.then_b, dest);
     if (e->as.iff.else_b) {
         int done = emit(L, OP_JUMP, 0, 0, 0);
         patch(L, br, here(L));
-        lower_block(L, e->as.iff.else_b);
+        lower_block_value(L, e->as.iff.else_b, dest);
         patch(L, done, here(L));
     } else {
-        patch(L, br, here(L));
+        if (dest >= 0) {
+            int done = emit(L, OP_JUMP, 0, 0, 0);
+            patch(L, br, here(L));
+            emit(L, OP_NIL, dest, 0, 0);
+            patch(L, done, here(L));
+        } else patch(L, br, here(L));
     }
-    if (dest >= 0) emit(L, OP_NIL, dest, 0, 0);
 }
 
 /* ------------------------------------------------------------- patterns */
@@ -955,6 +988,19 @@ static void lower_block(Lower *L, Block *b) {
     vec_foreach(i, &b->stmts) lower_stmt(L, b->stmts.items[i]);
 }
 
+/* A block used as a value: the last expression statement is its result. */
+static void lower_block_value(Lower *L, Block *b, int dest) {
+    if (!b || !b->stmts.len) { if (dest >= 0) emit(L, OP_NIL, dest, 0, 0); return; }
+    int last = b->stmts.len - 1;
+    for (int i = 0; i < last; i++) lower_stmt(L, b->stmts.items[i]);
+    Stmt *st = b->stmts.items[last];
+    if (st->kind == ST_EXPR && dest >= 0) lower_expr_to(L, st->as.expr, dest);
+    else {
+        lower_stmt(L, st);
+        if (dest >= 0) emit(L, OP_NIL, dest, 0, 0);
+    }
+}
+
 /* ------------------------------------------------------------- functions */
 static IRFunc *new_func(Lower *L, const char *name, FnDecl *decl) {
     IRFunc *f = NEW(L->a, IRFunc);
@@ -997,17 +1043,9 @@ static void lower_function(Lower *L, FnDecl *decl) {
         L->cur_line = line;
     }
 
-    /* captures */
-    f->ncaps = 0;
-    if (decl->is_lambda) {
-        /* capture slots were assigned during sema; collect the sources */
-        int n = 0;
-        int srcs[64];
-        /* the captures are stored on the lambda expression; re-derive from the
-           function scope symbols recorded by sema */
-        f->cap_src = NULL;
-        (void)srcs; (void)n;
-    }
+    /* prologue: lift every captured value into its local slot */
+    for (int ci = 0; ci < f->ncaps; ci++)
+        emit(L, OP_GETCAP, f->cap_slot ? f->cap_slot[ci] : ci, ci, 0);
 
     if (decl->expr_body) {
         int r = reg_alloc(L);
@@ -1140,9 +1178,13 @@ IRProgram *ir_lower(Arena *a, Sema *sema, SourceMap *sm, DiagBag *db) {
             t->init_fn = -1;
             t->drop_fn = -1;
             t->base = -1;
-            t->nfields = td->fields.len;
-            t->field_names = NEWN(a, const char *, td->fields.len + 1);
-            vec_foreach(fi, &td->fields) t->field_names[fi] = td->fields.items[fi].name;
+            {
+                FieldDecl *flds[128];
+                int nf = collect_fields(td, flds, 128);
+                t->nfields = nf;
+                t->field_names = NEWN(a, const char *, nf + 1);
+                for (int fi = 0; fi < nf; fi++) t->field_names[fi] = flds[fi]->name;
+            }
             vec_push(&p->types, t);
         }
     }
@@ -1203,13 +1245,6 @@ IRProgram *ir_lower(Arena *a, Sema *sema, SourceMap *sm, DiagBag *db) {
     /* 5. function bodies */
     vec_foreach(i, &sema->all_fns) lower_function(&L, sema->all_fns.items[i]);
 
-    /* 6. lambda captures: record source slots */
-    vec_foreach(i, &sema->all_fns) {
-        FnDecl *fn = sema->all_fns.items[i];
-        if (fn->ir_index < 0) continue;
-        IRFunc *f = p->funcs.items[fn->ir_index];
-        f->ncaps = 0;
-    }
 
     /* 7. app declarations */
     vec_foreach(mi, &sema->modules) {

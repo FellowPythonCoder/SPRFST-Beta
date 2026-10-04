@@ -15,7 +15,8 @@ BIN     := $(BUILD)/bin
 OBJDIR  := $(BUILD)/obj
 
 CFLAGS  := -std=c11 -I$(INCDIR) -Wall -Wextra -Wno-unused-parameter \
-           -Wno-missing-field-initializers -Wno-unused-function -fno-strict-aliasing
+           -Wno-missing-field-initializers -Wno-unused-function -fno-strict-aliasing \
+           -MMD -MP
 LDFLAGS := -lm
 
 ifeq ($(DEBUG),1)
@@ -37,6 +38,7 @@ endif
 
 SRCS := $(wildcard $(SRCDIR)/*.c)
 OBJS := $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRCS))
+DEPS := $(OBJS:.o=.d)
 
 .PHONY: all clean test install studio dirs
 
@@ -58,6 +60,8 @@ test: all
 
 clean:
 	rm -rf $(BUILD)
+
+-include $(DEPS)
 
 install: all
 	install -d $(DESTDIR)/usr/local/bin

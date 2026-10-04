@@ -64,8 +64,8 @@ X(TEXT_REPLACE,  "@Text","replace",    "(Text, Text) -> Text",    "Replace every
 X(TEXT_SLICE,    "@Text","slice",      "(Int, Int) -> Text",      "Substring between two byte offsets")                  \
 X(TEXT_INDEX_OF, "@Text","index_of",   "(Text) -> Int",           "Byte offset of a part, or -1")                        \
 X(TEXT_REPEAT,   "@Text","repeat",     "(Int) -> Text",           "Repeat the text n times")                             \
-X(TEXT_PAD_LEFT, "@Text","pad_left",   "(Int, Text) -> Text",     "Pad on the left to a width")                          \
-X(TEXT_PAD_RIGHT,"@Text","pad_right",  "(Int, Text) -> Text",     "Pad on the right to a width")                         \
+X(TEXT_PAD_LEFT, "@Text","pad_left",   "(Int, Text?) -> Text",     "Pad on the left to a width")                          \
+X(TEXT_PAD_RIGHT,"@Text","pad_right",  "(Int, Text?) -> Text",     "Pad on the right to a width")                         \
 X(TEXT_TO_INT,   "@Text","to_int",     "() -> Int?",              "Parse an Int, nil when it is not a number")           \
 X(TEXT_TO_NUM,   "@Text","to_num",     "() -> Num?",              "Parse a Num, nil when it is not a number")            \
 X(TEXT_REVERSE,  "@Text","reverse",    "() -> Text",              "Reversed copy")                                       \
@@ -143,6 +143,7 @@ X(B_PANIC,       "",     "panic",      "(Text) -> Nil",           "Stop the prog
 X(B_CLONE,       "",     "clone",      "(Any) -> Any",            "Deep copy of a value")                                \
 X(B_HASH,        "",     "hash_of",    "(Any) -> Int",            "Stable hash of a value")                              \
 X(B_RANGE_LIST,  "",     "range",      "(Int, Int) -> [Int]",     "List of integers from start up to end")               \
+X(B_SET,         "",     "set",        "([T]) -> {T}",            "Make a set out of a list")                            \
 /* ------------------------------------------------------------------ fs */                          \
 X(FS_READ,       "fs",   "read",       "(Text) -> Text?",         "Read a whole file as text")                           \
 X(FS_WRITE,      "fs",   "write",      "(Text, Text) -> Bool",    "Write text to a file")                                \

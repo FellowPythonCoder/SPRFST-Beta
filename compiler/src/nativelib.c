@@ -561,7 +561,7 @@ Value vm_native_call(VM *vm, int id, Value *args, int nargs, bool *ok) {
         int n = (int)strlen(s);
         StrBuf b; sb_init(&b);
         if (id == NF_TEXT_PAD_RIGHT) sb_puts(&b, s);
-        while ((int)b.len + n < width) sb_puts(&b, pad);
+        while ((int)b.len + (id == NF_TEXT_PAD_RIGHT ? 0 : n) < width) sb_puts(&b, pad);
         if (id == NF_TEXT_PAD_LEFT) sb_puts(&b, s);
         Value v = mktextn(vm, b.data ? b.data : "", (int)b.len);
         sb_free(&b);
@@ -974,6 +974,19 @@ Value vm_native_call(VM *vm, int id, Value *args, int nargs, bool *ok) {
         return v;
     }
     case NF_B_HASH: return v_int((int64_t)(vm_value_hash(A(0)) & 0x7fffffffffffffffULL));
+    case NF_B_SET: {
+        ObjSet *st = vm_set(vm);
+        Value v = A(0);
+        if (IS_OBJ(v, O_LIST)) {
+            vec_foreach(i, &AS_LIST(v)->items) {
+                Value item = AS_LIST(v)->items.items[i];
+                bool found = false;
+                vec_foreach(k, &st->items) if (vm_values_equal(st->items.items[k], item)) found = true;
+                if (!found) vec_push(&st->items, item);
+            }
+        }
+        return v_obj((Obj *)st);
+    }
     case NF_B_RANGE_LIST: {
         ObjList *l = vm_list(vm);
         for (int64_t i = INT(0); i < INT(1); i++) vec_push(&l->items, v_int(i));
