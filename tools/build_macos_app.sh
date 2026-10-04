@@ -50,6 +50,9 @@ make -j"$( (command -v sysctl >/dev/null && sysctl -n hw.ncpu) || nproc || echo 
 step "running the test suite"
 ./tests/run_tests.sh >/dev/null || die "tests failed — not packaging a broken build"
 
+step "checking the Studio sources"
+./tools/check_swift.sh >/dev/null || die "the Swift sources did not pass their static checks"
+
 # -------------------------------------------------------------- icons
 step "drawing the icons with SPRFST itself"
 rm -rf "$APP"

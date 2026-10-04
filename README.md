@@ -223,8 +223,10 @@ that are not finished. They are listed here rather than hidden.
   do not exist. `make stage` lays out the bundle and the contents of
   the disk image anywhere so the layout, the `Info.plist` and the icon
   can be checked, and it says plainly that the staged bundle has no
-  executable in it. The first `make dmg` on a Mac is the first time
-  that code will be compiled.
+  executable in it. `tools/check_swift.sh` goes as far as a machine
+  with no Swift can: brackets, every `#selector` target, the AppKit
+  initialisers and the single entry point. The first `make dmg` on a
+  Mac is still the first time that code will be compiled.
 
 Everything else in this README was run on the machine that wrote it.
 `make test` is the proof: 48 checks covering the language suite, all

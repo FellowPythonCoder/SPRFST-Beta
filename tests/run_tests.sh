@@ -206,7 +206,14 @@ else
     report "icns icon generated" no "no icns file"
 fi
 
-for script in tools/build_macos_app.sh tools/make_dmg.sh tools/check_guidebook.sh; do
+# the Swift editor, as far as a machine with no Swift can tell
+if sw=$("$ROOT/tools/check_swift.sh" 2>&1); then
+    report "studio sources ($(printf '%s' "$sw" | grep -oE '[0-9]+ Swift files'))" ok
+else
+    report "studio sources" no "$(printf '%s' "$sw" | head -4)"
+fi
+
+for script in tools/build_macos_app.sh tools/make_dmg.sh tools/check_guidebook.sh tools/check_swift.sh; do
     bash -n "$ROOT/$script" 2>/dev/null && report "$(basename "$script") parses" ok \
         || report "$(basename "$script") parses" no
 done
