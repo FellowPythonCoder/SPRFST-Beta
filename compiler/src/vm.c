@@ -210,12 +210,10 @@ void vm_gc(VM *vm) {
     }
 
     Obj **slot = &root->objects;
-    size_t freed = 0;
     while (*slot) {
         Obj *o = *slot;
         if (!o->marked) {
             *slot = o->next;
-            freed++;
             free_obj(o);
             root->obj_count--;
         } else {

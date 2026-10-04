@@ -7,6 +7,24 @@ set -u
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SPRFST="$ROOT/build/bin/sprfst"
 export SPRFST_HOME="$ROOT"
+
+# macOS has no timeout(1), so bring our own: run a command, kill it if it
+# overstays.  Used so one hung example cannot hang the whole run.
+limit() {   # limit <seconds> <command...>
+    local secs="$1"; shift
+    if [ -z "${SPRFST_PORTABLE_LIMIT:-}" ]; then
+        if command -v timeout >/dev/null 2>&1; then timeout "$secs" "$@"; return $?; fi
+        if command -v gtimeout >/dev/null 2>&1; then gtimeout "$secs" "$@"; return $?; fi
+    fi
+    "$@" &
+    local job=$!
+    { sleep "$secs"; kill -9 "$job" 2>/dev/null; } >/dev/null 2>&1 &
+    local watch=$!
+    wait "$job"; local code=$?
+    kill "$watch" 2>/dev/null
+    wait "$watch" 2>/dev/null
+    return $code
+}
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 
@@ -32,7 +50,7 @@ PY
     for file in "$TMP/${name%.md}"-*.spf; do
         [ -e "$file" ] || continue
         block=$((block + 1))
-        if out=$(cd "$TMP" && SPRFST_UI=none timeout 30 "$SPRFST" "$mode" "$file" 2>&1 >/dev/null); then
+        if out=$(cd "$TMP" && SPRFST_UI=none limit 30 "$SPRFST" "$mode" "$file" 2>&1 >/dev/null); then
             ok=$((ok + 1))
         else
             bad=$((bad + 1))

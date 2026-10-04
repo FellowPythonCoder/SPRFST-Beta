@@ -22,6 +22,24 @@ else
     AMBER=""; GREEN=""; RED=""; DIM=""; BOLD=""; OFF=""
 fi
 
+# macOS has no timeout(1), so bring our own: run a command, kill it if it
+# overstays.  Used so one hung example cannot hang the whole run.
+limit() {   # limit <seconds> <command...>
+    local secs="$1"; shift
+    if [ -z "${SPRFST_PORTABLE_LIMIT:-}" ]; then
+        if command -v timeout >/dev/null 2>&1; then timeout "$secs" "$@"; return $?; fi
+        if command -v gtimeout >/dev/null 2>&1; then gtimeout "$secs" "$@"; return $?; fi
+    fi
+    "$@" &
+    local job=$!
+    { sleep "$secs"; kill -9 "$job" 2>/dev/null; } >/dev/null 2>&1 &
+    local watch=$!
+    wait "$job"; local code=$?
+    kill "$watch" 2>/dev/null
+    wait "$watch" 2>/dev/null
+    return $code
+}
+
 pass=0
 fail=0
 started=$(date +%s)
@@ -64,7 +82,7 @@ for file in "$ROOT"/examples/*.spf; do
             continue
             ;;
     esac
-    if err=$(cd "$ROOT" && SPRFST_UI=none timeout 60 "$SPRFST" run "$file" 2>&1 >/dev/null); then
+    if err=$(cd "$ROOT" && SPRFST_UI=none limit 60 "$SPRFST" run "$file" 2>&1 >/dev/null); then
         report "$name" ok
     else
         report "$name" no "$(printf '%s' "$err" | head -4)"

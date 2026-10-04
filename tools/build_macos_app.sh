@@ -4,6 +4,7 @@
 #
 #      ./tools/build_macos_app.sh            full build (needs macOS)
 #      ./tools/build_macos_app.sh --stage    lay the bundle out only
+#      ./tools/build_macos_app.sh --skip-tests   build anyway, unverified
 #
 #  The bundle carries the compiler, the standard library, the examples
 #  and the guidebook, so the app works on a machine with nothing else
@@ -25,7 +26,14 @@ BUNDLE_ID="ai.sprfst.studio"
 VERSION="$(grep -o '"[0-9][^"]*"' compiler/include/sprfst/common.h | head -1 | tr -d '"')"
 ARCH="${SPRFST_ARCH:-arm64}"
 STAGE_ONLY=0
-[ "${1:-}" = "--stage" ] && STAGE_ONLY=1
+SKIP_TESTS=0
+for arg in "$@"; do
+    case "$arg" in
+        --stage)       STAGE_ONLY=1 ;;
+        --skip-tests)  SKIP_TESTS=1 ;;
+        *) echo "unknown option: $arg" >&2; exit 2 ;;
+    esac
+done
 
 DIST="$ROOT/dist"
 [ "$STAGE_ONLY" = 1 ] && DIST="$ROOT/dist/stage"
@@ -48,10 +56,24 @@ make -j"$( (command -v sysctl >/dev/null && sysctl -n hw.ncpu) || nproc || echo 
 [ -x build/bin/sprfst ] || die "the compiler did not build"
 
 step "running the test suite"
-./tests/run_tests.sh >/dev/null || die "tests failed — not packaging a broken build"
+if [ "$SKIP_TESTS" = 1 ]; then
+    printf '    %s\n' "skipped by --skip-tests; you are packaging an unverified build"
+elif ! test_log=$(./tests/run_tests.sh 2>&1); then
+    printf '\n'
+    printf '%s\n' "$test_log" | grep -E "FAIL|failed" | head -20
+    printf '\n'
+    die "tests failed — not packaging a broken build. The whole run: ./tests/run_tests.sh"
+else
+    printf '    %s\n' "$(printf '%s' "$test_log" | grep -oE '[0-9]+ passed[^0-9]*[0-9]+ failed' | tail -1)"
+fi
 
 step "checking the Studio sources"
-./tools/check_swift.sh >/dev/null || die "the Swift sources did not pass their static checks"
+if ! swift_log=$(./tools/check_swift.sh 2>&1); then
+    printf '\n'
+    printf '%s\n' "$swift_log" | head -20
+    printf '\n'
+    die "the Swift sources did not pass their static checks"
+fi
 
 # -------------------------------------------------------------- icons
 step "drawing the icons with SPRFST itself"
@@ -152,7 +174,7 @@ swiftc \
     -O -whole-module-optimization \
     -framework AppKit -framework Foundation \
     -o "$APP/Contents/MacOS/SPRFSTStudio" \
-    "${SOURCES[@]}"
+    "${SOURCES[@]}" || die "swiftc could not build Studio — the errors above are the first real compile of that code"
 
 # ------------------------------------------------------------- sign
 step "signing (ad hoc)"

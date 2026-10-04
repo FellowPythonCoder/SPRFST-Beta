@@ -6,6 +6,12 @@ each one prints. Nothing here needs the disk image.
 Written for macOS. It works the same on Linux; where the two differ, it
 says so.
 
+Two things about copying commands out of here. None of these blocks
+contain comments, because zsh — the Mac's shell — treats a `#` on a
+command line as an argument, not a comment, and answers `too many
+arguments`. And when a block has several lines, paste them one at a
+time, so you see each answer before the next command runs.
+
 ---
 
 ## 1. Get the tools
@@ -45,16 +51,20 @@ git clone https://github.com/FellowPythonCoder/SPRFST-Beta.git
 cd SPRFST-Beta
 ```
 
-You should see this:
+Check you are in the right place:
 
 ```
 ls
 ```
 
 ```
-Makefile   README.md  assets  compiler  docs  examples
-guidebook  ide        std     tests     tools   project.sprfst
+Makefile   README.md  RUNNING.md  assets  compiler  docs
+examples   guidebook  ide         std     tests     tools
 ```
+
+If you see `Makefile` in that list, you are in the project folder. If
+instead you see a single folder name, go into it first — unzipping
+sometimes makes a folder inside a folder.
 
 ---
 
@@ -375,6 +385,20 @@ may well find mistakes. The language, the compiler and everything in
 sections 1 to 9 are not affected by this: they are tested on every
 change.
 
+If the test suite fails on your machine, the script stops before
+packaging and prints which checks failed. Run them yourself to see
+everything:
+
+```
+./tests/run_tests.sh
+```
+
+To build the app anyway, knowing it is unverified:
+
+```
+./tools/build_macos_app.sh --skip-tests
+```
+
 If you only want to see the bundle layout without a Mac:
 
 ```
@@ -457,6 +481,22 @@ make clean && make
 
 **macOS refuses to open something you downloaded** — right click it and
 choose Open, instead of double clicking it.
+
+**`cd: too many arguments`** — you pasted a line with a `#` comment on
+it. zsh does not take comments on the command line. Paste the command
+only.
+
+**`zsh: no such file or directory: ./build/bin/sprfst`** — `make` has
+not run yet, or it ran somewhere else. `ls` should show `Makefile`; if
+it does, run `make` and watch for the line that ends `✓ built`.
+
+**`error tests failed — not packaging a broken build`** — the packaging
+script will not wrap a toolchain that does not pass its own tests. See
+exactly what broke:
+
+```
+./tests/run_tests.sh
+```
 
 **`sprfst debug` exits with 1** — that is what quitting the debugger
 does. Nothing is wrong.

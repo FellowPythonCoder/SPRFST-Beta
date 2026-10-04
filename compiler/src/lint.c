@@ -20,7 +20,6 @@ typedef struct {
 
 static void lint_source(DiagBag *db, SourceFile *f, LintCfg *cfg, int *count) {
     const char *src = f->src;
-    int line = 1;
     int depth = 0;
     size_t line_start = 0;
     size_t n = f->len;
@@ -79,7 +78,6 @@ static void lint_source(DiagBag *db, SourceFile *f, LintCfg *cfg, int *count) {
             (*count)++;
             depth = cfg->max_depth;   /* report once per run */
         }
-        line++;
         line_start = i + 1;
     }
 }
