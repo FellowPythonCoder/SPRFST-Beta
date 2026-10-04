@@ -1,0 +1,10 @@
+fn main() {
+    hold path: Text = "notes.txt"
+    write(path, "SPRFST file manager example")
+    when exists(path) {
+        show("wrote ", path)
+        show(read(path))
+    } else {
+        show("write failed")
+    }
+}

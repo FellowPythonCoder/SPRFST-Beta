@@ -1,0 +1,9 @@
+// SPRFST standard prelude — thin typed facades over the runtime.
+
+fn io_now() -> Int {
+    give now()
+}
+
+fn io_sleep(ms: Int) {
+    sleep(ms)
+}

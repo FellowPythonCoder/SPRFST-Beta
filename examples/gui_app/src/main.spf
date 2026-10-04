@@ -1,0 +1,6 @@
+fn main() {
+    hold w: Int = gui_window("SPRFST", 480, 280)
+    gui_label(w, "A calm place to build software.", 24, 180)
+    gui_button(w, "Run", 24, 40, 96, 32)
+    show("gui ready")
+}

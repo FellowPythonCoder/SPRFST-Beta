@@ -1,0 +1,6 @@
+fn main() {
+    hold db: Int = db_open("app.sqlite")
+    hold ok: Int = db_exec(db, "create table if not exists notes (id integer, body text)")
+    show("db ", db, " exec ", ok)
+    db_close(db)
+}

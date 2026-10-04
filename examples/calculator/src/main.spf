@@ -1,0 +1,27 @@
+fn add(a: Num, b: Num) -> Num {
+    give a + b
+}
+
+fn sub(a: Num, b: Num) -> Num {
+    give a - b
+}
+
+fn mul(a: Num, b: Num) -> Num {
+    give a * b
+}
+
+fn div(a: Num, b: Num) -> Num {
+    when b == 0.0 {
+        give 0.0
+    }
+    give a / b
+}
+
+fn main() {
+    hold x: Num = 12.0
+    hold y: Num = 4.0
+    show("add ", add(x, y))
+    show("sub ", sub(x, y))
+    show("mul ", mul(x, y))
+    show("div ", div(x, y))
+}

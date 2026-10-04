@@ -1,0 +1,13 @@
+form Cell {
+    x: Int
+    y: Int
+}
+
+fn main() {
+    hold p: Cell = Cell { x: 2, y: 5 }
+    hold score: Int = 0
+    each i in 0..5 {
+        score = score + p.x
+    }
+    show("score ", score, " at ", p.y)
+}

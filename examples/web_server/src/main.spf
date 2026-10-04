@@ -1,0 +1,11 @@
+fn handle(path: Text) -> Text {
+    when path == "/" {
+        give "<h1>SPRFST</h1><p>fast and calm.</p>"
+    }
+    give "<p>not found</p>"
+}
+
+fn main() {
+    show("server sketch on :8080")
+    show(handle("/"))
+}

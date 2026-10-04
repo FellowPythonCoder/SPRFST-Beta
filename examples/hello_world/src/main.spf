@@ -1,0 +1,7 @@
+fn greet(name: Text) -> Text {
+    give "Hello, " + name + "!"
+}
+
+fn main() {
+    show(greet("SPRFST"))
+}

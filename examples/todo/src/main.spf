@@ -1,0 +1,12 @@
+fn main() {
+    hold items: List<Text> = ["write SPRFST", "run tests", "ship Studio"]
+    hold i: Int = 0
+    show("todo")
+    each n in 0..3 {
+        show(n, ") item")
+        i = i + 1
+    }
+    show("count ", i)
+    push(items, 0)
+    show("stored ", len(items))
+}

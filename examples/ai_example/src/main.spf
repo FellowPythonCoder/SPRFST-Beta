@@ -1,0 +1,13 @@
+fn main() {
+    hold a: Tensor = tensor(2, 2)
+    hold b: Tensor = tensor(2, 2)
+    tset(a, 0, 0, 1.0)
+    tset(a, 0, 1, 2.0)
+    tset(a, 1, 0, 0.0)
+    tset(a, 1, 1, 1.0)
+    tset(b, 0, 0, 1.0)
+    tset(b, 1, 1, 1.0)
+    hold c: Tensor = tmul(a, b)
+    relu(c)
+    show("out ", tget(c, 0, 0))
+}

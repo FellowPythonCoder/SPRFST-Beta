@@ -1,0 +1,9 @@
+fn main() {
+    show("sprfst-cli")
+    show("args ", argc())
+    when argc() > 1 {
+        show("first ", argv(1))
+    } else {
+        show("usage: cli_app <name>")
+    }
+}

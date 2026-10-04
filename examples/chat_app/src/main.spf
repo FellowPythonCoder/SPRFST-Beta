@@ -1,0 +1,8 @@
+fn format_msg(who: Text, body: Text) -> Text {
+    give who + ": " + body
+}
+
+fn main() {
+    show(format_msg("ada", "shipping SPRFST"))
+    show(format_msg("lin", "the editor feels handwritten"))
+}

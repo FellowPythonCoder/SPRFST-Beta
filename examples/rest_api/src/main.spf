@@ -1,0 +1,8 @@
+fn json_ok(msg: Text) -> Text {
+    give "{\"ok\":true,\"msg\":\"" + msg + "\"}"
+}
+
+fn main() {
+    show(json_ok("created"))
+    show(json_ok("listed"))
+}
