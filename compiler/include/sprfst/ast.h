@@ -266,6 +266,7 @@ typedef struct UiNode {
     ExprVec     prop_values;
     UiNodeVec   children;
     NameVec     handler_names;   /* on click { ... } */
+    NameVec     handler_params;  /* on change(text) { ... }, NULL when absent */
     BlockVec    handler_bodies;
     FnVec       handler_fns;
 } UiNode;

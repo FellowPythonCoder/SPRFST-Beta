@@ -1314,8 +1314,16 @@ static void parse_ui_body(Parser *P, UiNode *n) {
         if (at(P, T_ON)) {
             advance(P);
             const char *ev = ident_of(P, "an event name");
+            /* an optional name for the value the event carries:
+                   on change(text) { draft = text } */
+            const char *arg = NULL;
+            if (accept(P, T_LPAREN)) {
+                arg = ident_of(P, "a name for the event value");
+                expect(P, T_RPAREN, "an event value name");
+            }
             Block *b = parse_block(P);
             vec_push(&n->handler_names, ev);
+            vec_push(&n->handler_params, arg);
             vec_push(&n->handler_bodies, b);
             vec_push(&n->handler_fns, (FnDecl *)NULL);
         } else if (at(P, T_LET) || at(P, T_VAR)) {
@@ -1323,7 +1331,7 @@ static void parse_ui_body(Parser *P, UiNode *n) {
             UiNode *st = NEW(P->arena, UiNode);
             st->kind = intern(P->interner, str_cstr("state"));
             vec_init(&st->prop_names); vec_init(&st->prop_values); vec_init(&st->children);
-            vec_init(&st->handler_names); vec_init(&st->handler_bodies); vec_init(&st->handler_fns);
+            vec_init(&st->handler_names); vec_init(&st->handler_params); vec_init(&st->handler_bodies); vec_init(&st->handler_fns);
             st->span = cur(P)->span;
             advance(P);
             const char *nm = ident_of(P, "a state variable");
@@ -1356,7 +1364,7 @@ static void parse_ui_body(Parser *P, UiNode *n) {
 static UiNode *parse_ui_node(Parser *P) {
     UiNode *n = NEW(P->arena, UiNode);
     vec_init(&n->prop_names); vec_init(&n->prop_values); vec_init(&n->children);
-    vec_init(&n->handler_names); vec_init(&n->handler_bodies); vec_init(&n->handler_fns);
+    vec_init(&n->handler_names); vec_init(&n->handler_params); vec_init(&n->handler_bodies); vec_init(&n->handler_fns);
     n->span = cur(P)->span;
     n->kind = ident_of(P, "a UI element");
     if (at(P, T_TEXT)) {
@@ -1684,7 +1692,7 @@ static Decl *parse_decl(Parser *P) {
             else d->as.app.name = "SPRFST App";
             UiNode *root = NEW(P->arena, UiNode);
             vec_init(&root->prop_names); vec_init(&root->prop_values); vec_init(&root->children);
-            vec_init(&root->handler_names); vec_init(&root->handler_bodies); vec_init(&root->handler_fns);
+            vec_init(&root->handler_names); vec_init(&root->handler_params); vec_init(&root->handler_bodies); vec_init(&root->handler_fns);
             root->kind = intern(P->interner, str_cstr("app"));
             root->label = d->as.app.name;
             root->span = sp;

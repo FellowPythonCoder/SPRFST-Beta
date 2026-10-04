@@ -66,6 +66,33 @@ static Symbol *declare(Sema *s, SymKind k, const char *name, Type *t, Span sp) {
     return sym;
 }
 
+/* ------------------------------------------------------------ ownership
+   `own T` says a value has exactly one owner. Handing it to something
+   else that wants ownership moves it, and the old name stops working.
+   The check is deliberately simple: a name is moved from the point the
+   move is written onwards. */
+static void move_from(Sema *s, Expr *src) {
+    if (!src || src->kind != EX_IDENT) return;
+    Symbol *sym = sema_lookup(s, src->as.ident.name);
+    if (!sym || !sym->is_owned || sym->moved) return;
+    sym->moved = true;
+    sym->move_span = src->span;
+    (void)s;
+}
+
+/* Moves caused by passing an owned value to a parameter that wants to own it. */
+static void move_call_args(Sema *s, FnDecl *fn, ExprVec *args) {
+    if (!fn) return;
+    int shown = 0;
+    vec_foreach(i, &fn->params) {
+        Param *p = &fn->params.items[i];
+        if (p->is_self) continue;
+        if (shown < args->len && p->type && p->type->kind == TE_OWN)
+            move_from(s, args->items[shown]);
+        shown++;
+    }
+}
+
 /* find a symbol, inserting capture symbols when crossing a function boundary */
 static Symbol *lookup_through(Sema *s, Scope *from, const char *name) {
     FnDecl *fn = from ? from->fn : NULL;
@@ -85,7 +112,11 @@ static Symbol *lookup_through(Sema *s, Scope *from, const char *name) {
                 /* record where the value comes from on the enclosing frame */
                 Symbol *src = sym;
                 src->used = true;
-                vec_push(&from->syms, cap);
+                /* the capture belongs to the function, not to whichever block
+                   happens to mention it, or it disappears when that block ends */
+                Scope *target = from;
+                while (target->parent && target->parent->fn == fn) target = target->parent;
+                vec_push(&target->syms, cap);
                 cap->value = NULL;
                 cap->fn = NULL;
                 cap->td = NULL;
@@ -1340,6 +1371,7 @@ static Type *check_expr(Sema *s, Expr *e) {
             if (callee->kind == EX_IDENT) what = callee->as.ident.name;
             GenericEnv env = { 0 };
             t = check_call_args(s, e->span, what, &ct->params, &e->as.call.args, ct->ret, &env, false);
+            move_call_args(s, ct->fndecl, &e->as.call.args);
             if (ct->fndecl && ct->fndecl->is_task) t = type_future(tt, t);
             break;
         }
@@ -1716,6 +1748,9 @@ static void check_stmt(Sema *s, Stmt *st) {
                 sym->is_mut = st->as.let.mutable_;
                 sym->value = st->as.let.init;
                 st->as.let.sym = sym;
+                /* `own T` means this binding is the single owner */
+                sym->is_owned = st->as.let.type && st->as.let.type->kind == TE_OWN;
+                if (sym->is_owned) move_from(s, st->as.let.init);
                 if (st->as.let.is_const && st->as.let.init && !st->as.let.init->comptime_known) {
                     /* constants must be simple values */
                     Expr *iv = st->as.let.init;
@@ -1888,6 +1923,7 @@ static void check_fn_body(Sema *s, FnDecl *fn, Type *self_type) {
         p->sym = declare(s, SYM_PARAM, p->name, pt, p->span);
         p->sym->is_mut = p->mut || p->is_self;
         p->sym->is_self = p->is_self;
+        p->sym->is_owned = p->type && p->type->kind == TE_OWN;
         if (p->is_self) p->sym->used = true;
     }
     Type *ret = fn->ret ? resolve_type(s, fn->ret) : tt->t_nil;
@@ -2049,6 +2085,16 @@ static void app_declare_handlers(Sema *s, UiNode *n, const char *app_name, int *
         fn->body      = n->handler_bodies.items[i];
         fn->ir_index  = -1;
         TypeVec ps; vec_init(&ps);
+        /* `on change(text) { ... }` takes the value the event carries */
+        const char *argname = i < n->handler_params.len ? n->handler_params.items[i] : NULL;
+        if (argname) {
+            Param p; memset(&p, 0, sizeof p);
+            p.name = argname;
+            p.type = NULL;                      /* typed Any */
+            p.span = n->span;
+            vec_push(&fn->params, p);
+            vec_push(&ps, s->tt->t_any);
+        }
         fn->type = type_fn(s->tt, ps, s->tt->t_nil);
         if (i < n->handler_fns.len) n->handler_fns.items[i] = fn;
         else vec_push(&n->handler_fns, fn);
@@ -2209,6 +2255,12 @@ static void declare_members(Sema *s, Module *m) {
             ft->fndecl = fn;
             ft->is_task = fn->is_task;
             fn->type = ft;
+            if (fn->is_test || fn->is_bench) {
+                /* a test is named by its description, not by an identifier,
+                   so it never takes a name away from your code */
+                vec_push(&s->all_fns, fn);
+                continue;
+            }
             Symbol *sym = declare(s, SYM_FN, fn->name, ft, fn->name_span);
             sym->fn = fn;
             sym->used = fn->is_pub || fn->is_test || fn->is_bench || strcmp(fn->name, "main") == 0;

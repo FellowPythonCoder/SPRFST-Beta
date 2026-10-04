@@ -40,7 +40,7 @@ SRCS := $(wildcard $(SRCDIR)/*.c)
 OBJS := $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRCS))
 DEPS := $(OBJS:.o=.d)
 
-.PHONY: all clean test install studio dirs
+.PHONY: all clean test install dirs app dmg stage docs guidebook
 
 all: dirs $(BIN)/sprfst
 
@@ -69,9 +69,20 @@ install: all
 	install -d $(DESTDIR)/usr/local/lib/sprfst
 	cp -R std $(DESTDIR)/usr/local/lib/sprfst/
 
-# macOS application bundle + DMG (requires macOS)
+docs: all
+	@SPRFST_HOME=$(CURDIR) $(BIN)/sprfst docs .
+
+guidebook: all
+	@./tools/check_guidebook.sh
+
+# macOS application bundle + disk image (both need macOS)
 app: all
 	./tools/build_macos_app.sh
 
 dmg: app
 	./tools/make_dmg.sh
+
+# lay out the bundle and the disk image contents anywhere, to check them
+stage: all
+	./tools/build_macos_app.sh --stage
+	./tools/make_dmg.sh --stage

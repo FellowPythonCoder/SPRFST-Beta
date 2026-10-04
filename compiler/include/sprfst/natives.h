@@ -88,7 +88,7 @@ X(LIST_LAST,     "@List","last",       "() -> T?",                "Last item, or
 X(LIST_SLICE,    "@List","slice",      "(Int, Int) -> [T]",       "Items between two indexes")                           \
 X(LIST_REVERSE,  "@List","reverse",    "() -> [T]",               "Reversed copy")                                       \
 X(LIST_SORT,     "@List","sort",       "() -> [T]",               "Sorted copy, ascending")                              \
-X(LIST_SORT_BY,  "@List","sort_by",    "(fn(T, T) -> Int) -> [T]","Sorted copy using a comparison function")             \
+X(LIST_SORT_BY,  "@List","sort_by",    "(fn(T, T) -> Bool) -> [T]","Sorted copy; the test answers \"does a come first\"")  \
 X(LIST_MAP,      "@List","map",        "(fn(T) -> U) -> [U]",     "Apply a function to every item")                      \
 X(LIST_FILTER,   "@List","filter",     "(fn(T) -> Bool) -> [T]",  "Keep the items a test accepts")                       \
 X(LIST_REDUCE,   "@List","reduce",     "(U, fn(U, T) -> U) -> U", "Fold the list into one value")                        \

@@ -9,6 +9,7 @@
 #include "sprfst/driver.h"
 #include "sprfst/parser.h"
 #include "sprfst/natives.h"
+#include <unistd.h>
 
 static void write_doc_text(StrBuf *b, const char *doc, const char *prefix) {
     if (!doc || !*doc) return;
@@ -42,7 +43,21 @@ static void fn_signature(Arena *a, StrBuf *b, FnDecl *fn) {
 static void document_module(Build *b, Module *m, StrBuf *out) {
     Arena *a = &b->arena;
     sb_printf(out, "# %s\n\n", m->name ? m->name : path_basename(m->path));
-    sb_printf(out, "`%s`\n\n", m->path ? m->path : "");
+    /* show the path relative to the project, not the whole machine */
+    const char *shown = m->path ? m->path : "";
+    const char *dot = strstr(shown, "/./");
+    if (dot) shown = dot + 3;
+    else {
+        char cwd[1200];
+        const char *base = (b->root && b->root[0] == '/') ? b->root
+                         : (getcwd(cwd, sizeof cwd) ? cwd : NULL);
+        if (base) {
+            size_t bl = strlen(base);
+            if (strncmp(shown, base, bl) == 0) shown += bl;
+        }
+    }
+    while (*shown == '/') shown++;
+    sb_printf(out, "`%s`\n\n", shown);
     write_doc_text(out, m->doc, "");
 
     /* imports */
@@ -218,6 +233,28 @@ int cmd_docs(int argc, char **argv) {
         snprintf(entry, sizeof entry, "%s/%s", root ? root : ".", p.entry);
     }
     build_load(&b, entry);
+
+    /* a project's own library code is documented too, not only what the
+       entry point happens to import */
+    const char *root = b.root ? b.root : ".";
+    const char *folders[2] = { "src", "std" };
+    for (int f = 0; f < 2; f++) {
+        char dir[1300];
+        snprintf(dir, sizeof dir, "%s/%s", root, folders[f]);
+        if (!dir_exists(dir)) continue;
+        int n = 0;
+        char **names = list_dir(dir, &n, NULL);
+        for (int i = 0; i < n; i++) {
+            if (strcmp(path_ext(names[i]), "spf") == 0) {
+                char file[1600];
+                snprintf(file, sizeof file, "%s/%s", dir, names[i]);
+                build_load(&b, file);
+            }
+            free(names[i]);
+        }
+        free(names);
+    }
+
     build_check(&b);                /* types make the docs better; errors do not stop us */
 
     char dir[1400];

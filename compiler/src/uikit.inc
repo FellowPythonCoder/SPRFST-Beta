@@ -148,13 +148,21 @@ static void ui_refresh(VM *vm) {
     if (fn.tag == V_OBJ) vm_call_value(vm, fn, NULL, 0);
 }
 
+/* Fire an event. A handler written as `on change(text) { ... }` takes one
+   argument: the control's current value. `on click { ... }` takes none. */
 static void ui_emit(VM *vm, int id, const char *event) {
     Value fn = ui_handler(id, event);
-    if (fn.tag == V_OBJ) {
+    if (fn.tag != V_OBJ || !fn.as.o || fn.as.o->kind != O_CLOSURE) return;
+    ObjClosure *c = (ObjClosure *)fn.as.o;
+    IRFunc *f = (c->fn >= 0 && c->fn < vm->prog->funcs.len) ? vm->prog->funcs.items[c->fn] : NULL;
+    if (f && f->nparams >= 1) {
+        Value arg = ui_get(vm, id, "value");
+        vm_call_value(vm, fn, &arg, 1);
+    } else {
         vm_call_value(vm, fn, NULL, 0);
-        ui_refresh(vm);
-        g_ui_dirty = true;
     }
+    ui_refresh(vm);
+    g_ui_dirty = true;
 }
 
 /* ----------------------------------------------------------- describe */

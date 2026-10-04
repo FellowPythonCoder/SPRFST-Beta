@@ -14,7 +14,7 @@ struct Symbol {
     const char *name;
     Type       *type;
     Span        span;
-    bool        is_mut, used, assigned, moved, is_self;
+    bool        is_mut, used, assigned, moved, is_self, is_owned;
     int         slot;          /* local slot / global index / capture index */
     FnDecl     *fn;
     TypeDecl   *td;

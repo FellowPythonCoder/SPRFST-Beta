@@ -180,18 +180,30 @@ static bool resolve_import(Build *b, Module *m, Decl *d) {
 
     char *dir = path_dirname(&b->arena, m->path);
     const char *home = sprfst_home();
-    char cand[4][1400];
-    snprintf(cand[0], sizeof cand[0], "%s/%s.spf", dir ? dir : ".", rel.data);
-    snprintf(cand[1], sizeof cand[1], "%s/%s/mod.spf", dir ? dir : ".", rel.data);
-    snprintf(cand[2], sizeof cand[2], "%s/packages/%s/src/%s.spf",
-             b->root ? b->root : (dir ? dir : "."), rel.data, p->items[p->len - 1]);
+    const char *root = b->root ? b->root : (dir ? dir : ".");
+    const char *last = p->items[p->len - 1];
+    char cand[8][1400];
+    int n = 0;
+    /* beside the importing file */
+    snprintf(cand[n++], sizeof cand[0], "%s/%s.spf", dir ? dir : ".", rel.data);
+    snprintf(cand[n++], sizeof cand[0], "%s/%s/mod.spf", dir ? dir : ".", rel.data);
+    /* inside a package installed by Forge: its own entry point first,
+       then the usual places a package keeps its root module */
+    char pkgdir[1300];
+    snprintf(pkgdir, sizeof pkgdir, "%s/packages/%s", root, p->items[0]);
+    Project pkg = project_load(pkgdir);
+    if (pkg.found && pkg.entry[0])
+        snprintf(cand[n++], sizeof cand[0], "%s/%s", pkgdir, pkg.entry);
+    snprintf(cand[n++], sizeof cand[0], "%s/packages/%s/src/%s.spf", root, rel.data, last);
+    snprintf(cand[n++], sizeof cand[0], "%s/packages/%s/src/main.spf", root, rel.data);
+    snprintf(cand[n++], sizeof cand[0], "%s/packages/%s/%s.spf", root, rel.data, last);
     /* `use std.ai` lives at $SPRFST_HOME/std/ai.spf */
     const char *tail = rel.data;
     if (strncmp(tail, "std/", 4) == 0) tail += 4;
-    snprintf(cand[3], sizeof cand[3], "%s/std/%s.spf", home, tail);
+    snprintf(cand[n++], sizeof cand[0], "%s/std/%s.spf", home, tail);
     sb_free(&rel);
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < n; i++)
         if (file_exists(cand[i])) return load_recursive(b, cand[i], d->span, false);
     return true;   /* sema reports the missing module with a good message */
 }

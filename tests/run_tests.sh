@@ -119,6 +119,104 @@ printf '%s' "$diag" | grep -q 'E0' && report "json diagnostics" ok || report "js
 dbg=$(printf 'b 5\nc\nv\nq\n' | "$SPRFST" debug "$ROOT/examples/02-variables.spf" 2>&1)
 printf '%s' "$dbg" | grep -q "breakpoint" && report "debugger breakpoint" ok || report "debugger breakpoint" no
 
+# a package added by Forge can actually be imported and run
+printf 'use std.io\nuse greet\nfn main() { io.say(greet.hello()) }\n' > "$tmp/demo/src/main.spf"
+(cd "$tmp/demo" && "$SPRFST" add greet --path="$tmp/pkg" >/dev/null 2>&1)
+if (cd "$tmp/demo" && "$SPRFST" run . 2>&1 | grep -q "hi from the package"); then
+    report "use a Forge package" ok
+else
+    report "use a Forge package" no "$(cd "$tmp/demo" && "$SPRFST" run . 2>&1 | head -4)"
+fi
+(cd "$tmp/demo" && "$SPRFST" remove greet >/dev/null 2>&1)
+
+# ----------------------------------------------------------- language
+printf "\n  ${DIM}language details${OFF}\n"
+
+# a closure capturing a value used inside a block body
+cat > "$tmp/capture.spf" <<'SPF'
+use std.io
+fn call(f: fn() -> Nil) { f() }
+fn main() {
+    let a = 10
+    let b = 20
+    call(fn() => { io.say("{a} {b}") })
+}
+SPF
+out=$("$SPRFST" run "$tmp/capture.spf" 2>&1)
+[ "$out" = "10 20" ] && report "closures capture inside blocks" ok \
+    || report "closures capture inside blocks" no "got: $out"
+
+# a UI event that carries its value back into state
+cat > "$tmp/ui.spf" <<'SPF'
+app "Field" {
+    var draft = ""
+    var kept: [Text] = []
+    window {
+        title: "Field"
+        field "Note" {
+            value: draft
+            on change(text) { draft = text }
+        }
+        button "Keep" {
+            on click { kept.push(draft) }
+        }
+        list { items: kept }
+    }
+}
+SPF
+out=$(printf '1\nhello\n2\nq\n' | SPRFST_UI=term "$SPRFST" run "$tmp/ui.spf" 2>&1)
+printf '%s' "$out" | grep -q -- "- hello" && report "ui event values reach state" ok \
+    || report "ui event values reach state" no "$(printf '%s' "$out" | tail -3)"
+
+# -O0 really turns the optimiser off
+printf 'use std.io\nfn main() { io.say("{2 + 3 * 4}") }\n' > "$tmp/fold.spf"
+o0=$(cd "$tmp" && "$SPRFST" build fold.spf -O0 2>&1 | grep -o 'folded [0-9]*')
+o2=$(cd "$tmp" && "$SPRFST" build fold.spf -O2 2>&1 | grep -o 'folded [0-9]*')
+[ "$o0" = "folded 0" ] && [ "$o2" != "folded 0" ] && report "optimiser levels ($o0 vs $o2)" ok \
+    || report "optimiser levels" no "O0: $o0  O2: $o2"
+
+# ------------------------------------------------------------ pictures
+printf "\n  ${DIM}graphics and packaging${OFF}\n"
+
+cat > "$tmp/png.spf" <<'SPF'
+use std.io
+use std.draw
+fn main() {
+    let c = draw.canvas(256, 256)
+    draw.clear(c, draw.rgb(11, 11, 13))
+    draw.circle(c, 128, 128, 90, draw.rgb(255, 161, 54))
+    io.say("{draw.save_png(c, "shot.png")}")
+}
+SPF
+(cd "$tmp" && "$SPRFST" run png.spf >/dev/null 2>&1)
+if [ -f "$tmp/shot.png" ]; then
+    size=$(wc -c < "$tmp/shot.png")
+    head -c 8 "$tmp/shot.png" | grep -q PNG && [ "$size" -lt 65536 ] \
+        && report "png written and compressed (${size} bytes for 256x256)" ok \
+        || report "png compression" no "${size} bytes — compression is not working"
+else
+    report "png written" no "no file"
+fi
+
+# the macOS icon file, written by SPRFST itself
+(cd "$ROOT" && "$SPRFST" run assets/logo/make_icns.spf -- "$tmp/SPRFST.icns" >/dev/null 2>&1)
+if [ -f "$tmp/SPRFST.icns" ] && head -c 4 "$tmp/SPRFST.icns" | grep -q icns; then
+    report "icns icon generated ($(( $(wc -c < "$tmp/SPRFST.icns") / 1024 )) KB)" ok
+else
+    report "icns icon generated" no "no icns file"
+fi
+
+for script in tools/build_macos_app.sh tools/make_dmg.sh tools/check_guidebook.sh; do
+    bash -n "$ROOT/$script" 2>/dev/null && report "$(basename "$script") parses" ok \
+        || report "$(basename "$script") parses" no
+done
+
+# every guidebook chapter still compiles
+gb=$("$ROOT/tools/check_guidebook.sh" 2>&1 | tail -3)
+printf '%s' "$gb" | grep -q "0 failed" \
+    && report "guidebook ($(printf '%s' "$gb" | grep -oE '[0-9]+ blocks ran'))" ok \
+    || report "guidebook" no "$gb"
+
 # ---------------------------------------------------------------- total
 elapsed=$(( $(date +%s) - started ))
 printf "\n  ${BOLD}%d passed${OFF}, %s%d failed${OFF}  ${DIM}%ds${OFF}\n\n" \

@@ -284,6 +284,121 @@ static void png_chunk(FILE *f, const char *type, const unsigned char *data, size
     fwrite(c4, 1, 4, f);
 }
 
+/* ------------------------------------------------------- deflate (fixed)
+   A real compressor: LZ77 over a 32 KB window, emitted with deflate's
+   fixed Huffman codes. Small enough to read, good enough that a picture
+   SPRFST draws is a normal sized PNG rather than a raw dump. */
+typedef struct { unsigned char *buf; size_t len, cap; uint32_t bits; int nbits; } BitW;
+
+static void bw_byte(BitW *b, unsigned char c) {
+    if (b->len + 1 > b->cap) { b->cap = b->cap * 2 + 256; b->buf = realloc(b->buf, b->cap); }
+    b->buf[b->len++] = c;
+}
+/* deflate packs bits least significant first */
+static void bw_bits(BitW *b, uint32_t value, int n) {
+    b->bits |= (value & ((1u << n) - 1u)) << b->nbits;
+    b->nbits += n;
+    while (b->nbits >= 8) { bw_byte(b, (unsigned char)(b->bits & 0xff)); b->bits >>= 8; b->nbits -= 8; }
+}
+/* Huffman codes are written most significant bit first */
+static void bw_code(BitW *b, uint32_t code, int n) {
+    for (int i = n - 1; i >= 0; i--) bw_bits(b, (code >> i) & 1u, 1);
+}
+static void bw_flush(BitW *b) {
+    if (b->nbits) { bw_byte(b, (unsigned char)(b->bits & 0xff)); b->bits = 0; b->nbits = 0; }
+}
+
+static const unsigned short LEN_BASE[29] = {3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258};
+static const unsigned char  LEN_EXTRA[29] = {0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0};
+static const unsigned short DIST_BASE[30] = {1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577};
+static const unsigned char  DIST_EXTRA[30] = {0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13};
+
+static void z_literal(BitW *b, int sym) {
+    if (sym <= 143)      bw_code(b, 0x30u + (uint32_t)sym, 8);
+    else if (sym <= 255) bw_code(b, 0x190u + (uint32_t)(sym - 144), 9);
+    else if (sym <= 279) bw_code(b, (uint32_t)(sym - 256), 7);
+    else                 bw_code(b, 0xC0u + (uint32_t)(sym - 280), 8);
+}
+
+static void z_match(BitW *b, int len, int dist) {
+    int lc = 28;
+    while (lc > 0 && LEN_BASE[lc] > len) lc--;
+    z_literal(b, 257 + lc);
+    if (LEN_EXTRA[lc]) bw_bits(b, (uint32_t)(len - LEN_BASE[lc]), LEN_EXTRA[lc]);
+    int dc = 29;
+    while (dc > 0 && DIST_BASE[dc] > dist) dc--;
+    bw_code(b, (uint32_t)dc, 5);
+    if (DIST_EXTRA[dc]) bw_bits(b, (uint32_t)(dist - DIST_BASE[dc]), DIST_EXTRA[dc]);
+}
+
+#define Z_HASHBITS 15
+#define Z_HASHSIZE (1 << Z_HASHBITS)
+#define Z_WINDOW   32768
+#define Z_CHAIN    48
+
+static uint32_t z_hash(const unsigned char *p) {
+    return ((uint32_t)p[0] * 0x9E3779B1u ^ (uint32_t)p[1] * 0x85EBCA77u ^ (uint32_t)p[2] * 0xC2B2AE3Du)
+           >> (32 - Z_HASHBITS);
+}
+
+/* zlib stream (header, one fixed Huffman block, adler32) */
+static unsigned char *zlib_compress(const unsigned char *src, size_t n, size_t *out_len) {
+    BitW b;
+    b.cap = n / 3 + 1024; b.buf = malloc(b.cap); b.len = 0; b.bits = 0; b.nbits = 0;
+    bw_byte(&b, 0x78); bw_byte(&b, 0x01);
+    bw_bits(&b, 1, 1);          /* final block */
+    bw_bits(&b, 1, 2);          /* fixed Huffman */
+
+    int *head = malloc(sizeof(int) * Z_HASHSIZE);
+    int *prev = malloc(sizeof(int) * (n ? n : 1));
+    for (int i = 0; i < Z_HASHSIZE; i++) head[i] = -1;
+
+    size_t i = 0;
+    while (i < n) {
+        int best_len = 0, best_dist = 0;
+        if (i + 3 <= n) {
+            uint32_t h = z_hash(src + i);
+            int cand = head[h];
+            size_t maxlen = n - i; if (maxlen > 258) maxlen = 258;
+            for (int chain = 0; cand >= 0 && chain < Z_CHAIN; chain++) {
+                if ((size_t)cand + Z_WINDOW <= i) break;
+                size_t l = 0;
+                while (l < maxlen && src[(size_t)cand + l] == src[i + l]) l++;
+                if ((int)l > best_len) { best_len = (int)l; best_dist = (int)(i - (size_t)cand); }
+                if ((size_t)best_len >= maxlen) break;
+                cand = prev[cand];
+            }
+            prev[i] = head[h];
+            head[h] = (int)i;
+        }
+        if (best_len >= 3) {
+            z_match(&b, best_len, best_dist);
+            for (size_t k = 1; k < (size_t)best_len; k++) {
+                if (i + k + 3 > n) break;
+                uint32_t h2 = z_hash(src + i + k);
+                prev[i + k] = head[h2];
+                head[h2] = (int)(i + k);
+            }
+            i += (size_t)best_len;
+        } else {
+            z_literal(&b, src[i]);
+            i++;
+        }
+    }
+    z_literal(&b, 256);         /* end of block */
+    bw_flush(&b);
+    free(head); free(prev);
+
+    uint32_t a1 = 1, a2 = 0;
+    for (size_t k = 0; k < n; k++) { a1 = (a1 + src[k]) % 65521; a2 = (a2 + a1) % 65521; }
+    uint32_t adler = (a2 << 16) | a1;
+    bw_byte(&b, (unsigned char)(adler >> 24)); bw_byte(&b, (unsigned char)(adler >> 16));
+    bw_byte(&b, (unsigned char)(adler >> 8));  bw_byte(&b, (unsigned char)adler);
+
+    *out_len = b.len;
+    return b.buf;
+}
+
 static bool write_png(const char *path, int w, int h, uint32_t *px) {
     FILE *f = fopen(path, "wb");
     if (!f) return false;
@@ -297,43 +412,49 @@ static bool write_png(const char *path, int w, int h, uint32_t *px) {
     ihdr[8] = 8; ihdr[9] = 6; ihdr[10] = 0; ihdr[11] = 0; ihdr[12] = 0;
     png_chunk(f, "IHDR", ihdr, 13);
 
-    size_t raw_len = (size_t)h * (1 + (size_t)w * 4);
+    size_t stride = (size_t)w * 4;
+    size_t raw_len = (size_t)h * (1 + stride);
     unsigned char *raw = malloc(raw_len);
+    unsigned char *line = malloc(stride);
+    unsigned char *above = calloc(stride, 1);
+    unsigned char *try_sub = malloc(stride);
+    unsigned char *try_up = malloc(stride);
     size_t o = 0;
     for (int y = 0; y < h; y++) {
-        raw[o++] = 0;
         for (int x = 0; x < w; x++) {
             uint32_t c = px[y * w + x];
-            raw[o++] = (unsigned char)((c >> 16) & 0xff);
-            raw[o++] = (unsigned char)((c >> 8) & 0xff);
-            raw[o++] = (unsigned char)(c & 0xff);
-            raw[o++] = (unsigned char)((c >> 24) & 0xff ? (c >> 24) & 0xff : 255);
+            line[x * 4 + 0] = (unsigned char)((c >> 16) & 0xff);
+            line[x * 4 + 1] = (unsigned char)((c >> 8) & 0xff);
+            line[x * 4 + 2] = (unsigned char)(c & 0xff);
+            line[x * 4 + 3] = (unsigned char)((c >> 24) & 0xff ? (c >> 24) & 0xff : 255);
         }
+        /* pick the row filter that leaves the least for the compressor:
+           0 none, 1 difference from the pixel to the left, 2 from above */
+        long score_none = 0, score_sub = 0, score_up = 0;
+        for (size_t k = 0; k < stride; k++) {
+            unsigned char left = k >= 4 ? line[k - 4] : 0;
+            try_sub[k] = (unsigned char)(line[k] - left);
+            try_up[k]  = (unsigned char)(line[k] - above[k]);
+            score_none += line[k] < 128 ? line[k] : 256 - line[k];
+            score_sub  += try_sub[k] < 128 ? try_sub[k] : 256 - try_sub[k];
+            score_up   += try_up[k]  < 128 ? try_up[k]  : 256 - try_up[k];
+        }
+        if (score_sub <= score_none && score_sub <= score_up) {
+            raw[o++] = 1;
+            memcpy(raw + o, try_sub, stride);
+        } else if (score_up <= score_none) {
+            raw[o++] = 2;
+            memcpy(raw + o, try_up, stride);
+        } else {
+            raw[o++] = 0;
+            memcpy(raw + o, line, stride);
+        }
+        o += stride;
+        memcpy(above, line, stride);
     }
-    /* zlib stream with stored (uncompressed) deflate blocks */
-    size_t zcap = raw_len + (raw_len / 65535 + 1) * 5 + 6 + 16;
-    unsigned char *z = malloc(zcap);
+    free(line); free(above); free(try_sub); free(try_up);
     size_t zo = 0;
-    z[zo++] = 0x78; z[zo++] = 0x01;
-    size_t pos = 0;
-    while (pos < raw_len) {
-        size_t chunk = raw_len - pos;
-        if (chunk > 65535) chunk = 65535;
-        int last = (pos + chunk >= raw_len);
-        z[zo++] = (unsigned char)last;
-        z[zo++] = (unsigned char)(chunk & 0xff);
-        z[zo++] = (unsigned char)(chunk >> 8);
-        z[zo++] = (unsigned char)(~chunk & 0xff);
-        z[zo++] = (unsigned char)((~chunk >> 8) & 0xff);
-        memcpy(z + zo, raw + pos, chunk);
-        zo += chunk;
-        pos += chunk;
-    }
-    uint32_t a1 = 1, a2 = 0;
-    for (size_t i = 0; i < raw_len; i++) { a1 = (a1 + raw[i]) % 65521; a2 = (a2 + a1) % 65521; }
-    uint32_t adler = (a2 << 16) | a1;
-    z[zo++] = (unsigned char)(adler >> 24); z[zo++] = (unsigned char)(adler >> 16);
-    z[zo++] = (unsigned char)(adler >> 8);  z[zo++] = (unsigned char)adler;
+    unsigned char *z = zlib_compress(raw, raw_len, &zo);
     png_chunk(f, "IDAT", z, zo);
     png_chunk(f, "IEND", NULL, 0);
     free(raw); free(z);
@@ -685,9 +806,10 @@ Value vm_native_call(VM *vm, int id, Value *args, int nargs, bool *ok) {
             while (k >= 0) {
                 bool greater;
                 if (id == NF_LIST_SORT_BY && nargs > 1) {
-                    Value cargs[2] = { out->items.items[k], key };
+                    /* the callback answers "does a come before b" */
+                    Value cargs[2] = { key, out->items.items[k] };
                     Value r = vm_call_value(vm, A(1), cargs, 2);
-                    greater = v_toint(r) > 0;
+                    greater = v_truthy(r);
                 } else {
                     Value a2 = out->items.items[k];
                     if ((a2.tag == V_INT || a2.tag == V_NUM) && (key.tag == V_INT || key.tag == V_NUM))

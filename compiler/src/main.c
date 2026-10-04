@@ -20,6 +20,7 @@ int cmd_studio(int argc, char **argv);
 /* ------------------------------------------------------------- options */
 typedef struct {
     int   opt_level;
+    bool  opt_set;
     bool  json;
     bool  dump_ir;
     bool  timing;
@@ -139,7 +140,7 @@ static int cmd_check(Opts *o) {
 /* --------------------------------------------------------------- build */
 static int cmd_build(Opts *o) {
     Build b;
-    build_init(&b, o->opt_level ? o->opt_level : 2);
+    build_init(&b, o->opt_set ? o->opt_level : 2);
     b.json_diags = o->json;
     char buf[1200];
     char *entry = resolve_entry(&b, o->path, buf, sizeof buf);
@@ -334,7 +335,7 @@ int main(int argc, char **argv) {
     for (int i = 2; i < argc; i++) {
         const char *a = argv[i];
         if (strcmp(a, "--") == 0) { o.rest_argc = argc - i - 1; o.rest_argv = argv + i + 1; break; }
-        if (strncmp(a, "-O", 2) == 0 && isdigit((unsigned char)a[2])) { o.opt_level = a[2] - '0'; continue; }
+        if (strncmp(a, "-O", 2) == 0 && isdigit((unsigned char)a[2])) { o.opt_level = a[2] - '0'; o.opt_set = true; continue; }
         if (strcmp(a, "--json") == 0) { o.json = true; continue; }
         if (strcmp(a, "--ir") == 0) { o.dump_ir = true; continue; }
         if (strcmp(a, "--time") == 0) { o.timing = true; continue; }

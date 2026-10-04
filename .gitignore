@@ -3,3 +3,5 @@ build/
 *.spb
 packages/
 .DS_Store
+dist/
+*.forge
