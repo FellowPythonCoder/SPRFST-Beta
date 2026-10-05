@@ -270,19 +270,26 @@ fi
 fmtdir="$tmp/fmt"
 mkdir -p "$fmtdir"
 cp "$ROOT"/examples/*.spf "$ROOT"/std/*.spf "$ROOT"/tools/*.spf "$fmtdir/" 2>/dev/null
-broke=0; moved=0; count=0
+broke=0; moved=0; count=0; broken_files=""; moving_files=""
 for f in "$fmtdir"/*.spf; do
     count=$((count + 1))
     (cd "$ROOT" && "$SPRFST" fmt "$f" >/dev/null 2>&1)
-    (cd "$ROOT" && "$SPRFST" check "$f" >/dev/null 2>&1) || broke=$((broke + 1))
+    if ! (cd "$ROOT" && "$SPRFST" check "$f" >/dev/null 2>&1); then
+        broke=$((broke + 1))
+        broken_files="$broken_files $(basename "$f")"
+    fi
     cp "$f" "$f.once"
     (cd "$ROOT" && "$SPRFST" fmt "$f" >/dev/null 2>&1)
-    cmp -s "$f" "$f.once" || moved=$((moved + 1))
+    if ! cmp -s "$f" "$f.once"; then
+        moved=$((moved + 1))
+        moving_files="$moving_files $(basename "$f")"
+    fi
 done
 if [ "$broke" = 0 ] && [ "$moved" = 0 ]; then
     report "formatter round trip ($count files still compile, and settle in one pass)" ok
 else
-    report "formatter round trip" no "$broke files broken, $moved still moving"
+    detail="$broke files broken${broken_files:+:$broken_files}, $moved still moving${moving_files:+:$moving_files}"
+    report "formatter round trip" no "$detail"
 fi
 
 # the guidebook as PDF, typeset and then read back

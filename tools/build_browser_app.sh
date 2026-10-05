@@ -58,7 +58,13 @@ if [ "$SKIP_TESTS" = 1 ]; then
     printf '    %s\n' "skipped by --skip-tests; you are packaging an unverified build"
 else
     if ! language_log=$(./tests/run_tests.sh 2>&1); then
-        printf '%s\n' "$language_log" | grep -E "FAIL|failed" | head -20
+        # Keep the detail printed by the test runner.  Filtering to only the
+        # FAIL line hid the useful compiler/runtime error on macOS, leaving
+        # people with a failure name but no clue what to repair.
+        printf '%s\n' "$language_log" | awk '
+            /FAIL/ { print; remaining = 4; next }
+            remaining > 0 { print; remaining-- }
+        '
         die "the language tests failed — not packaging a broken build"
     fi
     printf '    %s\n' "$(printf '%s' "$language_log" | grep -oE '[0-9]+ passed[^0-9]*[0-9]+ failed' | tail -1)"
