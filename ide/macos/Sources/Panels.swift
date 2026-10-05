@@ -362,7 +362,7 @@ final class OutlinePanel: NSView, NSTableViewDataSource, NSTableViewDelegate {
 // ---------------------------------------------------------- debugger
 final class DebuggerPanel: NSView {
     let header = PanelHeader("Debugger")
-    private let transcript = NSTextView()
+    private let transcript = StudioTextView(editable: false)
     private let input = NSTextField()
     private var session: Process?
     private var toDebugger: FileHandle?
@@ -494,7 +494,7 @@ final class DebuggerPanel: NSView {
 // --------------------------------------------------------------- git
 final class GitPanel: NSView {
     let header = PanelHeader("Git")
-    private let status = NSTextView()
+    private let status = StudioTextView(editable: false)
     private let message = NSTextField()
     private let commit = NSButton(title: "Commit all", target: nil, action: nil)
     private var folder: String = "."

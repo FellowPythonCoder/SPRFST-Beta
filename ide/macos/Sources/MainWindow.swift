@@ -449,6 +449,7 @@ final class StudioWindowController: NSWindowController, EditorDelegate {
         terminal.use(folder: folder)
         window?.title = "SPRFST Studio — " + (folder as NSString).lastPathComponent
         NSDocumentController.shared.noteNewRecentDocumentURL(URL(fileURLWithPath: folder))
+        UserDefaults.standard.set(folder, forKey: "sprfst.lastFolder")
 
         for candidate in ["src/main.spf", "main.spf"] {
             let path = folder + "/" + candidate

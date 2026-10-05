@@ -23,6 +23,7 @@ final class GutterView: NSRulerView {
         self.editor = editor
         self.clientView = editor.textView
         self.ruleThickness = Theme.gutterWidth
+        clipToBounds()
     }
     // NSRulerView redeclares initWithCoder: as non-failable, so unlike
     // every NSView subclass here this override must not be failable.
@@ -33,11 +34,15 @@ final class GutterView: NSRulerView {
               let layout = text.layoutManager,
               let container = text.textContainer else { return }
 
+        // Bounds, never the rect AppKit hands in. Since macOS 14 that
+        // rect can be far larger than the ruler, and a view's drawing
+        // is no longer clipped to it, so filling it paints over the
+        // code itself and over everything drawn before this.
         Theme.ink.setFill()
-        rect.fill()
+        bounds.fill()
         let line = NSBezierPath()
-        line.move(to: CGPoint(x: ruleThickness - 0.5, y: rect.minY))
-        line.line(to: CGPoint(x: ruleThickness - 0.5, y: rect.maxY))
+        line.move(to: CGPoint(x: ruleThickness - 0.5, y: bounds.minY))
+        line.line(to: CGPoint(x: ruleThickness - 0.5, y: bounds.maxY))
         Theme.edge.setStroke()
         line.lineWidth = 1
         line.stroke()
@@ -175,11 +180,42 @@ final class MinimapView: NSView {
     }
 }
 
+// --------------------------------------------------------- code view
+/// The editor's text view. All it adds is a quiet band behind the
+/// line the caret is on.
+final class CodeTextView: StudioTextView {
+    private var bandRange: NSRange?
+
+    func band(on range: NSRange) {
+        let line = (string as NSString).lineRange(for: range)
+        if line != bandRange {
+            bandRange = line
+            needsDisplay = true
+        }
+    }
+
+    override func drawBackground(in rect: NSRect) {
+        super.drawBackground(in: rect)
+        guard let bandRange, let layout = layoutManager, let container = textContainer else { return }
+        let length = (string as NSString).length
+        guard bandRange.location <= length else { return }
+        let safe = NSRange(location: bandRange.location,
+                           length: min(bandRange.length, length - bandRange.location))
+        let glyphs = layout.glyphRange(forCharacterRange: safe, actualCharacterRange: nil)
+        var band = layout.boundingRect(forGlyphRange: glyphs, in: container)
+        band.origin.x = 0
+        band.origin.y += textContainerInset.height
+        band.size.width = bounds.width
+        Theme.panel.setFill()
+        band.fill()
+    }
+}
+
 // --------------------------------------------------------- the editor
 final class EditorView: NSView, NSTextViewDelegate {
     weak var delegate: EditorDelegate?
 
-    let textView = NSTextView()
+    let textView = CodeTextView(editable: true)
     let scrollView = NSScrollView()
     private let minimap = MinimapView()
     private var minimapWidth: NSLayoutConstraint!
@@ -224,8 +260,15 @@ final class EditorView: NSView, NSTextViewDelegate {
         textView.selectedTextAttributes = [.backgroundColor: Theme.amber.withAlphaComponent(0.22)]
         textView.textColor = Theme.text
         textView.font = Fonts.code()
-        textView.textContainerInset = NSSize(width: 12, height: 12)
+        textView.textContainerInset = NSSize(width: 14, height: 12)
+        textView.defaultParagraphStyle = Theme.codeLines
+        // what newly typed characters look like before the highlighter
+        // has had a chance to run over them
+        textView.typingAttributes = [.font: Fonts.code(),
+                                     .foregroundColor: Theme.text,
+                                     .paragraphStyle: Theme.codeLines]
         textView.delegate = self
+        clipToBounds()
 
         scrollView.hasHorizontalScroller = false
         scrollView.drawsBackground = true
@@ -240,6 +283,7 @@ final class EditorView: NSView, NSTextViewDelegate {
         scrollView.rulersVisible = true
 
         minimap.editor = self
+        minimap.clipToBounds()
         minimap.translatesAutoresizingMaskIntoConstraints = false
         addSubview(minimap)
 
@@ -284,6 +328,7 @@ final class EditorView: NSView, NSTextViewDelegate {
         set {
             textView.string = newValue
             reloadSyntax()
+            textView.band(on: NSRange(location: 0, length: 0))
             minimap.needsDisplay = true
             gutter.needsDisplay = true
         }
@@ -319,7 +364,9 @@ final class EditorView: NSView, NSTextViewDelegate {
         let source = textView.string as NSString
         let full = NSRange(location: 0, length: source.length)
         storage.beginEditing()
-        storage.setAttributes([.font: Fonts.code(), .foregroundColor: Theme.synName], range: full)
+        storage.setAttributes([.font: Fonts.code(),
+                               .foregroundColor: Theme.synName,
+                               .paragraphStyle: Theme.codeLines], range: full)
 
         var i = 0
         while i < source.length {
@@ -466,6 +513,7 @@ final class EditorView: NSView, NSTextViewDelegate {
     func textDidChange(_ notification: Notification) {
         isDirty = true
         reloadSyntax()
+        textView.band(on: textView.selectedRange())
         minimap.needsDisplay = true
         gutter.needsDisplay = true
         delegate?.editorDidChange(self)
@@ -475,6 +523,7 @@ final class EditorView: NSView, NSTextViewDelegate {
         let (line, _) = caretLineColumn
         gutter.currentLine = line
         gutter.needsDisplay = true
+        textView.band(on: textView.selectedRange())
     }
 
     /// Keep the indentation of the previous line, and add one step after `{`.

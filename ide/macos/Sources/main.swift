@@ -30,6 +30,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         }
+        // nothing asked for: pick up where the last session left off
+        if args.isEmpty, pendingFiles.isEmpty,
+           let last = UserDefaults.standard.string(forKey: "sprfst.lastFolder"),
+           FileManager.default.fileExists(atPath: last) {
+            window.open(folder: last)
+        }
         for file in pendingFiles { openFile(file) }
         pendingFiles.removeAll()
 

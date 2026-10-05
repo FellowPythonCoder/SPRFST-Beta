@@ -35,6 +35,13 @@ enum Theme {
     static let synName    = text
     static let synPunct   = NSColor(srgbRed: 0.569, green: 0.569, blue: 0.588, alpha: 1)
 
+    /// Code reads better with a little air between the lines.
+    static let codeLines: NSParagraphStyle = {
+        let p = NSMutableParagraphStyle()
+        p.lineHeightMultiple = 1.22
+        return p
+    }()
+
     // metrics
     static let corner: CGFloat = 10
     static let gutterWidth: CGFloat = 48
@@ -136,6 +143,13 @@ extension NSView {
         ])
     }
 
+    /// Since macOS 14 a view's drawing is no longer clipped to it, so
+    /// a view that paints the rect AppKit hands it can paint straight
+    /// over its neighbours. Everything here that draws itself says so.
+    func clipToBounds() {
+        if #available(macOS 14.0, *) { clipsToBounds = true }
+    }
+
     func painted(_ colour: NSColor, radius: CGFloat = 0) -> Self {
         wantsLayer = true
         layer?.backgroundColor = colour.cgColor
@@ -166,8 +180,43 @@ func label(_ string: String, _ font: NSFont, _ colour: NSColor) -> NSTextField {
 /// manager still answers questions about the text, which is why the
 /// line numbers and the minimap looked right while the page stayed
 /// black. These six lines are the whole fix.
+/// A text view that is TextKit 1 from the moment it is made.
+///
+/// A plain NSTextView() has been a TextKit 2 view since Ventura, and
+/// it tears its own text system down and rebuilds it as TextKit 1 the
+/// first time anything asks for its layoutManager — which the line
+/// number ruler does on every single draw. Apple's advice is to
+/// choose at construction time, so Studio builds the stack itself and
+/// hands the view a container that already belongs to it. The storage
+/// is held here because a text view only reaches its storage weakly.
+class StudioTextView: NSTextView {
+    let keptStorage: NSTextStorage
+
+    init(editable: Bool) {
+        let storage = NSTextStorage()
+        let layout = NSLayoutManager()
+        let container = NSTextContainer(size: NSSize(width: 900,
+                                                     height: CGFloat.greatestFiniteMagnitude))
+        container.widthTracksTextView = true
+        layout.addTextContainer(container)
+        storage.addLayoutManager(layout)
+        keptStorage = storage
+        super.init(frame: NSRect(x: 0, y: 0, width: 900, height: 600), textContainer: container)
+        isEditable = editable
+        isSelectable = true
+        isRichText = false
+        allowsUndo = editable
+        clipToBounds()
+    }
+    required init?(coder: NSCoder) { fatalError("not loaded from a nib") }
+}
+
+/// Put a text view in a scroll view so that it can be seen. A text
+/// view made in code starts with an empty frame and a maxSize to
+/// match, so it needs both a size and a ceiling before it is told it
+/// may grow, or it stays zero points tall for ever.
 func mountTextView(_ textView: NSTextView, in scrollView: NSScrollView, editable: Bool) {
-    let size = NSSize(width: 800, height: 600)
+    let size = NSSize(width: 900, height: 600)
     textView.frame = NSRect(origin: .zero, size: size)
     textView.minSize = NSSize(width: 0, height: 0)
     textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude,
@@ -183,10 +232,13 @@ func mountTextView(_ textView: NSTextView, in scrollView: NSScrollView, editable
     textView.textContainer?.containerSize = NSSize(width: size.width,
                                                    height: CGFloat.greatestFiniteMagnitude)
     textView.textContainer?.widthTracksTextView = true
+    textView.clipToBounds()
 
     scrollView.documentView = textView
     scrollView.hasVerticalScroller = true
     scrollView.autohidesScrollers = true
+    scrollView.contentView.clipToBounds()
+    scrollView.clipToBounds()
 }
 
 /// A one pixel rule, used between the regions of the window.

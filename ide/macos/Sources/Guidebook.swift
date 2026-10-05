@@ -13,7 +13,7 @@ struct Chapter {
 
 final class GuidebookWindow: NSWindowController {
     private let list = NSTableView()
-    private let reader = NSTextView()
+    private let reader = StudioTextView(editable: false)
     private var chapters: [Chapter] = []
     private var blocks: [(range: NSRange, code: String)] = []
     private let runner = RunConsole()

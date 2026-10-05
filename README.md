@@ -254,6 +254,20 @@ that are not finished. They are listed here rather than hidden.
   size, which left the editor 140 points wide; the window is now laid
   out with constraints and its own draggable dividers, and the chrome
   is set in a handwriting face throughout.
+- **Then the editor appeared empty, and that was one line.** The line
+  number ruler filled the rectangle AppKit handed it instead of its
+  own bounds. Since macOS 14 that rectangle can be much larger than
+  the ruler, and a view's drawing is no longer clipped to it, so the
+  ruler painted the editor background over the code, over the file
+  tabs, over the explorer and over the top bar — everything drawn
+  before it. The line numbers themselves survived because the ruler
+  drew them afterwards, which is exactly what the screenshot showed.
+  Every view that draws itself now fills its bounds and clips to
+  them. In the same pass the editor's text view was built on TextKit 1
+  explicitly: a text view made the plain way has been a TextKit 2 view
+  since Ventura, and it rebuilds its whole text system the first time
+  anything reads its `layoutManager` — which a line number ruler does
+  on every draw, losing the keyboard focus with it.
 - **Studio had never been compiled until now.** The whole editor is
   written — 3,300 lines of Swift and AppKit in `ide/macos/Sources/` —
   and so are the bundle and disk image scripts, but this repository was

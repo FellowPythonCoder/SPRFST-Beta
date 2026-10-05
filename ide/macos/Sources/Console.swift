@@ -6,7 +6,7 @@ import AppKit
 
 /// Shared output view with ANSI colour handling.
 final class OutputView: NSView {
-    let textView = NSTextView()
+    let textView = StudioTextView(editable: false)
     private let scroll = NSScrollView()
 
     override init(frame: NSRect) {
