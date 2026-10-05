@@ -1,0 +1,283 @@
+~~ =====================================================================
+~~  SPRFST Browser — fetching
+~~
+~~  Plain HTTP is spoken here, by hand, over a socket: request line,
+~~  headers, chunked bodies and redirects.
+~~
+~~  SPRFST has no TLS of its own yet, so https is handed to curl, which
+~~  every Mac has. That is the one piece of the browser the language
+~~  does not do itself, and it is deliberate: a hand rolled TLS stack
+~~  would be the least trustworthy code in the program.
+~~ =====================================================================
+module fetch
+
+use std.net
+use std.sys
+use std.time
+use uri
+
+pub object Response {
+    ok: Bool = false
+    status: Int = 0
+    body: Text = ""
+    mime: Text = "text/html"
+    address: Text = ""
+    bytes: Int = 0
+    ms: Num = 0.0
+    error: Text = ""
+    cached: Bool = false
+    secure: Bool = false
+}
+
+pub object Store {
+    pages: Map<Text, Response> = [:]
+    order: [Text] = []
+    limit: Int = 40
+
+    fn keep(self, key: Text, answer: Response) {
+        if not self.pages.has(key) { self.order.push(key) }
+        self.pages.set(key, answer)
+        while self.order.len() > self.limit {
+            let oldest = self.order.remove(0) ?? ""
+            self.pages.remove(oldest)
+        }
+    }
+
+    fn look(self, key: Text) -> Response? => self.pages.get(key)
+
+    fn forget(self) {
+        self.pages.clear()
+        self.order = []
+    }
+}
+
+~~ ------------------------------------------------------------ public
+~~ Fetch a page, following up to five redirects.
+pub fn get(target: uri.Url) -> Response {
+    give follow(target, 5)
+}
+
+fn follow(target: uri.Url, left: Int) -> Response {
+    let started = time.clock()
+    var answer = if target.is_secure() { over_tls(target) } else { over_tcp(target) }
+    answer.ms = (time.clock() - started) * 1000.0
+    answer.secure = target.is_secure()
+    if answer.address == "" { answer.address = target.full() }
+
+    let moved = answer.status == 301 or answer.status == 302 or answer.status == 303 or
+                answer.status == 307 or answer.status == 308
+    if moved and left > 0 and answer.error != "" {
+        let next = uri.resolve(target, answer.error)
+        if next.ok {
+            var hop = follow(next, left - 1)
+            hop.ms = hop.ms + answer.ms
+            give hop
+        }
+    }
+    give answer
+}
+
+~~ --------------------------------------------------------- plain http
+fn over_tcp(target: uri.Url) -> Response {
+    var answer = Response { address: target.full() }
+    let socket = net.connect(target.host, target.port)
+    if socket < 0 {
+        answer.error = "cannot reach {target.host}"
+        give answer
+    }
+    let request = "GET " + target.target() + " HTTP/1.1\r\n" +
+                  "Host: " + host_header(target) + "\r\n" +
+                  "User-Agent: SPRFST-Browser/0.1\r\n" +
+                  "Accept: text/html,text/plain,*/*\r\n" +
+                  "Accept-Encoding: identity\r\n" +
+                  "Connection: close\r\n\r\n"
+    net.send(socket, request)
+
+    var pieces: [Text] = []
+    loop {
+        let piece = net.recv(socket, 65536)
+        if piece == "" { break }
+        pieces.push(piece)
+    }
+    net.close(socket)
+
+    let raw = pieces.join("")
+    answer.bytes = raw.len()
+    if raw == "" {
+        answer.error = "no answer from {target.host}"
+        give answer
+    }
+    give read_message(raw, answer)
+}
+
+fn host_header(target: uri.Url) -> Text {
+    if target.port == uri.default_port(target.scheme) { give target.host }
+    give target.host + ":" + target.port.to_text()
+}
+
+~~ Split a raw HTTP message into status, headers and body.
+pub fn read_message(raw: Text, into: Response) -> Response {
+    var answer = into
+    var split = raw.index_of("\r\n\r\n")
+    var skip_by = 4
+    if split < 0 {
+        split = raw.index_of("\n\n")
+        skip_by = 2
+    }
+    if split < 0 {
+        answer.body = raw
+        answer.ok = true
+        answer.status = 200
+        give answer
+    }
+    let head = raw.slice(0, split)
+    var body = raw.slice(split + skip_by, raw.len())
+
+    var headers: Map<Text, Text> = [:]
+    var first = true
+    for line in head.lines() {
+        if first {
+            first = false
+            let bits = line.split(" ")
+            if bits.len() >= 2 { answer.status = bits[1].to_int() ?? 0 }
+            skip
+        }
+        let colon = line.index_of(":")
+        if colon < 0 { skip }
+        headers.set(line.slice(0, colon).trim().lower(),
+                    line.slice(colon + 1, line.len()).trim())
+    }
+
+    if (headers.get("transfer-encoding") ?? "").lower().contains("chunked") {
+        body = unchunk(body)
+    }
+    let kind = headers.get("content-type") ?? "text/html"
+    let semi = kind.index_of(";")
+    answer.mime = if semi >= 0 { kind.slice(0, semi).trim().lower() } else { kind.trim().lower() }
+    answer.body = body
+    answer.bytes = raw.len()
+    answer.ok = answer.status >= 200 and answer.status < 400
+    ~~ a redirect carries its destination in `error` until it is followed
+    if answer.status >= 300 and answer.status < 400 {
+        answer.error = headers.get("location") ?? ""
+    } else if not answer.ok {
+        answer.error = "the site answered {answer.status}"
+    }
+    give answer
+}
+
+~~ Chunked transfer: hex length, body, repeat until zero.
+pub fn unchunk(raw: Text) -> Text {
+    var out: [Text] = []
+    var i = 0
+    let n = raw.len()
+    while i < n {
+        var stop = raw.index_of("\r\n")
+        var line = ""
+        if i == 0 and stop >= 0 {
+            line = raw.slice(0, stop)
+            i = stop + 2
+        } else {
+            let rest_start = i
+            var j = i
+            while j + 1 < n {
+                if raw.code_at(j) == 13 and raw.code_at(j + 1) == 10 { break }
+                j = j + 1
+            }
+            line = raw.slice(rest_start, j)
+            i = j + 2
+        }
+        let semi = line.index_of(";")
+        let digits = if semi >= 0 { line.slice(0, semi) } else { line }
+        let size = from_hex(digits.trim())
+        if size <= 0 { break }
+        if i + size > n { 
+            out.push(raw.slice(i, n))
+            break
+        }
+        out.push(raw.slice(i, i + size))
+        i = i + size + 2
+    }
+    give out.join("")
+}
+
+pub fn from_hex(digits: Text) -> Int {
+    var total = 0
+    var i = 0
+    while i < digits.len() {
+        let c = digits.lower().code_at(i)
+        var value = -1
+        if c >= 48 and c <= 57 { value = c - 48 }
+        if c >= 97 and c <= 102 { value = c - 87 }
+        if value < 0 { break }
+        total = total * 16 + value
+        i = i + 1
+    }
+    give total
+}
+
+~~ --------------------------------------------------------------- tls
+fn over_tls(target: uri.Url) -> Response {
+    var answer = Response { address: target.full() }
+    if not have_curl() {
+        answer.error = "https needs curl, which is not on this machine"
+        give answer
+    }
+    let marker = "@@SPRFST@@"
+    let command = "curl -sS -L --max-time 20 --compressed " +
+                  "-A 'SPRFST-Browser/0.1' " +
+                  "-w '\\n" + marker + "%{{http_code}} %{{content_type}} %{{url_effective}}' " +
+                  shell_quote(target.full()) + " 2>/dev/null"
+    let out = sys.run(command)
+    let at = last_index_of(out, marker)
+    if at < 0 {
+        answer.error = "no answer from {target.host}"
+        answer.body = out
+        answer.bytes = out.len()
+        give answer
+    }
+    answer.body = out.slice(0, at)
+    if answer.body.ends_with("\n") { answer.body = answer.body.slice(0, answer.body.len() - 1) }
+    let trailer = out.slice(at + marker.len(), out.len()).trim().split(" ")
+    if trailer.len() >= 1 { answer.status = trailer[0].to_int() ?? 0 }
+    if trailer.len() >= 2 {
+        let kind = trailer[1]
+        let semi = kind.index_of(";")
+        answer.mime = if semi >= 0 { kind.slice(0, semi) } else { kind }
+    }
+    if trailer.len() >= 3 { answer.address = trailer[2] }
+    answer.bytes = answer.body.len()
+    answer.ok = answer.status >= 200 and answer.status < 400
+    if not answer.ok and answer.status > 0 {
+        answer.error = "the site answered {answer.status}"
+    }
+    if answer.status == 0 { answer.error = "could not open a secure connection" }
+    give answer
+}
+
+var curl_checked = false
+var curl_there = false
+
+pub fn have_curl() -> Bool {
+    if not curl_checked {
+        curl_there = sys.run("command -v curl 2>/dev/null").trim() != ""
+        curl_checked = true
+    }
+    give curl_there
+}
+
+pub fn shell_quote(text: Text) -> Text {
+    give "'" + text.replace("'", "'\\''") + "'"
+}
+
+fn last_index_of(text: Text, part: Text) -> Int {
+    var found = -1
+    var from = 0
+    while from < text.len() {
+        let at = text.slice(from, text.len()).index_of(part)
+        if at < 0 { break }
+        found = from + at
+        from = found + 1
+    }
+    give found
+}

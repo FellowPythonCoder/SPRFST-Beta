@@ -122,6 +122,12 @@ static ObjInstance *vm_instance(VM *vm, int type_id, const char *tname, int nfie
     for (int i = 0; i < nfields; i++) vec_push(&o->fields, v_nil());
     return o;
 }
+/* A copy of an object, field for field: what `clone` gives you. */
+ObjInstance *vm_instance_copy(VM *vm, ObjInstance *src) {
+    ObjInstance *o = vm_instance(vm, src->type_id, src->tname, 0);
+    vec_foreach(i, &src->fields) vec_push(&o->fields, src->fields.items[i]);
+    return o;
+}
 static ObjVariant *vm_variant(VM *vm, int tag, const char *vname) {
     ObjVariant *v = (ObjVariant *)alloc_obj(vm, sizeof(ObjVariant), O_VARIANT);
     v->tag = tag; v->vname = vname;

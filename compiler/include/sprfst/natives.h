@@ -140,8 +140,9 @@ X(B_TO_NUM,      "",     "to_num",     "(Any) -> Num",            "Convert a num
 X(B_TYPE_OF,     "",     "type_of",    "(Any) -> Text",           "Name of a value's runtime type")                      \
 X(B_ASSERT,      "",     "assert",     "(Bool, Text) -> Nil",     "Fail the program when a condition is false")          \
 X(B_PANIC,       "",     "panic",      "(Text) -> Nil",           "Stop the program with an error")                      \
-X(B_CLONE,       "",     "clone",      "(Any) -> Any",            "Deep copy of a value")                                \
+X(B_CLONE,       "",     "clone",      "(T) -> T",                "A copy of a value, of the same type")                                \
 X(B_HASH,        "",     "hash_of",    "(Any) -> Int",            "Stable hash of a value")                              \
+X(B_CHAR_OF,     "",     "char_of",    "(Int) -> Text",           "The character with this code point, as UTF-8")        \
 X(B_RANGE_LIST,  "",     "range",      "(Int, Int) -> [Int]",     "List of integers from start up to end")               \
 X(B_SET,         "",     "set",        "([T]) -> {T}",            "Make a set out of a list")                            \
 /* ------------------------------------------------------------------ fs */                          \

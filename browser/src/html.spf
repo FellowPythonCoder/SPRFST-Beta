@@ -1,0 +1,457 @@
+~~ =====================================================================
+~~  SPRFST Browser — HTML
+~~
+~~  A forgiving parser: real pages are rarely well formed, so missing
+~~  end tags, stray closers and unquoted attributes all have to be
+~~  survivable. The scanner walks bytes and only ever cuts a substring
+~~  when it has a whole token, which keeps a big page linear.
+~~ =====================================================================
+module html
+
+pub object Node {
+    kind: Text = "element"          ~~ root, element, text or comment
+    name: Text = ""                 ~~ tag name, lowercased
+    text: Text = ""                 ~~ the words, for text nodes
+    attrs: Map<Text, Text> = [:]
+    kids: [Node] = []
+
+    fn attr(self, name: Text) -> Text => self.attrs.get(name) ?? ""
+
+    fn has(self, name: Text) -> Bool => self.attrs.has(name)
+
+    fn classes(self) -> [Text] {
+        var out: [Text] = []
+        for part in self.attr("class").split(" ") {
+            let name = part.trim()
+            if name != "" { out.push(name.lower()) }
+        }
+        give out
+    }
+
+    fn id_of(self) -> Text => self.attr("id").lower()
+
+    ~~ Every word under this element, scripts and styles left out.
+    fn inner_text(self) -> Text {
+        if self.kind == "text" { give self.text }
+        if self.name == "script" or self.name == "style" { give "" }
+        var parts: [Text] = []
+        for kid in self.kids {
+            let piece = kid.inner_text()
+            if piece == "" { skip }
+            ~~ a block ends a run of words, as it does on the screen
+            if kid.kind == "element" and is_block(kid.name) and parts.len() > 0 {
+                parts.push("\n")
+            }
+            parts.push(piece)
+        }
+        give parts.join("")
+    }
+
+    fn first(self, tag: Text) -> Node? {
+        for kid in self.kids {
+            if kid.kind == "element" and kid.name == tag { give kid }
+            let deeper = kid.first(tag)
+            if deeper != nil { give deeper }
+        }
+        give nil
+    }
+
+    fn all(self, tag: Text) -> [Node] {
+        var out: [Node] = []
+        self.gather(tag, out)
+        give out
+    }
+
+    fn gather(self, tag: Text, into: [Node]) {
+        for kid in self.kids {
+            if kid.kind == "element" and kid.name == tag { into.push(kid) }
+            kid.gather(tag, into)
+        }
+    }
+
+    fn count(self) -> Int {
+        var n = 1
+        for kid in self.kids { n = n + kid.count() }
+        give n
+    }
+}
+
+~~ ------------------------------------------------------------ bytes
+fn is_space_byte(c: Int) -> Bool => c == 32 or c == 9 or c == 10 or c == 13 or c == 12
+
+fn is_name_byte(c: Int) -> Bool {
+    if c >= 97 and c <= 122 { give true }        ~~ a-z
+    if c >= 65 and c <= 90 { give true }         ~~ A-Z
+    if c >= 48 and c <= 57 { give true }         ~~ 0-9
+    give c == 45 or c == 95 or c == 58           ~~ - _ :
+}
+
+fn find_byte(source: Text, want: Int, from: Int, upto: Int) -> Int {
+    var i = from
+    while i < upto {
+        if source.code_at(i) == want { give i }
+        i = i + 1
+    }
+    give -1
+}
+
+fn skip_spaces(source: Text, from: Int, upto: Int) -> Int {
+    var i = from
+    while i < upto and is_space_byte(source.code_at(i)) { i = i + 1 }
+    give i
+}
+
+~~ Tags that never have children.
+fn is_void(tag: Text) -> Bool {
+    give tag == "area" or tag == "base" or tag == "br" or tag == "col" or
+         tag == "embed" or tag == "hr" or tag == "img" or tag == "input" or
+         tag == "link" or tag == "meta" or tag == "param" or tag == "source" or
+         tag == "track" or tag == "wbr"
+}
+
+~~ Tags whose content is text, not markup.
+fn is_raw(tag: Text) -> Bool {
+    give tag == "script" or tag == "style" or tag == "textarea" or tag == "title"
+}
+
+~~ Block level tags, which end an open paragraph.
+pub fn is_block(tag: Text) -> Bool {
+    give tag == "address" or tag == "article" or tag == "aside" or
+         tag == "blockquote" or tag == "details" or tag == "div" or
+         tag == "dl" or tag == "fieldset" or tag == "figcaption" or
+         tag == "figure" or tag == "footer" or tag == "form" or
+         tag == "h1" or tag == "h2" or tag == "h3" or tag == "h4" or
+         tag == "h5" or tag == "h6" or tag == "header" or tag == "hr" or
+         tag == "li" or tag == "main" or tag == "nav" or tag == "ol" or
+         tag == "p" or tag == "pre" or tag == "section" or tag == "table" or
+         tag == "ul" or tag == "body" or tag == "html" or tag == "tr" or
+         tag == "td" or tag == "th" or tag == "thead" or tag == "tbody" or
+         tag == "dt" or tag == "dd" or tag == "figure" or
+         tag == "hgroup" or tag == "menu" or tag == "dir"
+}
+
+~~ Which open tag a new one implicitly closes.
+fn implies_close(open_tag: Text, new_tag: Text) -> Bool {
+    if open_tag == "p" { give is_block(new_tag) }
+    if open_tag == "li" { give new_tag == "li" }
+    if open_tag == "dt" or open_tag == "dd" { give new_tag == "dt" or new_tag == "dd" }
+    if open_tag == "td" or open_tag == "th" {
+        give new_tag == "td" or new_tag == "th" or new_tag == "tr"
+    }
+    if open_tag == "tr" { give new_tag == "tr" }
+    if open_tag == "option" { give new_tag == "option" }
+    if open_tag == "thead" or open_tag == "tbody" {
+        give new_tag == "tbody" or new_tag == "tfoot"
+    }
+    give false
+}
+
+~~ ------------------------------------------------------- the parser
+pub fn parse(source: Text) -> Node {
+    var root = Node { kind: "root", name: "#document" }
+    var stack: [Node] = [root]
+    let n = source.len()
+    var i = 0
+
+    while i < n {
+        let lt = find_byte(source, 60, i, n)       ~~ '<'
+        if lt < 0 {
+            add_text(stack, source.slice(i, n))
+            break
+        }
+        if lt > i { add_text(stack, source.slice(i, lt)) }
+        if lt + 1 >= n { break }
+
+        let after = source.code_at(lt + 1)
+
+        ~~ comment or doctype
+        if after == 33 {                            ~~ '!'
+            if lt + 3 < n and source.code_at(lt + 2) == 45 and source.code_at(lt + 3) == 45 {
+                let close = find_text(source, "-->", lt + 4, n)
+                if close < 0 { break }
+                i = close + 3
+                skip
+            }
+            let gt = find_byte(source, 62, lt + 1, n)
+            if gt < 0 { break }
+            i = gt + 1
+            skip
+        }
+
+        ~~ end tag
+        if after == 47 {                            ~~ '/'
+            var j = lt + 2
+            let start = j
+            while j < n and is_name_byte(source.code_at(j)) { j = j + 1 }
+            let name = source.slice(start, j).lower()
+            let gt = find_byte(source, 62, j, n)
+            close_tag(stack, name)
+            if gt < 0 { break }
+            i = gt + 1
+            skip
+        }
+
+        ~~ anything that is not a name after '<' is just text
+        if not is_name_byte(after) {
+            add_text(stack, "<")
+            i = lt + 1
+            skip
+        }
+
+        ~~ start tag
+        var j = lt + 1
+        let start = j
+        while j < n and is_name_byte(source.code_at(j)) { j = j + 1 }
+        let name = source.slice(start, j).lower()
+
+        var element = Node { kind: "element", name: name }
+        var self_closing = false
+
+        ~~ attributes
+        while true {
+            j = skip_spaces(source, j, n)
+            if j >= n { break }
+            let c = source.code_at(j)
+            if c == 62 { j = j + 1; break }                     ~~ '>'
+            if c == 47 {                                        ~~ '/'
+                self_closing = true
+                j = j + 1
+                skip
+            }
+            let name_start = j
+            while j < n {
+                let b = source.code_at(j)
+                if is_space_byte(b) or b == 61 or b == 62 or b == 47 { break }
+                j = j + 1
+            }
+            if j == name_start { j = j + 1; skip }
+            let attr_name = source.slice(name_start, j).lower()
+            j = skip_spaces(source, j, n)
+            var value = ""
+            if j < n and source.code_at(j) == 61 {              ~~ '='
+                j = skip_spaces(source, j + 1, n)
+                if j < n {
+                    let quote = source.code_at(j)
+                    if quote == 34 or quote == 39 {
+                        let value_start = j + 1
+                        let close = find_byte(source, quote, value_start, n)
+                        if close < 0 { j = n } else {
+                            value = source.slice(value_start, close)
+                            j = close + 1
+                        }
+                    } else {
+                        let value_start = j
+                        while j < n {
+                            let b = source.code_at(j)
+                            if is_space_byte(b) or b == 62 { break }
+                            j = j + 1
+                        }
+                        value = source.slice(value_start, j)
+                    }
+                }
+            }
+            element.attrs.set(attr_name, decode(value))
+        }
+
+        ~~ place it in the tree
+        while stack.len() > 1 and implies_close(stack[stack.len() - 1].name, name) {
+            stack.pop()
+        }
+        stack[stack.len() - 1].kids.push(element)
+
+        if is_raw(name) {
+            let end = find_close_tag(source, name, j, n)
+            let stop = if end < 0 { n } else { end }
+            let body = source.slice(j, stop)
+            if body != "" {
+                ~~ entities are text in a title, but code in a script
+                let keep = if name == "script" or name == "style" { body } else { decode(body) }
+                element.kids.push(Node { kind: "text", text: keep })
+            }
+            if end < 0 {
+                i = n
+            } else {
+                let gt = find_byte(source, 62, end, n)
+                i = if gt < 0 { n } else { gt + 1 }
+            }
+            skip
+        }
+
+        if not is_void(name) and not self_closing { stack.push(element) }
+        i = j
+    }
+    give root
+}
+
+fn add_text(stack: [Node], raw: Text) {
+    if raw == "" { give }
+    let parent = stack[stack.len() - 1]
+    parent.kids.push(Node { kind: "text", text: decode(raw) })
+}
+
+fn close_tag(stack: [Node], name: Text) {
+    var depth = stack.len() - 1
+    while depth > 0 {
+        if stack[depth].name == name {
+            while stack.len() > depth { stack.pop() }
+            give
+        }
+        depth = depth - 1
+    }
+}
+
+~~ Where "</name" next appears, whatever case it is written in.
+fn find_close_tag(source: Text, name: Text, from: Int, upto: Int) -> Int {
+    let width = name.len()
+    var i = from
+    while i + width + 2 <= upto {
+        if source.code_at(i) == 60 and source.code_at(i + 1) == 47 {
+            if lower_eq(source, i + 2, name) { give i }
+        }
+        i = i + 1
+    }
+    give -1
+}
+
+fn lower_eq(source: Text, at: Int, want: Text) -> Bool {
+    var k = 0
+    while k < want.len() {
+        var c = source.code_at(at + k)
+        if c >= 65 and c <= 90 { c = c + 32 }
+        if c != want.code_at(k) { give false }
+        k = k + 1
+    }
+    give true
+}
+
+pub fn find_text(source: Text, want: Text, from: Int, upto: Int) -> Int {
+    let first = want.code_at(0)
+    let width = want.len()
+    var i = from
+    while i + width <= upto {
+        if source.code_at(i) == first {
+            if source.slice(i, i + width) == want { give i }
+        }
+        i = i + 1
+    }
+    give -1
+}
+
+~~ --------------------------------------------------------- entities
+pub fn decode(raw: Text) -> Text {
+    if not raw.contains("&") { give raw }
+    var out = raw
+    if out.contains("&#") { out = numeric(out) }
+    out = out.replace("&nbsp;", "\u{a0}")
+    out = out.replace("&amp;", "&")
+    out = out.replace("&lt;", "<")
+    out = out.replace("&gt;", ">")
+    out = out.replace("&quot;", "\"")
+    out = out.replace("&apos;", "'")
+    out = out.replace("&#39;", "'")
+    out = out.replace("&#x27;", "'")
+    out = out.replace("&#34;", "\"")
+    out = out.replace("&mdash;", "—")
+    out = out.replace("&ndash;", "–")
+    out = out.replace("&hellip;", "…")
+    out = out.replace("&bull;", "•")
+    out = out.replace("&middot;", "·")
+    out = out.replace("&copy;", "©")
+    out = out.replace("&reg;", "®")
+    out = out.replace("&trade;", "™")
+    out = out.replace("&rsquo;", "’")
+    out = out.replace("&lsquo;", "‘")
+    out = out.replace("&ldquo;", "“")
+    out = out.replace("&rdquo;", "”")
+    out = out.replace("&laquo;", "«")
+    out = out.replace("&raquo;", "»")
+    out = out.replace("&deg;", "°")
+    out = out.replace("&euro;", "€")
+    out = out.replace("&pound;", "£")
+    out = out.replace("&times;", "×")
+    out = out.replace("&divide;", "÷")
+    give out
+}
+
+~~ &#65; and &#x41; and the thousands of others nobody lists by name.
+fn numeric(raw: Text) -> Text {
+    var out: [Text] = []
+    let n = raw.len()
+    var i = 0
+    while i < n {
+        if raw.code_at(i) != 38 or i + 2 >= n or raw.code_at(i + 1) != 35 {
+            out.push(raw.char_at(i))
+            i = i + 1
+            skip
+        }
+        var j = i + 2
+        var hex = false
+        if j < n and (raw.code_at(j) == 120 or raw.code_at(j) == 88) {
+            hex = true
+            j = j + 1
+        }
+        let start = j
+        var value = 0
+        while j < n {
+            let c = raw.code_at(j)
+            var digit = -1
+            if c >= 48 and c <= 57 { digit = c - 48 }
+            else if hex and c >= 97 and c <= 102 { digit = c - 87 }
+            else if hex and c >= 65 and c <= 70 { digit = c - 55 }
+            if digit < 0 { break }
+            value = value * (if hex { 16 } else { 10 }) + digit
+            j = j + 1
+        }
+        if j == start or j >= n or raw.code_at(j) != 59 or value <= 0 or value > 1114111 {
+            out.push(raw.char_at(i))
+            i = i + 1
+            skip
+        }
+        out.push(char_of(value))
+        i = j + 1
+    }
+    give out.join("")
+}
+
+~~ Collapse runs of whitespace, as a browser does outside <pre>.
+pub fn squash(raw: Text) -> Text {
+    var out: [Text] = []
+    var i = 0
+    let n = raw.len()
+    while i < n {
+        if is_space_byte(raw.code_at(i)) {
+            out.push(" ")
+            while i < n and is_space_byte(raw.code_at(i)) { i = i + 1 }
+        } else {
+            let start = i
+            while i < n and not is_space_byte(raw.code_at(i)) { i = i + 1 }
+            out.push(raw.slice(start, i))
+        }
+    }
+    give out.join("")
+}
+
+~~ Title, description and language, for the chrome to show.
+~~ Every character under a node, scripts and styles included: what a
+~~ stylesheet or a script tag holds.
+pub fn raw_text(node: Node) -> Text {
+    if node.kind == "text" { give node.text }
+    var parts: [Text] = []
+    for kid in node.kids { parts.push(raw_text(kid)) }
+    give parts.join("")
+}
+
+pub fn title_of(document: Node) -> Text {
+    let node = document.first("title")
+    if node == nil { give "" }
+    give squash((node ?? Node { }).inner_text()).trim()
+}
+
+pub fn meta_of(document: Node, name: Text) -> Text {
+    for node in document.all("meta") {
+        if node.attr("name").lower() == name or node.attr("property").lower() == name {
+            give node.attr("content")
+        }
+    }
+    give ""
+}

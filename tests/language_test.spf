@@ -12,6 +12,26 @@ test "arithmetic follows the usual rules" {
     testing.close(10 / 4, 2.5, 0.0001, "division gives a Num")
 }
 
+test "a code point becomes a character" {
+    testing.same(char_of(65), "A", "ascii")
+    testing.same(char_of(233), "é", "latin-1 as utf-8")
+    testing.same(char_of(8212), "—", "an em dash")
+    testing.same(char_of(128013), "🐍", "beyond the basic plane")
+    testing.same(char_of(97).code_at(0), 97, "and back again")
+}
+
+test "clone copies an object, not a reference to it" {
+    var a = Point3 { x: 1, y: 2 }
+    var b = clone(a)
+    b.x = 99
+    testing.same(a.x, 1, "the first is untouched")
+    testing.same(b.x, 99, "the copy took the change")
+    var one = [1, 2]
+    var two = clone(one)
+    two.push(3)
+    testing.same(one.len(), 2, "lists are copied too")
+}
+
 test "text behaves" {
     testing.same("abc".upper(), "ABC", "upper")
     testing.same("  pad  ".trim(), "pad", "trim")
@@ -110,4 +130,9 @@ bench "list building" {
         xs.push(i)
         i = i + 1
     }
+}
+
+object Point3 {
+    x: Int = 0
+    y: Int = 0
 }

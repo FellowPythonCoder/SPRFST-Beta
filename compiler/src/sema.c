@@ -726,7 +726,13 @@ static Type *check_method(Sema *s, Expr *e) {
             if (all.len >= 1) {
                 TypeVec rest; vec_init(&rest);
                 for (int i = 1; i < all.len; i++) vec_push(&rest, all.items[i]);
-                Type *r = check_call_args(s, e->span, nf->name, &rest, &e->as.method.args, ret, NULL, false);
+                GenericEnv anyenv = { 0 };
+                if (all.items[0] && all.items[0]->kind == TY_GENERIC && rt) {
+                    anyenv.names[anyenv.n] = all.items[0]->name;
+                    anyenv.bound[anyenv.n++] = rt;
+                }
+                Type *r = check_call_args(s, e->span, nf->name, &rest, &e->as.method.args, ret,
+                                          anyenv.n ? &anyenv : NULL, false);
                 vec_free(&rest); vec_free(&all);
                 e->as.method.builtin = gid;
                 return was_optional ? type_maybe(tt, r ? r : tt->t_nil) : (r ? r : tt->t_nil);
@@ -2176,6 +2182,26 @@ static void declare_members(Sema *s, Module *m) {
         vec_foreach(k, &td->methods) {
             FnDecl *fn = td->methods.items[k];
             fn->owner = td;
+            /* Resolve the signature here, while the module that declares
+               the type is the one in scope.  Otherwise it is resolved at
+               the first call site instead, in whatever module that turns
+               out to be, and a method that mentions its own type -- the
+               usual `fn kids(self) -> [Node]` -- cannot be seen from
+               another module. */
+            scope_push(s, NULL);
+            vec_foreach(g, &fn->generics) {
+                GenericParam *gp = &fn->generics.items[g];
+                Symbol *gs = sym_new(s, SYM_GENERIC, gp->name,
+                                     type_generic(tt, gp->name, g), gp->span);
+                gs->used = true;
+                vec_push(&s->scope->syms, gs);
+            }
+            vec_foreach(j, &fn->params) {
+                Param *p = &fn->params.items[j];
+                if (!p->is_self && p->type) resolve_type(s, p->type);
+            }
+            if (fn->ret) resolve_type(s, fn->ret);
+            scope_pop(s);
             vec_push(&s->all_fns, fn);
         }
         scope_pop(s);

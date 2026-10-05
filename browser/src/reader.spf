@@ -1,0 +1,137 @@
+~~ =====================================================================
+~~  SPRFST Browser — the Lens
+~~
+~~  Finds the part of a page that is actually the page: the block with
+~~  the most prose and the fewest links, which is a surprisingly good
+~~  definition of an article. What comes back is a new, small document
+~~  that the ordinary layout then draws.
+~~ =====================================================================
+module reader
+
+use html
+
+pub object Pick {
+    node: html.Node = html.Node { }
+    score: Num = 0.0
+    found: Bool = false
+}
+
+~~ How much of this subtree reads like prose.
+pub fn score_of(node: html.Node) -> Num {
+    if node.kind != "element" { give 0.0 }
+    var words = 0.0
+    var links = 0.0
+    var commas = 0.0
+    for p in node.all("p") {
+        let text = html.squash(p.inner_text()).trim()
+        words = words + to_num(count_words(text))
+        commas = commas + to_num(count_of(text, ","))
+    }
+    for a in node.all("a") {
+        links = links + to_num(count_words(html.squash(a.inner_text()).trim()))
+    }
+    if words < 25.0 { give 0.0 }
+    var score = words + commas * 8.0 - links * 3.0
+    if node.name == "article" or node.name == "main" { score = score + 200.0 }
+    let marks = node.attr("class").lower() + " " + node.attr("id").lower()
+    if marks.contains("content") or marks.contains("article") or
+       marks.contains("post") or marks.contains("story") or marks.contains("entry") {
+        score = score + 120.0
+    }
+    if marks.contains("comment") or marks.contains("sidebar") or marks.contains("nav") or
+       marks.contains("footer") or marks.contains("promo") or marks.contains("related") {
+        score = score - 200.0
+    }
+    give score
+}
+
+fn count_words(text: Text) -> Int {
+    if text == "" { give 0 }
+    var n = 0
+    for word in text.split(" ") {
+        if word.trim() != "" { n = n + 1 }
+    }
+    give n
+}
+
+fn count_of(text: Text, part: Text) -> Int {
+    var n = 0
+    var from = 0
+    while from < text.len() {
+        let at = text.slice(from, text.len()).index_of(part)
+        if at < 0 { break }
+        n = n + 1
+        from = from + at + 1
+    }
+    give n
+}
+
+~~ The best candidate under a document.
+pub fn find(document: html.Node) -> Pick {
+    var best = Pick { }
+    for tag in ["article", "main", "section", "div", "body"] {
+        for node in document.all(tag) {
+            let score = score_of(node)
+            if score > best.score {
+                best = Pick { node: node, score: score, found: true }
+            }
+        }
+    }
+    give best
+}
+
+~~ Keep the parts of a subtree worth reading.
+fn keep(node: html.Node, into: html.Node, depth: Int) {
+    if depth > 24 { give }
+    for kid in node.kids {
+        if kid.kind == "text" {
+            let text = html.squash(kid.text).trim()
+            if text != "" { into.kids.push(kid) }
+            skip
+        }
+        if kid.kind != "element" { skip }
+        let tag = kid.name
+        if tag == "script" or tag == "style" or tag == "nav" or tag == "aside" or
+           tag == "footer" or tag == "form" or tag == "button" or tag == "svg" or
+           tag == "noscript" or tag == "iframe" {
+            skip
+        }
+        let marks = kid.attr("class").lower() + " " + kid.attr("id").lower()
+        if marks.contains("share") or marks.contains("social") or marks.contains("newsletter") or
+           marks.contains("promo") or marks.contains("related") or marks.contains("comment") {
+            skip
+        }
+        if tag == "p" or tag == "h1" or tag == "h2" or tag == "h3" or tag == "h4" or
+           tag == "blockquote" or tag == "ul" or tag == "ol" or tag == "pre" or
+           tag == "figure" or tag == "img" or tag == "table" {
+            into.kids.push(kid)
+            skip
+        }
+        keep(kid, into, depth + 1)
+    }
+}
+
+~~ Build the reading copy of a document. The title becomes an h1 so
+~~ the page still looks like a page.
+pub fn distil(document: html.Node, title: Text) -> html.Node {
+    var body = html.Node { kind: "element", name: "body" }
+    var root = html.Node { kind: "root", name: "#document" }
+    root.kids.push(body)
+
+    if title != "" {
+        var heading = html.Node { kind: "element", name: "h1" }
+        heading.kids.push(html.Node { kind: "text", text: title })
+        body.kids.push(heading)
+    }
+
+    let best = find(document)
+    if not best.found {
+        for p in document.all("p") { body.kids.push(p) }
+        give root
+    }
+    keep(best.node, body, 0)
+    if body.kids.len() <= 1 {
+        for p in document.all("p") { body.kids.push(p) }
+    }
+    give root
+}

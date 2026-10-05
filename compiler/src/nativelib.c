@@ -1105,7 +1105,29 @@ static Value native_dispatch(VM *vm, int id, Value *args, int nargs, bool *ok) {
             vec_foreach(i, &m->keys) vm_map_set(vm, out, m->keys.items[i], m->vals.items[i]);
             return v_obj((Obj *)out);
         }
+        if (IS_OBJ(v, O_INSTANCE)) return v_obj((Obj *)vm_instance_copy(vm, AS_INSTANCE(v)));
         return v;
+    }
+    case NF_B_CHAR_OF: {
+        int64_t cp = INT(0);
+        char buf[4];
+        int n = 0;
+        if (cp < 0 || cp > 0x10FFFF) cp = 0xFFFD;
+        if (cp < 0x80) buf[n++] = (char)cp;
+        else if (cp < 0x800) {
+            buf[n++] = (char)(0xC0 | (cp >> 6));
+            buf[n++] = (char)(0x80 | (cp & 0x3F));
+        } else if (cp < 0x10000) {
+            buf[n++] = (char)(0xE0 | (cp >> 12));
+            buf[n++] = (char)(0x80 | ((cp >> 6) & 0x3F));
+            buf[n++] = (char)(0x80 | (cp & 0x3F));
+        } else {
+            buf[n++] = (char)(0xF0 | (cp >> 18));
+            buf[n++] = (char)(0x80 | ((cp >> 12) & 0x3F));
+            buf[n++] = (char)(0x80 | ((cp >> 6) & 0x3F));
+            buf[n++] = (char)(0x80 | (cp & 0x3F));
+        }
+        return mktextn(vm, buf, n);
     }
     case NF_B_HASH: return v_int((int64_t)(vm_value_hash(A(0)) & 0x7fffffffffffffffULL));
     case NF_B_SET: {

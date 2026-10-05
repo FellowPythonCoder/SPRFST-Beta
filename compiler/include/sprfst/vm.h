@@ -223,6 +223,7 @@ void  vm_runtime_error(VM *vm, const char *fmt, ...);
 
 /* object helpers (shared with the native library) */
 ObjText     *vm_text(VM *vm, const char *s, int len);
+ObjInstance *vm_instance_copy(VM *vm, ObjInstance *src);
 ObjText     *vm_text_cstr(VM *vm, const char *s);
 ObjList     *vm_list(VM *vm);
 ObjMap      *vm_map(VM *vm);

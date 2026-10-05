@@ -1,0 +1,274 @@
+~~ =====================================================================
+~~  SPRFST Browser — the engine's front door
+~~
+~~      sprfst run src/main.spf -- http://example.com     read it here
+~~      sprfst run src/main.spf -- --serve                drive the window
+~~
+~~  In the first form the page is drawn in the terminal. In the second
+~~  the engine answers one JSON request per line, which is how the Mac
+~~  application talks to it.
+~~ =====================================================================
+use std.io
+use std.sys
+use std.json
+use std.fs
+use std.path
+use std.time
+use uri
+use html
+use css
+use shield
+use layout
+use fetch
+use page
+
+~~ ---------------------------------------------------------- colours
+~~ Ember is our own reading palette: deep black, soft white, amber.
+~~ With it off the page keeps whatever colours it asked for.
+fn ink(ember: Bool) -> Int { if ember { give 0x0B0B0D } give 0xFFFFFF }
+fn paper_text(ember: Bool) -> Int { if ember { give 0xE8E8E6 } give 0x111111 }
+fn link_colour(ember: Bool) -> Int { if ember { give 0xFFA136 } give 0x1A4FD0 }
+fn quiet(ember: Bool) -> Int { if ember { give 0x8A8A90 } give 0x666666 }
+fn panel(ember: Bool) -> Int { if ember { give 0x161618 } give 0xF3F3F1 }
+
+fn luminance(colour: Int) -> Num {
+    let r = to_num(to_int(colour / 65536) % 256)
+    let g = to_num(to_int(colour / 256) % 256)
+    let b = to_num(colour % 256)
+    give (r * 0.299 + g * 0.587 + b * 0.114) / 255.0
+}
+
+~~ Settle an item's colour against the theme.
+fn resolve_colour(raw: Int, ember: Bool) -> Int {
+    if raw == -1 { give paper_text(ember) }
+    if raw == -2 { give link_colour(ember) }
+    if raw == -3 { give panel(ember) }
+    if raw == -4 { give link_colour(ember) }
+    if raw == -5 { give 0x2A2A2E }
+    if not ember { give raw }
+    ~~ in Ember, text the page wanted dark becomes our soft white
+    if luminance(raw) < 0.45 { give paper_text(ember) }
+    give raw
+}
+
+~~ ------------------------------------------------------------- JSON
+fn items_of(drawn: layout.Page, ember: Bool) -> [Any] {
+    var out: [Any] = []
+    for item in drawn.items {
+        var one: Map<Text, Any> = [:]
+        one.set("k", item.kind)
+        one.set("x", item.x)
+        one.set("y", item.y)
+        one.set("w", item.w)
+        one.set("h", item.h)
+        if item.text != "" { one.set("t", item.text) }
+        one.set("c", resolve_colour(item.colour, ember))
+        if item.size != 16.0 { one.set("s", item.size) }
+        if item.weight != 400 { one.set("b", item.weight) }
+        if item.italic { one.set("i", true) }
+        if item.underline { one.set("u", true) }
+        if item.mono { one.set("m", true) }
+        if item.link != "" { one.set("l", item.link) }
+        if item.src != "" { one.set("src", item.src) }
+        out.push(one)
+    }
+    give out
+}
+
+fn answer_of(result: page.Result, session: page.Session) -> Map<Text, Any> {
+    let ember = session.settings.ember
+    var out: Map<Text, Any> = [:]
+    out.set("ok", result.error == "")
+    out.set("address", result.address)
+    out.set("title", result.title)
+    out.set("status", result.status)
+    out.set("height", result.page.height)
+    out.set("width", result.page.width)
+    out.set("background", ink(ember))
+    out.set("text", paper_text(ember))
+    out.set("quiet", quiet(ember))
+    out.set("secure", result.secure)
+    out.set("cached", result.cached)
+    out.set("reading", result.reading)
+    out.set("error", result.error)
+    out.set("ms", to_int(result.ms))
+    out.set("fetch_ms", to_int(result.fetch_ms))
+    out.set("bytes", result.bytes)
+    out.set("words", result.words)
+    out.set("blocked", result.blocked)
+    out.set("hidden", result.hidden)
+    out.set("requests", result.requests)
+    out.set("rules", session.guard.loaded)
+    out.set("back", session.can_back())
+    out.set("forward", session.can_forward())
+    out.set("headings", result.headings)
+    out.set("items", items_of(result.page, ember))
+    give out
+}
+
+~~ ------------------------------------------------------ the service
+fn serve(session: page.Session) {
+    var width = session.settings.width
+    io.say(json.write(["ok": true, "service": "sprfst-browser",
+                       "version": "0.1.0-beta", "rules": session.guard.loaded]))
+    io.flush()
+    loop {
+        let line = io.read_line()
+        if line == nil { break }
+        let text = (line ?? "").trim()
+        if text == "" { skip }
+        let parsed = json.parse(text)
+        if parsed == nil {
+            io.say(json.write(["ok": false, "error": "that was not JSON"]))
+            io.flush()
+            skip
+        }
+        let request: Map<Text, Any> = parsed ?? [:]
+        let verb = to_text(request.get("do") ?? "")
+        if verb == "bye" { break }
+
+        if verb == "width" {
+            width = to_num(to_text(request.get("value") ?? "860").to_num() ?? 860.0)
+            session.settings.width = width
+        }
+        if verb == "set" {
+            let what = to_text(request.get("what") ?? "")
+            let value = to_text(request.get("value") ?? "")
+            let yes = value == "true" or value == "1"
+            if what == "shield" { session.settings.shield_on = yes }
+            if what == "ember" { session.settings.ember = yes }
+            if what == "reading" { session.settings.reading = yes }
+            if what == "images" { session.settings.images = yes }
+            if what == "search" { session.settings.search = value }
+            if what == "size" { session.settings.text_size = value.to_num() ?? 16.0 }
+        }
+
+        var going = ""
+        var record = true
+        if verb == "open" { going = to_text(request.get("url") ?? "") }
+        if verb == "back" { going = session.back(); record = false }
+        if verb == "forward" { going = session.forward(); record = false }
+        if verb == "reload" or verb == "set" or verb == "width" {
+            going = session.last.address
+            record = false
+            if verb == "reload" { session.store.forget() }
+        }
+        if going == "" { going = session.settings.home }
+
+        let asked = to_text(request.get("width") ?? "")
+        if asked != "" { width = asked.to_num() ?? width }
+
+        let result = page.open(session, going, width, record and verb == "open")
+        io.say(json.write(answer_of(result, session)))
+        io.flush()
+    }
+}
+
+~~ -------------------------------------------------- the terminal eye
+~~ The same display list, printed. Useful on its own, and it means the
+~~ engine can be checked without a window anywhere near it.
+fn show(result: page.Result, colour: Bool) {
+    let amber = if colour { "\e[38;5;214m" } else { "" }
+    let grey = if colour { "\e[38;5;245m" } else { "" }
+    let bold = if colour { "\e[1m" } else { "" }
+    let off = if colour { "\e[0m" } else { "" }
+
+    io.say("")
+    io.say(amber + "  " + result.title + off)
+    io.say(grey + "  " + result.address + off)
+    io.say("")
+
+    var line: [Text] = []
+    var at = -1.0
+    var indent = 0
+    for item in result.page.items {
+        if item.kind == "rule" {
+            if line.len() > 0 { io.say(spaces(indent) + line.join(" ")); line = [] }
+            io.say(grey + "  " + "—".repeat(40) + off)
+            at = -1.0
+            skip
+        }
+        if item.kind != "text" and item.kind != "bullet" { skip }
+        let baseline = to_num(to_int((item.y + item.size * 0.78) * 2.0)) / 2.0
+        if baseline != at {
+            if line.len() > 0 { io.say(spaces(indent) + line.join(" ")) }
+            line = []
+            at = baseline
+            indent = 2 + to_int(item.x / 9.0)
+        }
+        var word = item.text
+        if item.link != "" { word = amber + word + off }
+        else if item.weight >= 600 or item.size > 20.0 { word = bold + word + off }
+        line.push(word)
+    }
+    if line.len() > 0 { io.say(spaces(indent) + line.join(" ")) }
+
+    io.say("")
+    io.say(grey + "  " + to_int(result.ms).to_text() + " ms  ·  " +
+           page.human(result.bytes) + "  ·  " + result.words.to_text() + " words  ·  " +
+           result.blocked.to_text() + " blocked  ·  " + result.hidden.to_text() + " hidden" + off)
+    if result.error != "" { io.say("  " + result.error) }
+    io.say("")
+}
+
+fn spaces(n: Int) -> Text {
+    if n <= 0 { give "" }
+    give " ".repeat(n)
+}
+
+~~ --------------------------------------------------------------- main
+fn main() {
+    var session = page.Session { }
+    session.guard = shield.from_file(rules_path())
+
+    var address = ""
+    var serving = false
+    var colour = true
+    var width = 860.0
+    var reading = false
+
+    var args = sys.args()
+    var i = 0
+    while i < args.len() {
+        let arg = args[i]
+        if arg == "--serve" { serving = true }
+        else if arg == "--plain" { colour = false }
+        else if arg == "--reader" { reading = true }
+        else if arg == "--no-shield" { session.settings.shield_on = false }
+        else if arg == "--true-colour" { session.settings.ember = false }
+        else if arg == "--width" and i + 1 < args.len() {
+            i = i + 1
+            width = args[i].to_num() ?? 860.0
+        }
+        else if not arg.starts_with("--") { address = arg }
+        i = i + 1
+    }
+    session.settings.reading = reading
+    session.settings.width = width
+
+    if serving {
+        serve(session)
+        give
+    }
+    if address == "" { address = "sprfst://start" }
+    let result = page.open(session, address, width, true)
+    show(result, colour)
+    if result.error != "" { sys.exit(1) }
+}
+
+~~ The rules live beside the engine, wherever it was installed. The
+~~ application sets SPRFST_BROWSER_HOME; from a terminal the usual
+~~ places are tried, and failing everything the built-in list is used.
+fn rules_path() -> Text {
+    let home = sys.env("SPRFST_BROWSER_HOME") ?? ""
+    var tries: [Text] = []
+    if home != "" { tries.push(home + "/shield.rules") }
+    tries.push("shield.rules")
+    tries.push("rules/shield.rules")
+    tries.push("browser/rules/shield.rules")
+    tries.push(path.join(path.dirname(path.abs("x")), "rules/shield.rules"))
+    for candidate in tries {
+        if fs.exists(candidate) { give candidate }
+    }
+    give "shield.rules"
+}
