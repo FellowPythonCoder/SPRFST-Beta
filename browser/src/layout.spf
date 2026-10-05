@@ -219,6 +219,10 @@ pub object Frame {
     rule_index: Index = Index { }
     measure: Ruler = Ruler { }
     hide: [Text] = []
+    hide_tag: Map<Text, Bool> = [:]      ~~ the simple ones, sorted once
+    hide_id: Map<Text, Bool> = [:]
+    hide_class: Map<Text, Bool> = [:]
+    hide_rest: [Text] = []               ~~ anything compound, matched the long way
     width: Num = 800.0
     margin: Num = 28.0
     left: Num = 0.0
@@ -530,8 +534,39 @@ pub object Frame {
         }
     }
 
-    fn is_hidden(self, crumb: Crumb) -> Bool {
+    ~~ A hiding rule is read once, not once per element: a page with
+    ~~ seventy rules and two thousand elements would otherwise spend
+    ~~ all its time pulling the same selectors apart.
+    fn sort_hiding(self) {
         for selector in self.hide {
+            let one = selector.trim()
+            if one == "" { skip }
+            if one.contains(" ") or one.contains(",") or one.contains("[") or
+               one.contains(":") or one.contains(">") {
+                self.hide_rest.push(one)
+                skip
+            }
+            let head = one.char_at(0)
+            let name = one.slice(1, one.len()).lower()
+            if head == "." and not name.contains(".") and not name.contains("#") {
+                self.hide_class.set(name, true)
+            } else if head == "#" and not name.contains(".") and not name.contains("#") {
+                self.hide_id.set(name, true)
+            } else if head != "." and head != "#" and not one.contains(".") and not one.contains("#") {
+                self.hide_tag.set(one.lower(), true)
+            } else {
+                self.hide_rest.push(one)
+            }
+        }
+    }
+
+    fn is_hidden(self, crumb: Crumb) -> Bool {
+        if self.hide_tag.has(crumb.tag) { give true }
+        if crumb.id != "" and self.hide_id.has(crumb.id) { give true }
+        for name in crumb.classes {
+            if self.hide_class.has(name) { give true }
+        }
+        for selector in self.hide_rest {
             if css.part_matches(selector, crumb.tag, crumb.id, crumb.classes) { give true }
         }
         give false
@@ -595,6 +630,7 @@ pub fn run(document: html.Node, sheet: css.Sheet, hide: [Text], width: Num) -> P
         page: Page { width: width }
     }
     frame.rule_index.build(sheet)
+    frame.sort_hiding()
     frame.left = frame.margin
     frame.y = 24.0
 

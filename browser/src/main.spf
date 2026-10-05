@@ -93,6 +93,9 @@ fn answer_of(result: page.Result, session: page.Session) -> Map<Text, Any> {
     out.set("error", result.error)
     out.set("ms", to_int(result.ms))
     out.set("fetch_ms", to_int(result.fetch_ms))
+    out.set("parse_ms", to_int(result.parse_ms))
+    out.set("style_ms", to_int(result.style_ms))
+    out.set("layout_ms", to_int(result.layout_ms))
     out.set("bytes", result.bytes)
     out.set("words", result.words)
     out.set("blocked", result.blocked)
@@ -107,7 +110,12 @@ fn answer_of(result: page.Result, session: page.Session) -> Map<Text, Any> {
 }
 
 ~~ ------------------------------------------------------ the service
-fn serve(session: page.Session) {
+fn serve(first: page.Session) {
+    ~~ Every tab in the window is a session of its own: its own history
+    ~~ and its own settings, sharing one shield and one store so that a
+    ~~ page already read is instant in any of them.
+    var sessions: Map<Text, page.Session> = ["0": first]
+    var session = first
     var width = session.settings.width
     io.say(json.write(["ok": true, "service": "sprfst-browser",
                        "version": "0.1.0-beta", "rules": session.guard.loaded]))
@@ -126,6 +134,27 @@ fn serve(session: page.Session) {
         let request: Map<Text, Any> = parsed ?? [:]
         let verb = to_text(request.get("do") ?? "")
         if verb == "bye" { break }
+
+        let which = to_text(request.get("tab") ?? "0")
+        var found = sessions.get(which)
+        if found == nil {
+            var fresh = page.Session { guard: first.guard, store: first.store }
+            fresh.settings = page.Settings {
+                search: first.settings.search, engine_name: first.settings.engine_name,
+                ember: first.settings.ember, shield_on: first.settings.shield_on,
+                width: first.settings.width, text_size: first.settings.text_size,
+                home: first.settings.home, images: first.settings.images
+            }
+            sessions.set(which, fresh)
+            found = fresh
+        }
+        session = found ?? first
+        if verb == "close" {
+            sessions.remove(which)
+            io.say(json.write(["ok": true, "closed": which]))
+            io.flush()
+            skip
+        }
 
         if verb == "width" {
             width = to_num(to_text(request.get("value") ?? "860").to_num() ?? 860.0)
@@ -204,6 +233,8 @@ fn show(result: page.Result, colour: Bool) {
     if line.len() > 0 { io.say(spaces(indent) + line.join(" ")) }
 
     io.say("")
+    io.say(grey + "  " + "fetch {to_int(result.fetch_ms)} · read {to_int(result.parse_ms)} · " +
+           "style {to_int(result.style_ms)} · lay out {to_int(result.layout_ms)}" + off)
     io.say(grey + "  " + to_int(result.ms).to_text() + " ms  ·  " +
            page.human(result.bytes) + "  ·  " + result.words.to_text() + " words  ·  " +
            result.blocked.to_text() + " blocked  ·  " + result.hidden.to_text() + " hidden" + off)

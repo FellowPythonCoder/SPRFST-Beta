@@ -298,14 +298,36 @@ else
     report "guidebook pdf written" no "no file"
 fi
 
-# the Swift editor, as far as a machine with no Swift can tell
+# the Swift of both applications, as far as a machine with no Swift can tell
 if sw=$("$ROOT/tools/check_swift.sh" 2>&1); then
-    report "studio sources ($(printf '%s' "$sw" | grep -oE '[0-9]+ Swift files'))" ok
+    report "studio sources ($(printf '%s' "$sw" | grep -oE 'Studio: [0-9]+ Swift files' | grep -oE '[0-9]+ Swift files'))" ok
+    report "browser sources ($(printf '%s' "$sw" | grep -oE 'Browser: [0-9]+ Swift files' | grep -oE '[0-9]+ Swift files'))" ok
 else
-    report "studio sources" no "$(printf '%s' "$sw" | head -4)"
+    report "application sources" no "$(printf '%s' "$sw" | head -6)"
 fi
 
-for script in tools/build_macos_app.sh tools/make_dmg.sh tools/check_guidebook.sh tools/check_swift.sh; do
+# ------------------------------------------------------------- browser
+printf "\n  ${DIM}browser${OFF}\n"
+if err=$("$SPRFST" check "$ROOT/browser/src/main.spf" 2>&1); then
+    report "engine checks ($(printf '%s' "$err" | grep -oE '[0-9]+ files'))" ok
+else
+    report "engine checks" no "$(printf '%s' "$err" | head -6)"
+fi
+bt=$(cd "$ROOT/browser" && "$SPRFST" test 2>&1)
+if printf '%s' "$bt" | grep -q "0 failed"; then
+    report "engine suite ($(printf '%s' "$bt" | grep -oE '[0-9]+ passed' | tail -1))" ok
+else
+    report "engine suite" no "$(printf '%s' "$bt" | grep -A 1 'fail ' | head -6)"
+fi
+bl=$(limit 120 "$ROOT/tools/browser_live.sh" 2>&1)
+if printf '%s' "$bl" | grep -q "0 failed"; then
+    report "browser against a server ($(printf '%s' "$bl" | grep -oE '[0-9]+ passed' | tail -1))" ok
+else
+    report "browser against a server" no "$(printf '%s' "$bl" | grep -B 1 'fail' | head -6)"
+fi
+
+for script in tools/build_macos_app.sh tools/make_dmg.sh tools/check_guidebook.sh tools/check_swift.sh \
+              tools/build_browser_app.sh tools/make_browser_dmg.sh tools/browser_live.sh; do
     bash -n "$ROOT/$script" 2>/dev/null && report "$(basename "$script") parses" ok \
         || report "$(basename "$script") parses" no
 done

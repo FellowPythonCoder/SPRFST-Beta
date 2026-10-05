@@ -40,7 +40,8 @@ SRCS := $(wildcard $(SRCDIR)/*.c)
 OBJS := $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRCS))
 DEPS := $(OBJS:.o=.d)
 
-.PHONY: all clean test install dirs app studio dmg pdf stage docs guidebook
+.PHONY: all clean test install dirs app studio dmg pdf stage docs guidebook \
+        browser browser-app browser-dmg browser-test
 
 all: dirs $(BIN)/sprfst
 
@@ -88,6 +89,26 @@ studio: all
 dmg: all pdf
 	./tools/make_dmg.sh
 
+# ------------------------------------------------------------- browser
+# the browser whose engine is written in SPRFST
+
+# the one people want: build it, put it in /Applications, open it
+browser: all
+	./tools/build_browser_app.sh --install
+
+browser-app: all
+	./tools/build_browser_app.sh
+
+# on a Mac this wraps the built app; anywhere else it writes the
+# installer image, which carries the project and builds it on arrival
+browser-dmg: all
+	./tools/make_browser_dmg.sh
+
+# the engine's own tests, then the engine against a real server
+browser-test: all
+	@cd browser && ../build/bin/sprfst test
+	@./tools/browser_live.sh
+
 # the guidebook as PDFs: one per chapter and one book, typeset by sprfst
 pdf: all
 	./build/bin/sprfst run tools/make_pdf.spf -- guidebook/pdf
@@ -97,3 +118,5 @@ pdf: all
 stage: all
 	./tools/build_macos_app.sh --stage
 	./tools/make_dmg.sh --stage
+	./tools/build_browser_app.sh --stage
+	./tools/make_browser_dmg.sh --stage

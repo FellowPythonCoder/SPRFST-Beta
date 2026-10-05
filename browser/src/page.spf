@@ -43,6 +43,9 @@ pub object Result {
     status: Int = 0
     ms: Num = 0.0
     fetch_ms: Num = 0.0
+    parse_ms: Num = 0.0
+    style_ms: Num = 0.0
+    layout_ms: Num = 0.0
     bytes: Int = 0
     blocked: Int = 0
     hidden: Int = 0
@@ -174,6 +177,7 @@ pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
     }
 
     ~~ ------------------------------------------------- make a document
+    var mark = time.clock()
     var document = html.Node { }
     if mime != "text/html" and mime != "application/xhtml+xml" and mime != "" {
         if mime.starts_with("text/") or mime.contains("json") or mime.contains("xml") {
@@ -185,6 +189,9 @@ pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
     } else {
         document = html.parse(source)
     }
+
+    out.parse_ms = (time.clock() - mark) * 1000.0
+    mark = time.clock()
 
     let here = uri.parse(out.address)
     out.title = html.title_of(document)
@@ -202,11 +209,15 @@ pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
         let sheet_url = uri.parse(href)
         out.requests = out.requests + 1
         if session.guard.check(sheet_url, here.host) { skip }
+        ~~ Pages are painted in one typeface, so a web font sheet is a
+        ~~ round trip that can change nothing. It is not fetched.
+        if is_font_host(sheet_url.host) { skip }
         if style_text.len() >= 4 { skip }
         let answer = fetch.get(sheet_url)
         if answer.ok { style_text.push(answer.body) }
     }
     let sheet = css.parse(style_text.join("\n"))
+    out.style_ms = (time.clock() - mark) * 1000.0
 
     ~~ ------------------------------------- everything else the page wants
     for tag in ["img", "script", "iframe", "embed", "video", "audio", "source"] {
@@ -231,7 +242,9 @@ pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
         shown = reader.distil(document, out.title)
     }
     let hide = session.guard.hiding(here.host)
+    mark = time.clock()
     let laid = layout.run(shown, sheet, hide, width)
+    out.layout_ms = (time.clock() - mark) * 1000.0
 
     out.page = laid
     out.words = laid.words
@@ -280,6 +293,15 @@ fn absolutise(document: html.Node, here: uri.Url) {
         let full = uri.resolve(base, href)
         if full.ok { node.attrs.set("href", full.full()) }
     }
+}
+
+~~ Hosts that serve nothing but typefaces.
+pub fn is_font_host(host: Text) -> Bool {
+    let name = uri.strip_www(host)
+    give name == "fonts.googleapis.com" or name == "fonts.gstatic.com" or
+         name == "use.typekit.net" or name == "p.typekit.net" or
+         name == "fast.fonts.net" or name == "cloud.typography.com" or
+         name == "use.fontawesome.com" or name == "maxcdn.bootstrapcdn.com"
 }
 
 pub fn escape(text: Text) -> Text {
