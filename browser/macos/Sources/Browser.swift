@@ -110,10 +110,9 @@ final class BrowserWindow: NSWindowController, PageViewDelegate, NSTextFieldDele
         let logo = LogoView(frame: .zero)
         logo.translatesAutoresizingMaskIntoConstraints = false
 
-        for view in [logo, backButton!, forwardButton!, reloadButton!, holder,
-                     lensButton!, emberButton!, shieldButton!] {
-            bar.addSubview(view)
-        }
+        let pieces: [NSView] = [logo, backButton, forwardButton, reloadButton, holder,
+                                lensButton, emberButton, shieldButton]
+        for view in pieces { bar.addSubview(view) }
 
         // ------------------------------------------------------- the strip
         strip.accessories.addArrangedSubview(BarButton("+", kind: .quiet) { [weak self] in
@@ -137,6 +136,8 @@ final class BrowserWindow: NSWindowController, PageViewDelegate, NSTextFieldDele
         status.translatesAutoresizingMaskIntoConstraints = false
         status.wantsLayer = true
         status.layer?.backgroundColor = Theme.panel.cgColor
+        let texts: [NSTextField] = [statusLeft, statusRight, findCount]
+        for text in texts { text.translatesAutoresizingMaskIntoConstraints = false }
         statusLeft.lineBreakMode = .byTruncatingMiddle
         status.addSubview(statusLeft)
         status.addSubview(statusRight)
@@ -257,7 +258,11 @@ final class BrowserWindow: NSWindowController, PageViewDelegate, NSTextFieldDele
         current = tabs.count - 1
         refreshTabs()
         open(place ?? "sprfst://start")
-        window?.makeFirstResponder(place == nil ? address : pageView)
+        if place == nil {
+            window?.makeFirstResponder(address)
+        } else {
+            window?.makeFirstResponder(pageView)
+        }
     }
 
     func closeTab(_ which: Int) {

@@ -72,6 +72,8 @@ final class Engine {
     private let queue = DispatchQueue(label: "ai.sprfst.browser.engine")
     private var buffer = Data()
     private(set) var rules = 0
+    /// The engine's first line, read on the queue during start().
+    private var greeting: String?
     private(set) var running = false
     var onTrouble: ((String) -> Void)?
 
@@ -135,10 +137,23 @@ final class Engine {
         fromEngine = output.fileHandleForReading
         running = true
 
-        // the handshake, so the rule count is known before the first page
-        if let hello = readLine(), let shape = decode(hello) {
-            rules = shape["rules"] as? Int ?? 0
+        // The handshake tells us the engine is alive and how many rules
+        // it loaded. It is read with a deadline: an engine that never
+        // speaks must not leave the application with no window.
+        let waited = DispatchSemaphore(value: 0)
+        queue.async { [weak self] in
+            self?.greeting = self?.readLine()
+            waited.signal()
         }
+        if waited.wait(timeout: .now() + 5) == .timedOut {
+            onTrouble?("the engine did not answer when it started")
+            return false
+        }
+        guard let line = greeting, let shape = decode(line), shape["ok"] as? Bool == true else {
+            onTrouble?("the engine started but said nothing we understood")
+            return false
+        }
+        rules = shape["rules"] as? Int ?? 0
         return true
     }
 
