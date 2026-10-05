@@ -84,7 +84,10 @@ fn answer_of(result: page.Result, session: page.Session) -> Map<Text, Any> {
     out.set("status", result.status)
     out.set("height", result.page.height)
     out.set("width", result.page.width)
-    out.set("background", ink(ember))
+    let page_background = if result.page.background >= 0 {
+        resolve_colour(result.page.background, ember)
+    } else { ink(ember) }
+    out.set("background", page_background)
     out.set("text", paper_text(ember))
     out.set("quiet", quiet(ember))
     out.set("secure", result.secure)

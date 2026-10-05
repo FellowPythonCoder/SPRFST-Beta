@@ -153,8 +153,11 @@ pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
         out.blocked = 1
     } else {
         var answer = fetch.Response { }
+        ~~ A normal revisit is a cache hit too. `record` controls history,
+        ~~ not whether the network should be used; reload explicitly clears
+        ~~ the store before it gets here.
         let cached = session.store.look(address)
-        if cached != nil and not record {
+        if cached != nil {
             answer = cached ?? fetch.Response { }
             answer.cached = true
         } else {
@@ -213,7 +216,17 @@ pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
         ~~ round trip that can change nothing. It is not fetched.
         if is_font_host(sheet_url.host) { skip }
         if style_text.len() >= 4 { skip }
-        let answer = fetch.get(sheet_url)
+        ~~ Stylesheets share the page store. A resize, back/forward trip
+        ~~ or second tab should not pay for the same CSS again.
+        let sheet_key = sheet_url.full()
+        let cached_sheet = session.store.look(sheet_key)
+        let answer = if cached_sheet != nil {
+            cached_sheet ?? fetch.Response { }
+        } else {
+            let fresh = fetch.get(sheet_url)
+            if fresh.ok { session.store.keep(sheet_key, fresh) }
+            fresh
+        }
         if answer.ok { style_text.push(answer.body) }
     }
     let sheet = css.parse(style_text.join("\n"))

@@ -21,6 +21,13 @@ final class PageView: NSView {
     private var hovered = -1
     private var pictures: [String: NSImage] = [:]
     private var asked: Set<String> = []
+    private var linkIndices: [Int] = []
+    private static let imageCache: NSCache<NSString, NSImage> = {
+        let cache = NSCache<NSString, NSImage>()
+        cache.countLimit = 256
+        cache.totalCostLimit = 96 * 1024 * 1024
+        return cache
+    }()
     var findTerm = "" { didSet { needsDisplay = true } }
     var findMatches: [Int] = []
     var currentMatch = 0
@@ -36,6 +43,7 @@ final class PageView: NSView {
         pictures.removeAll(keepingCapacity: true)
         asked.removeAll(keepingCapacity: true)
         hovered = -1
+        linkIndices = page.items.indices.filter { !page.items[$0].link.isEmpty }
         setFrameSize(NSSize(width: max(page.width, 320), height: max(page.height, 200)))
         if loadImages { fetchPictures() }
         refreshMatches()
@@ -135,8 +143,10 @@ final class PageView: NSView {
             let where_ = CGRect(x: box.minX + (box.width - size.width) / 2,
                                 y: box.minY + (box.height - size.height) / 2,
                                 width: size.width, height: size.height)
+            // Medium interpolation is substantially cheaper while a long
+            // page is scrolling, and still looks clean at display scale.
             picture.draw(in: where_, from: .zero, operation: .sourceOver, fraction: 1,
-                         respectFlipped: true, hints: [.interpolation: NSImageInterpolation.high])
+                         respectFlipped: true, hints: [.interpolation: NSImageInterpolation.medium])
             return
         }
         item.colour.withAlphaComponent(0.6).setStroke()
@@ -183,11 +193,17 @@ final class PageView: NSView {
             guard let url = URL(string: address), url.scheme == "http" || url.scheme == "https"
             else { continue }
             asked.insert(address)
+            let key = address as NSString
+            if let cached = Self.imageCache.object(forKey: key) {
+                pictures[address] = cached
+                continue
+            }
             var request = URLRequest(url: url, timeoutInterval: 12)
             request.setValue("SPRFST/0.1", forHTTPHeaderField: "User-Agent")
             URLSession.shared.dataTask(with: request) { [weak self] data, _, _ in
                 guard let data = data, data.count < 12_000_000,
                       let picture = NSImage(data: data) else { return }
+                Self.imageCache.setObject(picture, forKey: key, cost: data.count)
                 DispatchQueue.main.async {
                     guard let self = self else { return }
                     self.pictures[address] = picture
@@ -209,8 +225,11 @@ final class PageView: NSView {
     }
 
     private func item(at point: CGPoint) -> Int {
-        for (index, item) in page.items.enumerated().reversed()
-        where !item.link.isEmpty && item.rect.insetBy(dx: -1, dy: -2).contains(point) {
+        // Mouse-move events arrive far more often than paints. Keep the
+        // hit-test list to links instead of scanning every word, rule and
+        // image on a long page.
+        for index in linkIndices.reversed()
+        where page.items[index].rect.insetBy(dx: -1, dy: -2).contains(point) {
             return index
         }
         return -1
@@ -243,8 +262,8 @@ final class PageView: NSView {
 
     override func resetCursorRects() {
         super.resetCursorRects()
-        for item in page.items where !item.link.isEmpty {
-            addCursorRect(item.rect, cursor: .pointingHand)
+        for index in linkIndices {
+            addCursorRect(page.items[index].rect, cursor: .pointingHand)
         }
     }
 }

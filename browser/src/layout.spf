@@ -42,6 +42,7 @@ pub object Page {
     items: [Item] = []
     height: Num = 0.0
     width: Num = 800.0
+    background: Int = -1
     words: Int = 0
     links: Int = 0
     images: Int = 0
@@ -233,6 +234,7 @@ pub object Frame {
     tallest: Num = 0.0
     pending_space: Bool = false
     counters: [Int] = []
+    canvas: Int = -1
 
     ~~ ------------------------------------------------ inline building
     fn room(self) -> Num => self.width - self.margin - self.left
@@ -328,6 +330,7 @@ pub object Frame {
         var style = defaults(tag, parent)
         chain.push(crumb)
         self.apply_rules(style, chain, node)
+        if tag == "body" and style.background >= 0 { self.canvas = style.background }
 
         if style.hidden or style.display == "none" {
             chain.pop()
@@ -641,6 +644,7 @@ pub fn run(document: html.Node, sheet: css.Sheet, hide: [Text], width: Num) -> P
     frame.walk(start, root, chain)
     frame.end_line()
     frame.page.height = frame.y + 40.0
+    frame.page.background = frame.canvas
     give frame.page
 }
 
