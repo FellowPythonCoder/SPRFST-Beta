@@ -35,10 +35,16 @@ sprfst run src/main.spf -- --serve              the service the window drives
 Tests: `tests/browser_test.spf` (30, offline) and `tools/browser_live.sh`
 (19, against a server started for the purpose).
 
+```sh
+cd browser && sprfst test
+./tools/browser_live.sh
 ```
-cd browser && sprfst test        # 30 passed
-./tools/browser_live.sh          # 19 passed
-```
+
+The first command should report 30 passing engine tests; the second
+runs 19 checks against the local fixture server. These command examples
+have no trailing `#` comments because zsh, the default shell on macOS,
+passes an inline `#` as an argument unless interactive comments are
+enabled.
 
 ---
 

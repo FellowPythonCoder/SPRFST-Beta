@@ -26,7 +26,10 @@ else
 endif
 
 ifeq ($(UNAME_S),Darwin)
-  CFLAGS  += -DSPRFST_MACOS=1
+  # Keep the POSIX declarations visible when Apple Clang is in strict C11
+  # mode.  In particular, this covers strdup/strtok_r used by the driver
+  # and formatter; an implicit int return would truncate pointers on arm64.
+  CFLAGS  += -DSPRFST_MACOS=1 -D_DARWIN_C_SOURCE=1
   ifeq ($(UNAME_M),arm64)
     CFLAGS += -DSPRFST_ARM64=1 -mcpu=apple-m1
   endif

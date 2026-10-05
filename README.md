@@ -45,39 +45,57 @@ hello, Alan
 
 Needs a C compiler and `make`. Nothing else, and no network.
 
-```
-make                       # builds build/bin/sprfst
-make test                  # 61 checks: language, examples, CLI, guidebook, browser
+```sh
+make
+make test
 ./build/bin/sprfst run examples/01-hello.spf
 ```
 
+`make` builds `build/bin/sprfst`; `make test` runs the 61 checks covering
+language, examples, the CLI, the guidebook and the browser. The commands
+are deliberately shown without trailing comments: zsh, the default shell
+on macOS, passes an inline `#` to the command unless interactive comments
+are enabled.
+
 To use it from anywhere:
 
+```sh
+sudo make install
 ```
-sudo make install          # /usr/local/bin/sprfst + /usr/local/lib/sprfst/std
-```
+
+This installs `/usr/local/bin/sprfst` and
+`/usr/local/lib/sprfst/std`.
 
 On a Mac with the Xcode command line tools, one target builds the
 editor, installs it and opens it:
 
+```sh
+make studio
+make app
+make dmg
+make stage
 ```
-make studio                # /Applications/SPRFST Studio.app, launched
-make app                   # dist/SPRFST Studio.app, without installing
-make dmg                   # dist/SPRFST-Studio.dmg, mountable and verified
-make stage                 # lay both out without a Mac, to check them
-```
+
+These build, respectively, the installed Studio app, a staged app,
+the Studio disk image, and a non-Mac staging layout.
 
 And one builds the browser:
 
-```
-make browser               # /Applications/SPRFST Browser.app, launched
-make browser-dmg           # dist/SPRFST-Browser.dmg
-make browser-test          # the engine's 30 tests, then 19 against a server
+```sh
+make browser
+make browser-dmg
+make browser-test
 ```
 
+The browser targets build/install the app, create its disk image, and
+run the engine's 30 offline tests followed by 19 fixture-server tests.
+
+```sh
+make pdf
 ```
-make pdf                   # guidebook/pdf — 30 chapters and the whole book
-```
+
+This writes the 30 chapter PDFs and the complete guidebook to
+`guidebook/pdf`.
 
 The PDFs are typeset by `tools/make_pdf.spf`: it reads the Markdown,
 measures every line with the real Helvetica and Courier metrics, and
