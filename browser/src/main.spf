@@ -213,7 +213,15 @@ fn show(result: page.Result, colour: Bool) {
     for item in result.page.items {
         if item.kind == "rule" {
             if line.len() > 0 { io.say(spaces(indent) + line.join(" ")); line = [] }
-            io.say(grey + "  " + "—".repeat(40) + off)
+            let across = to_int(result.page.width / 9.0)
+            io.say(grey + "  " + "—".repeat(if across > 20 { across } else { 20 }) + off)
+            at = -1.0
+            skip
+        }
+        if item.kind == "image" {
+            if line.len() > 0 { io.say(spaces(indent) + line.join(" ")); line = [] }
+            let caption = if item.text != "" { item.text } else { "image" }
+            io.say(grey + spaces(2 + to_int(item.x / 9.0)) + "[" + caption + "]" + off)
             at = -1.0
             skip
         }
@@ -238,6 +246,12 @@ fn show(result: page.Result, colour: Bool) {
     io.say(grey + "  " + to_int(result.ms).to_text() + " ms  ·  " +
            page.human(result.bytes) + "  ·  " + result.words.to_text() + " words  ·  " +
            result.blocked.to_text() + " blocked  ·  " + result.hidden.to_text() + " hidden" + off)
+    var notes: [Text] = []
+    if result.secure and result.address.starts_with("https://") { notes.push("secure") }
+    if result.cached { notes.push("from the store") }
+    if result.reading { notes.push("the Lens") }
+    if result.requests > 0 { notes.push(result.requests.to_text() + " asked for") }
+    if notes.len() > 0 { io.say(grey + "  " + notes.join("  ·  ") + off) }
     if result.error != "" { io.say("  " + result.error) }
     io.say("")
 }
