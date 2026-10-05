@@ -56,18 +56,17 @@ final class GuidebookWindow: NSWindowController {
 
         let listScroll = NSScrollView()
         listScroll.documentView = list
+        listScroll.hasVerticalScroller = true
         listScroll.drawsBackground = true
         listScroll.backgroundColor = Theme.panel
         listScroll.hasVerticalScroller = true
 
         // reader
-        reader.isEditable = false
+        let readerScroll = NSScrollView()
+        mountTextView(reader, in: readerScroll, editable: false)
         reader.backgroundColor = Theme.ink
         reader.textColor = Theme.text
         reader.textContainerInset = NSSize(width: 32, height: 28)
-        let readerScroll = NSScrollView()
-        readerScroll.documentView = reader
-        readerScroll.hasVerticalScroller = true
         readerScroll.drawsBackground = true
         readerScroll.backgroundColor = Theme.ink
 

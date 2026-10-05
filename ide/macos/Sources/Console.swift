@@ -11,13 +11,11 @@ final class OutputView: NSView {
 
     override init(frame: NSRect) {
         super.init(frame: frame)
-        textView.isEditable = false
+        mountTextView(textView, in: scroll, editable: false)
         textView.backgroundColor = Theme.ink
         textView.textColor = Theme.text
         textView.font = Fonts.code()
         textView.textContainerInset = NSSize(width: 12, height: 10)
-        scroll.documentView = textView
-        scroll.hasVerticalScroller = true
         scroll.drawsBackground = true
         scroll.backgroundColor = Theme.ink
         scroll.fill(self)

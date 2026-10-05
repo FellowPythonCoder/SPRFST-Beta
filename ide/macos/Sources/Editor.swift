@@ -144,14 +144,21 @@ final class MinimapView: NSView {
             NSRect(x: 5 + indent * charWidth, y: y, width: max(width, 1), height: max(rowHeight - 0.6, 0.8)).fill()
         }
 
-        // the window on to the document
+        // the window on to the document: an outline, not a wash
         if let scroll = editor?.scrollView {
             let total = max(scroll.documentView?.frame.height ?? 1, 1)
             let visible = scroll.contentView.bounds
             let top = visible.origin.y / total * bounds.height
-            let height = visible.height / total * bounds.height
-            Theme.amber.withAlphaComponent(0.12).setFill()
-            NSRect(x: 0, y: top, width: bounds.width, height: height).fill()
+            let height = min(visible.height / total * bounds.height, bounds.height)
+            if height < bounds.height - 1 {
+                Theme.amber.withAlphaComponent(0.07).setFill()
+                NSRect(x: 0, y: top, width: bounds.width, height: height).fill()
+                Theme.amber.withAlphaComponent(0.35).setStroke()
+                let frame = NSBezierPath(rect: NSRect(x: 0.5, y: top + 0.5,
+                                                      width: bounds.width - 1, height: height - 1))
+                frame.lineWidth = 1
+                frame.stroke()
+            }
         }
     }
 
@@ -206,27 +213,20 @@ final class EditorView: NSView, NSTextViewDelegate {
         wantsLayer = true
         layer?.backgroundColor = Theme.ink.cgColor
 
-        textView.isRichText = false
+        mountTextView(textView, in: scrollView, editable: true)
         textView.isAutomaticQuoteSubstitutionEnabled = false
         textView.isAutomaticDashSubstitutionEnabled = false
         textView.isAutomaticTextReplacementEnabled = false
         textView.isAutomaticSpellingCorrectionEnabled = false
-        textView.allowsUndo = true
         textView.backgroundColor = Theme.ink
         textView.drawsBackground = true
         textView.insertionPointColor = Theme.amber
         textView.selectedTextAttributes = [.backgroundColor: Theme.amber.withAlphaComponent(0.22)]
         textView.textColor = Theme.text
         textView.font = Fonts.code()
-        textView.textContainerInset = NSSize(width: 10, height: 10)
+        textView.textContainerInset = NSSize(width: 12, height: 12)
         textView.delegate = self
-        textView.isVerticallyResizable = true
-        textView.isHorizontallyResizable = false
-        textView.autoresizingMask = [.width]
-        textView.textContainer?.widthTracksTextView = true
 
-        scrollView.documentView = textView
-        scrollView.hasVerticalScroller = true
         scrollView.hasHorizontalScroller = false
         scrollView.drawsBackground = true
         scrollView.backgroundColor = Theme.ink
@@ -287,6 +287,11 @@ final class EditorView: NSView, NSTextViewDelegate {
             minimap.needsDisplay = true
             gutter.needsDisplay = true
         }
+    }
+
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        if window != nil, !isHidden { window?.makeFirstResponder(textView) }
     }
 
     func load(path: String) {

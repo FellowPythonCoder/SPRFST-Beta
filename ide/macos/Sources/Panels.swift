@@ -373,15 +373,12 @@ final class DebuggerPanel: NSView {
         wantsLayer = true
         layer?.backgroundColor = Theme.panel.cgColor
 
-        transcript.isEditable = false
+        let scroll = NSScrollView()
+        mountTextView(transcript, in: scroll, editable: false)
         transcript.backgroundColor = Theme.ink
         transcript.textColor = Theme.text
         transcript.font = Fonts.code()
         transcript.textContainerInset = NSSize(width: 10, height: 8)
-
-        let scroll = NSScrollView()
-        scroll.documentView = transcript
-        scroll.hasVerticalScroller = true
         scroll.drawsBackground = false
         scroll.translatesAutoresizingMaskIntoConstraints = false
 
@@ -507,15 +504,12 @@ final class GitPanel: NSView {
         wantsLayer = true
         layer?.backgroundColor = Theme.panel.cgColor
 
-        status.isEditable = false
+        let scroll = NSScrollView()
+        mountTextView(status, in: scroll, editable: false)
         status.backgroundColor = Theme.ink
         status.textColor = Theme.text
         status.font = Fonts.code()
         status.textContainerInset = NSSize(width: 10, height: 8)
-
-        let scroll = NSScrollView()
-        scroll.documentView = status
-        scroll.hasVerticalScroller = true
         scroll.drawsBackground = false
         scroll.translatesAutoresizingMaskIntoConstraints = false
 

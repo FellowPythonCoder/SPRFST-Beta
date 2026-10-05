@@ -10,7 +10,7 @@
 // =====================================================================
 import AppKit
 
-final class StudioWindowController: NSWindowController, EditorDelegate, NSTabViewDelegate {
+final class StudioWindowController: NSWindowController, EditorDelegate {
 
     // panes
     private let explorer   = ExplorerPanel()
@@ -20,8 +20,14 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
     private let debugger   = DebuggerPanel()
     private let terminal   = TerminalPanel()
     private let console    = RunConsole()
-    private let tabs       = NSTabView()
     private let welcome    = WelcomeView()
+
+    /// What is open, in tab order. One of these views is visible at a
+    /// time; the strip above them is built from this list, so the tabs
+    /// and the editors can never disagree.
+    private let editorHost = NSView()
+    private var hosted: [(path: String, label: String, view: NSView)] = []
+    private var activePath: String?
 
     // chrome
     private let editorStrip    = TabStrip()
@@ -54,8 +60,10 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
             size.width = min(size.width, visible.width - 40)
             size.height = min(size.height, visible.height - 40)
         }
+        // not .fullSizeContentView: the title bar is drawn over the top
+        // 28 points of the content, which swallowed the whole top bar
         let window = NSWindow(contentRect: NSRect(origin: .zero, size: size),
-                              styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
+                              styleMask: [.titled, .closable, .miniaturizable, .resizable],
                               backing: .buffered, defer: false)
         window.title = "SPRFST Studio"
         window.titlebarAppearsTransparent = true
@@ -139,8 +147,7 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
         bar.addSubview(wordmark)
         bar.addSubview(actions)
         NSLayoutConstraint.activate([
-            // room for the window buttons
-            wordmark.leadingAnchor.constraint(equalTo: bar.leadingAnchor, constant: 82),
+            wordmark.leadingAnchor.constraint(equalTo: bar.leadingAnchor, constant: 18),
             wordmark.centerYAnchor.constraint(equalTo: bar.centerYAnchor),
             wordmark.widthAnchor.constraint(equalToConstant: 132),
             wordmark.heightAnchor.constraint(equalToConstant: 26),
@@ -199,10 +206,9 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
     private func buildCentre() -> NSView {
         let centre = NSView().painted(Theme.ink)
 
-        tabs.tabViewType = .noTabsNoBorder
-        tabs.drawsBackground = false
-        tabs.delegate = self
-        tabs.translatesAutoresizingMaskIntoConstraints = false
+        editorHost.translatesAutoresizingMaskIntoConstraints = false
+        editorHost.wantsLayer = true
+        editorHost.layer?.backgroundColor = Theme.ink.cgColor
 
         let bottom = buildBottom()
         bottom.translatesAutoresizingMaskIntoConstraints = false
@@ -210,7 +216,7 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
         bottomDivider = DragDivider(.height, bottomHeight, sign: 1, from: 90, to: 640)
 
         centre.addSubview(editorStrip)
-        centre.addSubview(tabs)
+        centre.addSubview(editorHost)
         centre.addSubview(bottomDivider)
         centre.addSubview(bottom)
 
@@ -221,10 +227,10 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
             editorStrip.leadingAnchor.constraint(equalTo: centre.leadingAnchor),
             editorStrip.trailingAnchor.constraint(equalTo: centre.trailingAnchor),
 
-            tabs.topAnchor.constraint(equalTo: editorStrip.bottomAnchor),
-            tabs.leadingAnchor.constraint(equalTo: centre.leadingAnchor),
-            tabs.trailingAnchor.constraint(equalTo: centre.trailingAnchor),
-            tabs.bottomAnchor.constraint(equalTo: bottomDivider.topAnchor),
+            editorHost.topAnchor.constraint(equalTo: editorStrip.bottomAnchor),
+            editorHost.leadingAnchor.constraint(equalTo: centre.leadingAnchor),
+            editorHost.trailingAnchor.constraint(equalTo: centre.trailingAnchor),
+            editorHost.bottomAnchor.constraint(equalTo: bottomDivider.topAnchor),
 
             bottomDivider.leadingAnchor.constraint(equalTo: centre.leadingAnchor),
             bottomDivider.trailingAnchor.constraint(equalTo: centre.trailingAnchor),
@@ -378,16 +384,60 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
 
     // ------------------------------------------------------- welcome
     private func showWelcome() {
-        let item = NSTabViewItem(identifier: "welcome")
-        item.label = "Welcome"
-        item.view = welcome
-        tabs.addTabViewItem(item)
+        if !hosted.contains(where: { $0.path == "welcome" }) {
+            host(welcome, path: "welcome", label: "Welcome")
+        }
+        show(path: "welcome")
+    }
+
+    /// Put a view in the editor area. They all sit on top of each
+    /// other, filling it; only the active one is visible.
+    private func host(_ view: NSView, path: String, label: String) {
+        view.translatesAutoresizingMaskIntoConstraints = false
+        editorHost.addSubview(view)
+        NSLayoutConstraint.activate([
+            view.topAnchor.constraint(equalTo: editorHost.topAnchor),
+            view.leadingAnchor.constraint(equalTo: editorHost.leadingAnchor),
+            view.trailingAnchor.constraint(equalTo: editorHost.trailingAnchor),
+            view.bottomAnchor.constraint(equalTo: editorHost.bottomAnchor)
+        ])
+        hosted.append((path: path, label: label, view: view))
+    }
+
+    private func show(path: String) {
+        activePath = path
+        for entry in hosted { entry.view.isHidden = entry.path != path }
         rebuildTabs()
+        if let editor = currentEditor { window?.makeFirstResponder(editor.textView) }
+        refreshAnalysis()
+        updateStatus()
+    }
+
+    /// The strip is rebuilt from the list of open files every time it
+    /// changes, so it cannot drift out of step with them.
+    private func rebuildTabs() {
+        var buttons: [TabButton] = []
+        for entry in hosted {
+            let path = entry.path
+            let button = TabButton(entry.label, closable: path != "welcome",
+                                   target: self, action: #selector(selectTab(_:)))
+            button.identifier = NSUserInterfaceItemIdentifier(path)
+            button.isActive = path == activePath
+            button.onClose = { [weak self] in self?.closeTab(path: path) }
+            buttons.append(button)
+        }
+        editorStrip.setTabs(buttons)
+    }
+
+    @objc private func selectTab(_ sender: TabButton) {
+        guard let path = sender.identifier?.rawValue else { return }
+        show(path: path)
     }
 
     // ------------------------------------------------- opening things
     var currentEditor: EditorView? {
-        tabs.selectedTabViewItem?.view as? EditorView
+        guard let activePath else { return nil }
+        return hosted.first(where: { $0.path == activePath })?.view as? EditorView
     }
 
     var currentPath: String? { currentEditor?.path }
@@ -407,84 +457,76 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
         updateStatus()
     }
 
-    func open(path: String) {
-        if let existing = editors[path] {
-            for item in tabs.tabViewItems where item.view === existing {
-                tabs.selectTabViewItem(item)
-                rebuildTabs()
-                return
+    /// Examples live inside the application bundle, which nobody should
+    /// be editing. The first time one is opened it is copied somewhere
+    /// the user owns, and that copy is what opens.
+    private func writableCopy(of path: String) -> String {
+        let fm = FileManager.default
+        guard path.hasPrefix(Bundle.main.bundlePath + "/") else { return path }
+        let home = NSHomeDirectory() + "/Documents/SPRFST Examples"
+        let source = (path as NSString).deletingLastPathComponent
+        try? fm.createDirectory(atPath: home, withIntermediateDirectories: true)
+        for name in (try? fm.contentsOfDirectory(atPath: source)) ?? [] where name.hasSuffix(".spf") {
+            let target = home + "/" + name
+            if !fm.fileExists(atPath: target) {
+                try? fm.copyItem(atPath: source + "/" + name, toPath: target)
             }
+        }
+        let copy = home + "/" + (path as NSString).lastPathComponent
+        return fm.fileExists(atPath: copy) ? copy : path
+    }
+
+    func open(path rawPath: String) {
+        let path = writableCopy(of: rawPath)
+        if hosted.contains(where: { $0.path == path }) {
+            show(path: path)
+            return
         }
         guard FileManager.default.fileExists(atPath: path) else { return }
 
-        // opening a loose file with no project open: follow it home
-        let folder = (path as NSString).deletingLastPathComponent
+        // a loose file with no project open: follow it home
         if !explorer.hasFolder || !path.hasPrefix(projectFolder + "/") {
-            if !path.hasPrefix(projectFolder + "/") { projectFolder = folder }
+            if !path.hasPrefix(projectFolder + "/") {
+                projectFolder = (path as NSString).deletingLastPathComponent
+            }
             explorer.open(folder: URL(fileURLWithPath: projectFolder))
             gitPanel.use(folder: projectFolder)
             terminal.use(folder: projectFolder)
+            window?.title = "SPRFST Studio — " + (projectFolder as NSString).lastPathComponent
         }
 
         let editor = EditorView(frame: .zero)
         editor.delegate = self
         editor.load(path: path)
         editors[path] = editor
+        host(editor, path: path, label: (path as NSString).lastPathComponent)
 
-        let item = NSTabViewItem(identifier: path)
-        item.label = (path as NSString).lastPathComponent
-        item.view = editor
-        tabs.addTabViewItem(item)
-        tabs.selectTabViewItem(item)
-
-        if tabs.tabViewItems.first?.identifier as? String == "welcome", tabs.numberOfTabViewItems > 1 {
-            tabs.removeTabViewItem(tabs.tabViewItems[0])
+        // the welcome screen steps aside once there is something to edit
+        if let index = hosted.firstIndex(where: { $0.path == "welcome" }), hosted.count > 1 {
+            hosted[index].view.removeFromSuperview()
+            hosted.remove(at: index)
         }
-        rebuildTabs()
-        refreshAnalysis()
+        show(path: path)
     }
 
     @objc func closeCurrentTab() {
-        guard let item = tabs.selectedTabViewItem else { return }
-        close(item)
+        guard let activePath else { return }
+        closeTab(path: activePath)
     }
 
-    private func close(_ item: NSTabViewItem) {
-        if let editor = item.view as? EditorView {
+    private func closeTab(path: String) {
+        guard let index = hosted.firstIndex(where: { $0.path == path }) else { return }
+        if let editor = hosted[index].view as? EditorView {
             if editor.isDirty { editor.save() }
             editors.removeValue(forKey: editor.path)
         }
-        tabs.removeTabViewItem(item)
-        if tabs.numberOfTabViewItems == 0 { showWelcome() }
-        rebuildTabs()
-    }
-
-    /// The tab strip is rebuilt from the tab view, so the two can never
-    /// disagree about what is open.
-    private func rebuildTabs() {
-        var buttons: [TabButton] = []
-        for item in tabs.tabViewItems {
-            let identifier = (item.identifier as? String) ?? item.label
-            let button = TabButton(item.label, closable: identifier != "welcome",
-                                   target: self, action: #selector(selectTab(_:)))
-            button.identifier = NSUserInterfaceItemIdentifier(identifier)
-            button.isActive = item === tabs.selectedTabViewItem
-            button.onClose = { [weak self] in
-                guard let self else { return }
-                for candidate in self.tabs.tabViewItems
-                where (candidate.identifier as? String) == identifier { self.close(candidate) }
-            }
-            buttons.append(button)
+        hosted[index].view.removeFromSuperview()
+        hosted.remove(at: index)
+        if hosted.isEmpty {
+            showWelcome()
+        } else {
+            show(path: hosted[min(index, hosted.count - 1)].path)
         }
-        editorStrip.setTabs(buttons)
-    }
-
-    @objc private func selectTab(_ sender: TabButton) {
-        guard let identifier = sender.identifier?.rawValue else { return }
-        for item in tabs.tabViewItems where (item.identifier as? String) == identifier {
-            tabs.selectTabViewItem(item)
-        }
-        rebuildTabs()
     }
 
     private func chooseFolder() {
@@ -547,12 +589,6 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
                 self.updateStatus()
             }
         }
-    }
-
-    func tabView(_ tabView: NSTabView, didSelect tabViewItem: NSTabViewItem?) {
-        rebuildTabs()
-        refreshAnalysis()
-        updateStatus()
     }
 
     private func updateStatus() {

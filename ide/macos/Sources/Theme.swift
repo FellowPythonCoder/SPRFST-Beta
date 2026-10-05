@@ -157,6 +157,38 @@ func label(_ string: String, _ font: NSFont, _ colour: NSColor) -> NSTextField {
     return t
 }
 
+/// Put a text view inside a scroll view, properly.
+///
+/// An NSTextView made in code starts with a zero frame, and its maxSize
+/// starts out as that same nothing. Tell such a view it may resize
+/// vertically and it clamps itself to maxSize for ever: no text is
+/// drawn, no click lands in it, nothing can be typed. The layout
+/// manager still answers questions about the text, which is why the
+/// line numbers and the minimap looked right while the page stayed
+/// black. These six lines are the whole fix.
+func mountTextView(_ textView: NSTextView, in scrollView: NSScrollView, editable: Bool) {
+    let size = NSSize(width: 800, height: 600)
+    textView.frame = NSRect(origin: .zero, size: size)
+    textView.minSize = NSSize(width: 0, height: 0)
+    textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude,
+                              height: CGFloat.greatestFiniteMagnitude)
+    textView.isVerticallyResizable = true
+    textView.isHorizontallyResizable = false
+    textView.autoresizingMask = [.width]
+
+    textView.isEditable = editable
+    textView.isSelectable = true
+    textView.isRichText = false
+    textView.allowsUndo = editable
+    textView.textContainer?.containerSize = NSSize(width: size.width,
+                                                   height: CGFloat.greatestFiniteMagnitude)
+    textView.textContainer?.widthTracksTextView = true
+
+    scrollView.documentView = textView
+    scrollView.hasVerticalScroller = true
+    scrollView.autohidesScrollers = true
+}
+
 /// A one pixel rule, used between the regions of the window.
 final class Hairline: NSView {
     private let horizontal: Bool
