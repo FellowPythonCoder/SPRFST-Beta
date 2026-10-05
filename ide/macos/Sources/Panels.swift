@@ -24,11 +24,15 @@ final class PanelHeader: NSView {
         title = label(text.uppercased(), Fonts.ui(10, weight: .semibold), Theme.muted)
         super.init(frame: .zero)
         title.translatesAutoresizingMaskIntoConstraints = false
+        title.lineBreakMode = .byTruncatingTail
+        title.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         addSubview(title)
         NSLayoutConstraint.activate([
             title.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 14),
+            // never run under the accessory button, never past the edge
+            title.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -76),
             title.centerYAnchor.constraint(equalTo: centerYAnchor),
-            heightAnchor.constraint(equalToConstant: 30)
+            heightAnchor.constraint(equalToConstant: 28)
         ])
     }
     required init?(coder: NSCoder) { fatalError() }
@@ -41,6 +45,9 @@ final class PanelHeader: NSView {
         Theme.edge.setFill()
         NSRect(x: 0, y: 0, width: bounds.width, height: 1).fill()
     }
+
+    /// One line of text, truncated, never wider than the panel.
+    func setDetail(_ text: String) { setTitle(text) }
 }
 
 func panelButton(_ symbol: String, _ tooltip: String, _ target: AnyObject, _ action: Selector) -> NSButton {
@@ -82,8 +89,12 @@ final class FileNode {
 final class ExplorerPanel: NSView, NSOutlineViewDataSource, NSOutlineViewDelegate {
     private let outline = NSOutlineView()
     private var root: FileNode?
+    private let empty = label("no folder open\n⇧⌘O to choose one", Fonts.ui(12), Theme.faint)
     var onOpen: ((URL) -> Void)?
     let header = PanelHeader("Explorer")
+
+    /// Whether a project folder has been opened in this panel.
+    var hasFolder: Bool { root != nil }
 
     override init(frame: NSRect) {
         super.init(frame: frame)
@@ -111,8 +122,13 @@ final class ExplorerPanel: NSView, NSOutlineViewDataSource, NSOutlineViewDelegat
         scroll.translatesAutoresizingMaskIntoConstraints = false
         header.translatesAutoresizingMaskIntoConstraints = false
         header.accessory = panelButton("Refresh", "Reload the folder", self, #selector(refresh))
+        empty.alignment = .center
+        empty.lineBreakMode = .byWordWrapping
+        empty.maximumNumberOfLines = 2
+        empty.translatesAutoresizingMaskIntoConstraints = false
         addSubview(header)
         addSubview(scroll)
+        addSubview(empty)
         NSLayoutConstraint.activate([
             header.topAnchor.constraint(equalTo: topAnchor),
             header.leadingAnchor.constraint(equalTo: leadingAnchor),
@@ -120,14 +136,17 @@ final class ExplorerPanel: NSView, NSOutlineViewDataSource, NSOutlineViewDelegat
             scroll.topAnchor.constraint(equalTo: header.bottomAnchor),
             scroll.leadingAnchor.constraint(equalTo: leadingAnchor),
             scroll.trailingAnchor.constraint(equalTo: trailingAnchor),
-            scroll.bottomAnchor.constraint(equalTo: bottomAnchor)
+            scroll.bottomAnchor.constraint(equalTo: bottomAnchor),
+            empty.centerXAnchor.constraint(equalTo: centerXAnchor),
+            empty.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -40)
         ])
     }
     required init?(coder: NSCoder) { fatalError() }
 
     func open(folder: URL) {
         root = FileNode(url: folder, isDirectory: true)
-        header.setTitle(folder.lastPathComponent)
+        empty.isHidden = true
+        header.setTitle(folder.lastPathComponent.isEmpty ? "Explorer" : folder.lastPathComponent)
         outline.reloadData()
         outline.expandItem(nil, expandChildren: false)
         if let r = root {
@@ -480,6 +499,7 @@ final class GitPanel: NSView {
     let header = PanelHeader("Git")
     private let status = NSTextView()
     private let message = NSTextField()
+    private let commit = NSButton(title: "Commit all", target: nil, action: nil)
     private var folder: String = "."
 
     override init(frame: NSRect) {
@@ -507,7 +527,8 @@ final class GitPanel: NSView {
         message.focusRingType = .none
         message.translatesAutoresizingMaskIntoConstraints = false
 
-        let commit = NSButton(title: "Commit all", target: self, action: #selector(commitAll))
+        commit.target = self
+        commit.action = #selector(commitAll)
         commit.bezelStyle = .rounded
         commit.contentTintColor = Theme.amber
         commit.translatesAutoresizingMaskIntoConstraints = false
@@ -559,9 +580,18 @@ final class GitPanel: NSView {
 
     @objc func refresh() {
         let branch = git(["rev-parse", "--abbrev-ref", "HEAD"]).trimmingCharacters(in: .whitespacesAndNewlines)
+        if branch.isEmpty || branch.contains("fatal") || branch.contains("not a git repository") {
+            header.setTitle("Git")
+            status.string = "this folder is not a git repository\n"
+            message.isEnabled = false
+            commit.isEnabled = false
+            return
+        }
+        message.isEnabled = true
+        commit.isEnabled = true
+        header.setTitle("Git — \(branch)")
         let changes = git(["status", "--short"])
         let log = git(["log", "--oneline", "-8"])
-        header.setTitle(branch.isEmpty ? "Git" : "Git — \(branch)")
         status.string = (changes.isEmpty ? "working tree clean\n" : changes) + "\nrecent\n" + log
     }
 

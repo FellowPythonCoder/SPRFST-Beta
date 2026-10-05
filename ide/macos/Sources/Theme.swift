@@ -8,13 +8,14 @@ enum Theme {
     // surfaces
     static let ink        = NSColor(srgbRed: 0.043, green: 0.043, blue: 0.051, alpha: 1)  // #0B0B0D
     static let panel      = NSColor(srgbRed: 0.071, green: 0.071, blue: 0.078, alpha: 1)  // #121214
-    static let raised     = NSColor(srgbRed: 0.094, green: 0.094, blue: 0.102, alpha: 1)
-    static let edge       = NSColor(srgbRed: 0.114, green: 0.114, blue: 0.125, alpha: 1)  // #1D1D20
+    static let raised     = NSColor(srgbRed: 0.106, green: 0.106, blue: 0.118, alpha: 1)
+    static let panelHi    = NSColor(srgbRed: 0.137, green: 0.137, blue: 0.149, alpha: 1)
+    static let edge       = NSColor(srgbRed: 0.145, green: 0.145, blue: 0.157, alpha: 1)  // #252528
 
     // ink on top
-    static let text       = NSColor(srgbRed: 0.949, green: 0.949, blue: 0.941, alpha: 1)  // #F2F2F0
-    static let muted      = NSColor(srgbRed: 0.431, green: 0.431, blue: 0.447, alpha: 1)  // #6E6E72
-    static let faint      = NSColor(srgbRed: 0.267, green: 0.267, blue: 0.282, alpha: 1)
+    static let text       = NSColor(srgbRed: 0.957, green: 0.957, blue: 0.949, alpha: 1)  // #F4F4F2
+    static let muted      = NSColor(srgbRed: 0.624, green: 0.624, blue: 0.643, alpha: 1)  // #9F9FA4
+    static let faint      = NSColor(srgbRed: 0.427, green: 0.427, blue: 0.447, alpha: 1)
 
     // accents
     static let amber      = NSColor(srgbRed: 1.000, green: 0.631, blue: 0.212, alpha: 1)  // #FFA136
@@ -36,8 +37,12 @@ enum Theme {
 
     // metrics
     static let corner: CGFloat = 10
-    static let gutterWidth: CGFloat = 54
-    static let minimapWidth: CGFloat = 76
+    static let gutterWidth: CGFloat = 48
+    static let minimapWidth: CGFloat = 72
+    static let topBarHeight: CGFloat = 46
+    static let stripHeight: CGFloat = 32
+    static let statusHeight: CGFloat = 26
+    static let dividerThickness: CGFloat = 7
 }
 
 // ---------------------------------------------------------------- fonts
@@ -65,11 +70,13 @@ enum Fonts {
         didSet { UserDefaults.standard.set(Double(size), forKey: "sprfst.fontSize") }
     }
 
-    /// The code font follows the user's choice but always stays readable:
-    /// the handwriting face is only ever used for headings and branding.
+    /// The editor font. "SPRFST Hand" really is handwriting — the setting
+    /// would be a lie otherwise — everything else is monospaced.
     static func code() -> NSFont {
         switch current {
-        case .hand, .clean:
+        case .hand:
+            return hand(size + 2)
+        case .clean:
             return NSFont(name: "JetBrains Mono", size: size)
                 ?? NSFont(name: "SF Mono", size: size)
                 ?? NSFont(name: "Menlo", size: size)
@@ -82,16 +89,36 @@ enum Fonts {
         }
     }
 
-    /// Handwriting-style face for the brand, welcome screen and headings.
-    static func hand(_ points: CGFloat, weight: NSFont.Weight = .semibold) -> NSFont {
-        let candidates = ["Bradley Hand", "Noteworthy", "Marker Felt", "Snell Roundhand", "Chalkboard SE"]
-        for name in candidates {
+    /// Line numbers and anything that has to line up with code.
+    static func mono(_ points: CGFloat) -> NSFont {
+        NSFont(name: "SF Mono", size: points)
+            ?? NSFont(name: "Menlo", size: points)
+            ?? NSFont.monospacedSystemFont(ofSize: points, weight: .regular)
+    }
+
+    /// The handwriting face. macOS always has at least one of these; the
+    /// system font is only reached on a machine stripped of them.
+    static func hand(_ points: CGFloat, weight: NSFont.Weight = .regular) -> NSFont {
+        let heavy = weight.rawValue >= NSFont.Weight.semibold.rawValue
+        let names = heavy
+            ? ["Noteworthy-Bold", "BradleyHandITCTT-Bold", "ChalkboardSE-Bold",
+               "MarkerFelt-Wide", "Noteworthy", "Bradley Hand", "Chalkboard SE"]
+            : ["Noteworthy-Light", "Noteworthy", "Bradley Hand", "BradleyHandITCTT-Bold",
+               "ChalkboardSE-Light", "Chalkboard SE", "MarkerFelt-Thin"]
+        for name in names {
             if let f = NSFont(name: name, size: points) { return f }
         }
         return NSFont.systemFont(ofSize: points, weight: weight)
     }
 
+    /// Every label in the chrome. Handwriting reads small, so it is set
+    /// a point and a half larger than the system font would be.
     static func ui(_ points: CGFloat, weight: NSFont.Weight = .regular) -> NSFont {
+        hand(points + 1.5, weight: weight)
+    }
+
+    /// For the few places that must be exact: figures in the status bar.
+    static func plain(_ points: CGFloat, weight: NSFont.Weight = .regular) -> NSFont {
         NSFont.systemFont(ofSize: points, weight: weight)
     }
 }
@@ -125,5 +152,23 @@ func label(_ string: String, _ font: NSFont, _ colour: NSColor) -> NSTextField {
     t.isBezeled = false
     t.isEditable = false
     t.drawsBackground = false
+    t.lineBreakMode = .byTruncatingTail
+    t.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
     return t
+}
+
+/// A one pixel rule, used between the regions of the window.
+final class Hairline: NSView {
+    private let horizontal: Bool
+    init(horizontal: Bool) {
+        self.horizontal = horizontal
+        super.init(frame: .zero)
+        translatesAutoresizingMaskIntoConstraints = false
+        (horizontal ? heightAnchor : widthAnchor).constraint(equalToConstant: 1).isActive = true
+    }
+    required init?(coder: NSCoder) { fatalError() }
+    override func draw(_ dirtyRect: NSRect) {
+        Theme.edge.setFill()
+        bounds.fill()
+    }
 }

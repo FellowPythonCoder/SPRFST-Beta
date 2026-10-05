@@ -1,6 +1,12 @@
 // =====================================================================
-//  The Studio window: welcome screen, editor tabs, side panels,
-//  bottom strip, status bar and the command palette.
+//  The Studio window: top bar, editor tabs, side panels, bottom strip,
+//  status bar and the command palette.
+//
+//  The regions are laid out with plain Auto Layout and dragged with
+//  DragDivider, not with nested NSSplitViews. A split view chooses its
+//  divider positions from whatever size it happens to have at the
+//  time, and at build time that size is nothing — which is how the
+//  first version of this window opened with a 140 point wide editor.
 // =====================================================================
 import AppKit
 
@@ -15,18 +21,40 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
     private let terminal   = TerminalPanel()
     private let console    = RunConsole()
     private let tabs       = NSTabView()
-    private let statusBar  = NSView()
-    private let statusLeft = NSTextField(labelWithString: "")
-    private let statusRight = NSTextField(labelWithString: "")
     private let welcome    = WelcomeView()
+
+    // chrome
+    private let editorStrip    = TabStrip()
+    private let bottomStrip    = TabStrip()
+    private let inspectorStrip = TabStrip()
+    private let statusBar      = NSView()
+    private let statusLeft     = NSTextField(labelWithString: "")
+    private let statusRight    = NSTextField(labelWithString: "")
+    private let wordmark       = WordmarkView()
+
+    // the three resizable regions
+    private var leftWidth: NSLayoutConstraint!
+    private var rightWidth: NSLayoutConstraint!
+    private var bottomHeight: NSLayoutConstraint!
+    private var leftDivider: DragDivider!
+    private var rightDivider: DragDivider!
+    private var bottomDivider: DragDivider!
+    private var lastLeftWidth: CGFloat = 250
+    private var lastRightWidth: CGFloat = 310
+    private var lastBottomHeight: CGFloat = 210
 
     private var editors: [String: EditorView] = [:]
     private var checkTimer: Timer?
-    var projectFolder: String = FileManager.default.currentDirectoryPath
+    var projectFolder: String = NSHomeDirectory()
 
     // ---------------------------------------------------------- setup
     convenience init() {
-        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 1420, height: 900),
+        var size = NSSize(width: 1420, height: 900)
+        if let visible = NSScreen.main?.visibleFrame.size {
+            size.width = min(size.width, visible.width - 40)
+            size.height = min(size.height, visible.height - 40)
+        }
+        let window = NSWindow(contentRect: NSRect(origin: .zero, size: size),
                               styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
                               backing: .buffered, defer: false)
         window.title = "SPRFST Studio"
@@ -34,7 +62,7 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
         window.titleVisibility = .hidden
         window.backgroundColor = Theme.ink
         window.appearance = NSAppearance(named: .darkAqua)
-        window.minSize = NSSize(width: 980, height: 620)
+        window.minSize = NSSize(width: 900, height: 560)
         window.center()
         self.init(window: window)
         build()
@@ -46,53 +74,271 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
         content.wantsLayer = true
         content.layer?.backgroundColor = Theme.ink.cgColor
 
-        // left column: explorer over outline
-        let left = NSSplitView()
-        left.isVertical = false
-        left.dividerStyle = .thin
-        left.addArrangedSubview(explorer)
-        left.addArrangedSubview(outline)
+        let top = buildTopBar()
+        let body = buildBody()
+        buildStatusBar()
 
-        // right column: problems over git over debugger
-        let right = NSSplitView()
-        right.isVertical = false
-        right.dividerStyle = .thin
-        right.addArrangedSubview(problems)
-        right.addArrangedSubview(gitPanel)
-        right.addArrangedSubview(debugger)
+        for view in [top, body, statusBar] {
+            view.translatesAutoresizingMaskIntoConstraints = false
+            content.addSubview(view)
+        }
+        let underTop = Hairline(horizontal: true)
+        let overStatus = Hairline(horizontal: true)
+        content.addSubview(underTop)
+        content.addSubview(overStatus)
 
-        // bottom strip
-        let bottom = NSTabView()
-        bottom.tabViewType = .topTabsBezelBorder
-        bottom.appearance = NSAppearance(named: .darkAqua)
-        let consoleTab = NSTabViewItem(identifier: "console")
-        consoleTab.label = "Run"
-        consoleTab.view = console
-        let terminalTab = NSTabViewItem(identifier: "terminal")
-        terminalTab.label = "Terminal"
-        terminalTab.view = terminal
-        bottom.addTabViewItem(consoleTab)
-        bottom.addTabViewItem(terminalTab)
+        NSLayoutConstraint.activate([
+            top.topAnchor.constraint(equalTo: content.topAnchor),
+            top.leadingAnchor.constraint(equalTo: content.leadingAnchor),
+            top.trailingAnchor.constraint(equalTo: content.trailingAnchor),
+            top.heightAnchor.constraint(equalToConstant: Theme.topBarHeight),
 
-        // centre: editor tabs over the bottom strip
-        tabs.tabViewType = .topTabsBezelBorder
-        tabs.appearance = NSAppearance(named: .darkAqua)
+            underTop.topAnchor.constraint(equalTo: top.bottomAnchor),
+            underTop.leadingAnchor.constraint(equalTo: content.leadingAnchor),
+            underTop.trailingAnchor.constraint(equalTo: content.trailingAnchor),
+
+            body.topAnchor.constraint(equalTo: underTop.bottomAnchor),
+            body.leadingAnchor.constraint(equalTo: content.leadingAnchor),
+            body.trailingAnchor.constraint(equalTo: content.trailingAnchor),
+            body.bottomAnchor.constraint(equalTo: overStatus.topAnchor),
+
+            overStatus.leadingAnchor.constraint(equalTo: content.leadingAnchor),
+            overStatus.trailingAnchor.constraint(equalTo: content.trailingAnchor),
+            overStatus.bottomAnchor.constraint(equalTo: statusBar.topAnchor),
+
+            statusBar.leadingAnchor.constraint(equalTo: content.leadingAnchor),
+            statusBar.trailingAnchor.constraint(equalTo: content.trailingAnchor),
+            statusBar.bottomAnchor.constraint(equalTo: content.bottomAnchor),
+            statusBar.heightAnchor.constraint(equalToConstant: Theme.statusHeight)
+        ])
+
+        wire()
+        updateStatus()
+    }
+
+    // ------------------------------------------------------- top bar
+    private func buildTopBar() -> NSView {
+        let bar = NSView().painted(Theme.panel)
+
+        wordmark.subtitle = nil
+        wordmark.translatesAutoresizingMaskIntoConstraints = false
+
+        let actions = NSStackView(views: [
+            BarButton("Run", kind: .primary) { [weak self] in self?.runProject(nil) },
+            BarButton("Stop") { [weak self] in self?.stopRunning(nil) },
+            BarButton("Build") { [weak self] in self?.buildProject(nil) },
+            BarButton("Test") { [weak self] in self?.testProject(nil) },
+            BarButton("Debug") { [weak self] in self?.startDebugging(nil) },
+            BarButton("Guidebook") { _ = NSApp.sendAction(#selector(AppDelegate.openGuidebook), to: nil, from: nil) },
+            BarButton("⌘P") { [weak self] in self?.openCommandPalette(nil) }
+        ])
+        actions.orientation = .horizontal
+        actions.spacing = 8
+        actions.translatesAutoresizingMaskIntoConstraints = false
+
+        bar.addSubview(wordmark)
+        bar.addSubview(actions)
+        NSLayoutConstraint.activate([
+            // room for the window buttons
+            wordmark.leadingAnchor.constraint(equalTo: bar.leadingAnchor, constant: 82),
+            wordmark.centerYAnchor.constraint(equalTo: bar.centerYAnchor),
+            wordmark.widthAnchor.constraint(equalToConstant: 132),
+            wordmark.heightAnchor.constraint(equalToConstant: 26),
+            actions.trailingAnchor.constraint(equalTo: bar.trailingAnchor, constant: -14),
+            actions.centerYAnchor.constraint(equalTo: bar.centerYAnchor),
+            actions.leadingAnchor.constraint(greaterThanOrEqualTo: wordmark.trailingAnchor, constant: 20)
+        ])
+        return bar
+    }
+
+    // ---------------------------------------------------------- body
+    private func buildBody() -> NSView {
+        let body = NSView()
+
+        let centre = buildCentre()
+        let inspector = buildInspector()
+        for view in [explorer, centre, inspector] {
+            view.translatesAutoresizingMaskIntoConstraints = false
+            body.addSubview(view)
+        }
+
+        leftWidth = explorer.widthAnchor.constraint(equalToConstant: lastLeftWidth)
+        rightWidth = inspector.widthAnchor.constraint(equalToConstant: lastRightWidth)
+        leftDivider = DragDivider(.width, leftWidth, sign: 1, from: 170, to: 520)
+        rightDivider = DragDivider(.width, rightWidth, sign: -1, from: 220, to: 560)
+        body.addSubview(leftDivider)
+        body.addSubview(rightDivider)
+
+        NSLayoutConstraint.activate([
+            leftWidth, rightWidth,
+
+            explorer.leadingAnchor.constraint(equalTo: body.leadingAnchor),
+            explorer.topAnchor.constraint(equalTo: body.topAnchor),
+            explorer.bottomAnchor.constraint(equalTo: body.bottomAnchor),
+
+            leftDivider.leadingAnchor.constraint(equalTo: explorer.trailingAnchor),
+            leftDivider.topAnchor.constraint(equalTo: body.topAnchor),
+            leftDivider.bottomAnchor.constraint(equalTo: body.bottomAnchor),
+
+            centre.leadingAnchor.constraint(equalTo: leftDivider.trailingAnchor),
+            centre.topAnchor.constraint(equalTo: body.topAnchor),
+            centre.bottomAnchor.constraint(equalTo: body.bottomAnchor),
+
+            rightDivider.leadingAnchor.constraint(equalTo: centre.trailingAnchor),
+            rightDivider.topAnchor.constraint(equalTo: body.topAnchor),
+            rightDivider.bottomAnchor.constraint(equalTo: body.bottomAnchor),
+
+            inspector.leadingAnchor.constraint(equalTo: rightDivider.trailingAnchor),
+            inspector.trailingAnchor.constraint(equalTo: body.trailingAnchor),
+            inspector.topAnchor.constraint(equalTo: body.topAnchor),
+            inspector.bottomAnchor.constraint(equalTo: body.bottomAnchor)
+        ])
+        return body
+    }
+
+    private func buildCentre() -> NSView {
+        let centre = NSView().painted(Theme.ink)
+
+        tabs.tabViewType = .noTabsNoBorder
+        tabs.drawsBackground = false
         tabs.delegate = self
+        tabs.translatesAutoresizingMaskIntoConstraints = false
 
-        let centreStack = NSSplitView()
-        centreStack.isVertical = false
-        centreStack.dividerStyle = .thin
-        centreStack.addArrangedSubview(tabs)
-        centreStack.addArrangedSubview(bottom)
+        let bottom = buildBottom()
+        bottom.translatesAutoresizingMaskIntoConstraints = false
+        bottomHeight = bottom.heightAnchor.constraint(equalToConstant: lastBottomHeight)
+        bottomDivider = DragDivider(.height, bottomHeight, sign: 1, from: 90, to: 640)
 
-        let main = NSSplitView()
-        main.isVertical = true
-        main.dividerStyle = .thin
-        main.addArrangedSubview(left)
-        main.addArrangedSubview(centreStack)
-        main.addArrangedSubview(right)
+        centre.addSubview(editorStrip)
+        centre.addSubview(tabs)
+        centre.addSubview(bottomDivider)
+        centre.addSubview(bottom)
 
-        // status bar
+        NSLayoutConstraint.activate([
+            bottomHeight,
+
+            editorStrip.topAnchor.constraint(equalTo: centre.topAnchor),
+            editorStrip.leadingAnchor.constraint(equalTo: centre.leadingAnchor),
+            editorStrip.trailingAnchor.constraint(equalTo: centre.trailingAnchor),
+
+            tabs.topAnchor.constraint(equalTo: editorStrip.bottomAnchor),
+            tabs.leadingAnchor.constraint(equalTo: centre.leadingAnchor),
+            tabs.trailingAnchor.constraint(equalTo: centre.trailingAnchor),
+            tabs.bottomAnchor.constraint(equalTo: bottomDivider.topAnchor),
+
+            bottomDivider.leadingAnchor.constraint(equalTo: centre.leadingAnchor),
+            bottomDivider.trailingAnchor.constraint(equalTo: centre.trailingAnchor),
+            bottomDivider.bottomAnchor.constraint(equalTo: bottom.topAnchor),
+
+            bottom.leadingAnchor.constraint(equalTo: centre.leadingAnchor),
+            bottom.trailingAnchor.constraint(equalTo: centre.trailingAnchor),
+            bottom.bottomAnchor.constraint(equalTo: centre.bottomAnchor)
+        ])
+        return centre
+    }
+
+    private func buildBottom() -> NSView {
+        let host = NSView().painted(Theme.ink)
+        console.translatesAutoresizingMaskIntoConstraints = false
+        terminal.translatesAutoresizingMaskIntoConstraints = false
+        terminal.isHidden = true
+
+        host.addSubview(bottomStrip)
+        host.addSubview(console)
+        host.addSubview(terminal)
+
+        let clear = BarButton("Clear") { [weak self] in self?.console.clear() }
+        bottomStrip.accessories.addArrangedSubview(clear)
+
+        NSLayoutConstraint.activate([
+            bottomStrip.topAnchor.constraint(equalTo: host.topAnchor),
+            bottomStrip.leadingAnchor.constraint(equalTo: host.leadingAnchor),
+            bottomStrip.trailingAnchor.constraint(equalTo: host.trailingAnchor),
+            console.topAnchor.constraint(equalTo: bottomStrip.bottomAnchor),
+            console.leadingAnchor.constraint(equalTo: host.leadingAnchor),
+            console.trailingAnchor.constraint(equalTo: host.trailingAnchor),
+            console.bottomAnchor.constraint(equalTo: host.bottomAnchor),
+            terminal.topAnchor.constraint(equalTo: bottomStrip.bottomAnchor),
+            terminal.leadingAnchor.constraint(equalTo: host.leadingAnchor),
+            terminal.trailingAnchor.constraint(equalTo: host.trailingAnchor),
+            terminal.bottomAnchor.constraint(equalTo: host.bottomAnchor)
+        ])
+
+        let run = TabButton("Run", target: self, action: #selector(showRunPane))
+        let shell = TabButton("Terminal", target: self, action: #selector(showTerminalPane))
+        run.isActive = true
+        bottomStrip.setTabs([run, shell])
+        return host
+    }
+
+    @objc private func showRunPane() {
+        console.isHidden = false
+        terminal.isHidden = true
+        markStrip(bottomStrip, active: 0)
+    }
+
+    @objc private func showTerminalPane() {
+        console.isHidden = true
+        terminal.isHidden = false
+        markStrip(bottomStrip, active: 1)
+        terminal.focusInput()
+    }
+
+    // ----------------------------------------------------- inspector
+    private var inspectorPanels: [NSView] = []
+
+    private func buildInspector() -> NSView {
+        let host = NSView().painted(Theme.panel)
+        inspectorPanels = [problems, outline, gitPanel, debugger]
+
+        host.addSubview(inspectorStrip)
+        NSLayoutConstraint.activate([
+            inspectorStrip.topAnchor.constraint(equalTo: host.topAnchor),
+            inspectorStrip.leadingAnchor.constraint(equalTo: host.leadingAnchor),
+            inspectorStrip.trailingAnchor.constraint(equalTo: host.trailingAnchor)
+        ])
+        for panel in inspectorPanels {
+            panel.translatesAutoresizingMaskIntoConstraints = false
+            host.addSubview(panel)
+            NSLayoutConstraint.activate([
+                panel.topAnchor.constraint(equalTo: inspectorStrip.bottomAnchor),
+                panel.leadingAnchor.constraint(equalTo: host.leadingAnchor),
+                panel.trailingAnchor.constraint(equalTo: host.trailingAnchor),
+                panel.bottomAnchor.constraint(equalTo: host.bottomAnchor)
+            ])
+            panel.isHidden = true
+        }
+        problems.isHidden = false
+
+        let buttons = [
+            TabButton("Problems", target: self, action: #selector(showProblemsPane)),
+            TabButton("Outline", target: self, action: #selector(showOutlinePane)),
+            TabButton("Git", target: self, action: #selector(showGitPane)),
+            TabButton("Debug", target: self, action: #selector(showDebugPane))
+        ]
+        buttons[0].isActive = true
+        inspectorStrip.setTabs(buttons)
+        return host
+    }
+
+    private func showInspector(_ index: Int) {
+        for (i, panel) in inspectorPanels.enumerated() { panel.isHidden = i != index }
+        markStrip(inspectorStrip, active: index)
+    }
+
+    @objc private func showProblemsPane() { showInspector(0) }
+    @objc private func showOutlinePane()  { showInspector(1) }
+    @objc private func showGitPane()      { showInspector(2); gitPanel.refresh() }
+    @objc private func showDebugPane()    { showInspector(3) }
+
+    private func markStrip(_ strip: TabStrip, active: Int) {
+        for (i, view) in strip.tabs.arrangedSubviews.enumerated() {
+            (view as? TabButton)?.isActive = (i == active)
+        }
+    }
+
+    // ----------------------------------------------------- status bar
+    private func buildStatusBar() {
         statusBar.wantsLayer = true
         statusBar.layer?.backgroundColor = Theme.panel.cgColor
         for field in [statusLeft, statusRight] {
@@ -101,40 +347,22 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
             field.backgroundColor = .clear
             field.isBezeled = false
             field.isEditable = false
+            field.drawsBackground = false
+            field.lineBreakMode = .byTruncatingTail
             field.translatesAutoresizingMaskIntoConstraints = false
             statusBar.addSubview(field)
         }
         NSLayoutConstraint.activate([
-            statusLeft.leadingAnchor.constraint(equalTo: statusBar.leadingAnchor, constant: 14),
+            statusLeft.leadingAnchor.constraint(equalTo: statusBar.leadingAnchor, constant: 16),
             statusLeft.centerYAnchor.constraint(equalTo: statusBar.centerYAnchor),
-            statusRight.trailingAnchor.constraint(equalTo: statusBar.trailingAnchor, constant: -14),
-            statusRight.centerYAnchor.constraint(equalTo: statusBar.centerYAnchor)
+            statusRight.trailingAnchor.constraint(equalTo: statusBar.trailingAnchor, constant: -16),
+            statusRight.centerYAnchor.constraint(equalTo: statusBar.centerYAnchor),
+            statusLeft.trailingAnchor.constraint(lessThanOrEqualTo: statusRight.leadingAnchor, constant: -20)
         ])
+    }
 
-        let column = NSStackView()
-        column.orientation = .vertical
-        column.spacing = 0
-        column.distribution = .fill
-        column.translatesAutoresizingMaskIntoConstraints = false
-        main.translatesAutoresizingMaskIntoConstraints = false
-        statusBar.translatesAutoresizingMaskIntoConstraints = false
-        column.addArrangedSubview(main)
-        column.addArrangedSubview(statusBar)
-        column.fill(content)
-        statusBar.heightAnchor.constraint(equalToConstant: 24).isActive = true
-        statusBar.widthAnchor.constraint(equalTo: column.widthAnchor).isActive = true
-        main.widthAnchor.constraint(equalTo: column.widthAnchor).isActive = true
-
-        DispatchQueue.main.async {
-            main.setPosition(268, ofDividerAt: 0)
-            main.setPosition(main.bounds.width - 330, ofDividerAt: 1)
-            centreStack.setPosition(centreStack.bounds.height - 230, ofDividerAt: 0)
-            left.setPosition(left.bounds.height * 0.62, ofDividerAt: 0)
-            right.setPosition(right.bounds.height * 0.38, ofDividerAt: 0)
-            right.setPosition(right.bounds.height * 0.68, ofDividerAt: 1)
-        }
-
-        // wiring
+    // --------------------------------------------------------- wiring
+    private func wire() {
         explorer.onOpen = { [weak self] url in self?.open(path: url.path) }
         problems.onSelect = { [weak self] d in
             self?.open(path: d.file)
@@ -144,10 +372,8 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
         debugger.onStopped = { [weak self] line in self?.currentEditor?.setExecutionLine(line) }
         welcome.onOpenFolder = { [weak self] in self?.chooseFolder() }
         welcome.onNewProject = { [weak self] in self?.newProject() }
-        welcome.onOpenGuide = { NSApp.sendAction(#selector(AppDelegate.openGuidebook), to: nil, from: nil) }
+        welcome.onOpenGuide = { _ = NSApp.sendAction(#selector(AppDelegate.openGuidebook), to: nil, from: nil) }
         welcome.onOpenExample = { [weak self] path in self?.open(path: path) }
-
-        updateStatus()
     }
 
     // ------------------------------------------------------- welcome
@@ -156,6 +382,7 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
         item.label = "Welcome"
         item.view = welcome
         tabs.addTabViewItem(item)
+        rebuildTabs()
     }
 
     // ------------------------------------------------- opening things
@@ -173,7 +400,6 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
         window?.title = "SPRFST Studio — " + (folder as NSString).lastPathComponent
         NSDocumentController.shared.noteNewRecentDocumentURL(URL(fileURLWithPath: folder))
 
-        // open the entry file if there is one
         for candidate in ["src/main.spf", "main.spf"] {
             let path = folder + "/" + candidate
             if FileManager.default.fileExists(atPath: path) { open(path: path); break }
@@ -185,10 +411,20 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
         if let existing = editors[path] {
             for item in tabs.tabViewItems where item.view === existing {
                 tabs.selectTabViewItem(item)
+                rebuildTabs()
                 return
             }
         }
         guard FileManager.default.fileExists(atPath: path) else { return }
+
+        // opening a loose file with no project open: follow it home
+        let folder = (path as NSString).deletingLastPathComponent
+        if !explorer.hasFolder || !path.hasPrefix(projectFolder + "/") {
+            if !path.hasPrefix(projectFolder + "/") { projectFolder = folder }
+            explorer.open(folder: URL(fileURLWithPath: projectFolder))
+            gitPanel.use(folder: projectFolder)
+            terminal.use(folder: projectFolder)
+        }
 
         let editor = EditorView(frame: .zero)
         editor.delegate = self
@@ -204,17 +440,51 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
         if tabs.tabViewItems.first?.identifier as? String == "welcome", tabs.numberOfTabViewItems > 1 {
             tabs.removeTabViewItem(tabs.tabViewItems[0])
         }
+        rebuildTabs()
         refreshAnalysis()
     }
 
     @objc func closeCurrentTab() {
         guard let item = tabs.selectedTabViewItem else { return }
+        close(item)
+    }
+
+    private func close(_ item: NSTabViewItem) {
         if let editor = item.view as? EditorView {
             if editor.isDirty { editor.save() }
             editors.removeValue(forKey: editor.path)
         }
         tabs.removeTabViewItem(item)
         if tabs.numberOfTabViewItems == 0 { showWelcome() }
+        rebuildTabs()
+    }
+
+    /// The tab strip is rebuilt from the tab view, so the two can never
+    /// disagree about what is open.
+    private func rebuildTabs() {
+        var buttons: [TabButton] = []
+        for item in tabs.tabViewItems {
+            let identifier = (item.identifier as? String) ?? item.label
+            let button = TabButton(item.label, closable: identifier != "welcome",
+                                   target: self, action: #selector(selectTab(_:)))
+            button.identifier = NSUserInterfaceItemIdentifier(identifier)
+            button.isActive = item === tabs.selectedTabViewItem
+            button.onClose = { [weak self] in
+                guard let self else { return }
+                for candidate in self.tabs.tabViewItems
+                where (candidate.identifier as? String) == identifier { self.close(candidate) }
+            }
+            buttons.append(button)
+        }
+        editorStrip.setTabs(buttons)
+    }
+
+    @objc private func selectTab(_ sender: TabButton) {
+        guard let identifier = sender.identifier?.rawValue else { return }
+        for item in tabs.tabViewItems where (item.identifier as? String) == identifier {
+            tabs.selectTabViewItem(item)
+        }
+        rebuildTabs()
     }
 
     private func chooseFolder() {
@@ -280,20 +550,22 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
     }
 
     func tabView(_ tabView: NSTabView, didSelect tabViewItem: NSTabViewItem?) {
+        rebuildTabs()
         refreshAnalysis()
         updateStatus()
-        gitPanel.refresh()
     }
 
     private func updateStatus() {
         let version = Toolchain.shared.isAvailable ? Toolchain.shared.version : "compiler not found"
         if let editor = currentEditor {
             let (line, column) = editor.caretLineColumn
-            statusLeft.stringValue = "\((editor.path as NSString).lastPathComponent)\(editor.isDirty ? " •" : "")   line \(line), column \(column)"
+            statusLeft.stringValue = "\((editor.path as NSString).lastPathComponent)"
+                + (editor.isDirty ? "  •" : "")
+                + "    line \(line), column \(column)"
             let marks = editor.breakpoints
-            statusRight.stringValue = (marks.isEmpty ? "" : "\(marks.count) breakpoints   ") + version
+            statusRight.stringValue = (marks.isEmpty ? "" : "\(marks.count) breakpoints    ") + version
         } else {
-            statusLeft.stringValue = projectFolder
+            statusLeft.stringValue = (projectFolder as NSString).abbreviatingWithTildeInPath
             statusRight.stringValue = version
         }
     }
@@ -307,23 +579,27 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
 
     @objc func runProject(_ sender: Any?) {
         currentEditor?.save()
+        showRunPane()
         let target = currentPath ?? projectFolder
         console.runWithFigures(file: target, cwd: projectFolder)
     }
 
     @objc func buildProject(_ sender: Any?) {
         currentEditor?.save()
+        showRunPane()
         console.run(arguments: ["build", projectFolder], cwd: projectFolder, title: "build")
     }
 
     @objc func testProject(_ sender: Any?) {
         currentEditor?.save()
+        showRunPane()
         console.run(arguments: ["test", projectFolder], cwd: projectFolder, title: "tests")
     }
 
     @objc func checkProject(_ sender: Any?) {
         currentEditor?.save()
         refreshAnalysis()
+        showRunPane()
         console.run(arguments: ["check", currentPath ?? projectFolder], cwd: projectFolder, title: "check")
     }
 
@@ -346,6 +622,7 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
     @objc func startDebugging(_ sender: Any?) {
         guard let editor = currentEditor else { return }
         editor.save()
+        showInspector(3)
         debugger.start(file: editor.path, breakpoints: editor.breakpoints, cwd: projectFolder)
     }
 
@@ -361,7 +638,7 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
         editor.toggleBreakpoint(line: editor.caretLineColumn.0)
     }
 
-    @objc func focusTerminal(_ sender: Any?) { terminal.focusInput() }
+    @objc func focusTerminal(_ sender: Any?) { showTerminalPane() }
 
     @objc func completeHere(_ sender: Any?) {
         guard let editor = currentEditor else { return }
@@ -416,6 +693,40 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
         refreshAnalysis()
     }
 
+    // --------------------------------------------------- panel toggles
+    @objc func toggleExplorer(_ sender: Any?) {
+        if leftWidth.constant > 1 {
+            lastLeftWidth = leftWidth.constant
+            leftWidth.constant = 0
+            leftDivider.isHidden = true
+        } else {
+            leftWidth.constant = lastLeftWidth
+            leftDivider.isHidden = false
+        }
+    }
+
+    @objc func toggleInspector(_ sender: Any?) {
+        if rightWidth.constant > 1 {
+            lastRightWidth = rightWidth.constant
+            rightWidth.constant = 0
+            rightDivider.isHidden = true
+        } else {
+            rightWidth.constant = lastRightWidth
+            rightDivider.isHidden = false
+        }
+    }
+
+    @objc func toggleBottom(_ sender: Any?) {
+        if bottomHeight.constant > 1 {
+            lastBottomHeight = bottomHeight.constant
+            bottomHeight.constant = 0
+            bottomDivider.isHidden = true
+        } else {
+            bottomHeight.constant = lastBottomHeight
+            bottomDivider.isHidden = false
+        }
+    }
+
     @objc func openCommandPalette(_ sender: Any?) {
         guard let window else { return }
         let palette = CommandPalette(commands: paletteCommands())
@@ -436,8 +747,11 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
             PaletteCommand(title: "Open folder…", subtitle: "⇧⌘O", action: { [weak self] in self?.chooseFolder() }),
             PaletteCommand(title: "New project…", subtitle: "⇧⌘N", action: { [weak self] in self?.newProject() }),
             PaletteCommand(title: "Guidebook", subtitle: "⌘0", action: {
-                NSApp.sendAction(#selector(AppDelegate.openGuidebook), to: nil, from: nil) }),
+                _ = NSApp.sendAction(#selector(AppDelegate.openGuidebook), to: nil, from: nil) }),
             PaletteCommand(title: "Terminal", subtitle: "⌃`", action: { [weak self] in self?.focusTerminal(nil) }),
+            PaletteCommand(title: "Hide or show the explorer", subtitle: "⌘1", action: { [weak self] in self?.toggleExplorer(nil) }),
+            PaletteCommand(title: "Hide or show the inspector", subtitle: "⌘2", action: { [weak self] in self?.toggleInspector(nil) }),
+            PaletteCommand(title: "Hide or show the bottom panel", subtitle: "⌘3", action: { [weak self] in self?.toggleBottom(nil) }),
             PaletteCommand(title: "Generate documentation", subtitle: "sprfst docs", action: { [weak self] in
                 guard let self else { return }
                 self.console.run(arguments: ["docs", self.projectFolder], cwd: self.projectFolder, title: "docs") }),
@@ -445,7 +759,6 @@ final class StudioWindowController: NSWindowController, EditorDelegate, NSTabVie
                 guard let self else { return }
                 self.console.run(arguments: ["lint", self.projectFolder], cwd: self.projectFolder, title: "lint") })
         ]
-        // every symbol in the open file is reachable from the palette
         for item in outlineItems() {
             commands.append(PaletteCommand(title: item.name, subtitle: "\(item.kind)  line \(item.line)",
                                            action: { [weak self] in self?.currentEditor?.go(toLine: item.line) }))
@@ -475,34 +788,33 @@ final class WelcomeView: NSView {
         logo.showPlate = false
         logo.translatesAutoresizingMaskIntoConstraints = false
 
-        let title = label("SPRFST Studio", Fonts.hand(42), Theme.text)
+        let title = label("SPRFST Studio", Fonts.hand(46, weight: .semibold), Theme.text)
         let tagline = label("a small, fast language and the place to write it", Fonts.ui(14), Theme.muted)
         let version = label(Toolchain.shared.isAvailable
                             ? Toolchain.shared.version
                             : "the sprfst compiler was not found — set it in Settings",
                             Fonts.ui(11), Toolchain.shared.isAvailable ? Theme.faint : Theme.red)
 
-        let actions = NSStackView()
+        let actions = NSStackView(views: [
+            BarButton("New project", kind: .primary) { [weak self] in self?.onNewProject?() },
+            BarButton("Open folder") { [weak self] in self?.onOpenFolder?() },
+            BarButton("Guidebook") { [weak self] in self?.onOpenGuide?() }
+        ])
         actions.orientation = .horizontal
-        actions.spacing = 12
-        actions.addArrangedSubview(bigButton("New project", .amber) { [weak self] in self?.onNewProject?() })
-        actions.addArrangedSubview(bigButton("Open folder", .edge) { [weak self] in self?.onOpenFolder?() })
-        actions.addArrangedSubview(bigButton("Guidebook", .edge) { [weak self] in self?.onOpenGuide?() })
+        actions.spacing = 10
 
         let examples = NSStackView()
         examples.orientation = .vertical
         examples.alignment = .leading
-        examples.spacing = 4
+        examples.spacing = 2
         examples.addArrangedSubview(label("EXAMPLES", Fonts.ui(10, weight: .semibold), Theme.faint))
         for path in WelcomeView.exampleFiles().prefix(8) {
             let name = (path as NSString).lastPathComponent
-            let button = NSButton(title: name, target: nil, action: nil)
+            let button = NSButton(title: name, target: self, action: #selector(openExample(_:)))
             button.isBordered = false
-            button.font = Fonts.code()
+            button.font = Fonts.ui(12)
             button.contentTintColor = Theme.amberLight
             button.alignment = .left
-            button.target = self
-            button.action = #selector(openExample(_:))
             button.identifier = NSUserInterfaceItemIdentifier(path)
             examples.addArrangedSubview(button)
         }
@@ -510,14 +822,16 @@ final class WelcomeView: NSView {
         let column = NSStackView(views: [logo, title, tagline, version, actions, examples])
         column.orientation = .vertical
         column.alignment = .centerX
-        column.spacing = 14
+        column.spacing = 16
+        column.setCustomSpacing(26, after: version)
+        column.setCustomSpacing(30, after: actions)
         column.translatesAutoresizingMaskIntoConstraints = false
         addSubview(column)
         NSLayoutConstraint.activate([
             column.centerXAnchor.constraint(equalTo: centerXAnchor),
             column.centerYAnchor.constraint(equalTo: centerYAnchor),
-            logo.widthAnchor.constraint(equalToConstant: 108),
-            logo.heightAnchor.constraint(equalToConstant: 108)
+            logo.widthAnchor.constraint(equalToConstant: 104),
+            logo.heightAnchor.constraint(equalToConstant: 104)
         ])
     }
     required init?(coder: NSCoder) { fatalError() }
@@ -539,38 +853,11 @@ final class WelcomeView: NSView {
         }
         return []
     }
-
-    private func bigButton(_ title: String, _ tint: NSColor, _ action: @escaping () -> Void) -> NSView {
-        let button = ActionButton(title: title, action: action)
-        button.wantsLayer = true
-        button.isBordered = false
-        button.font = Fonts.ui(13, weight: .medium)
-        button.contentTintColor = tint == .amber ? Theme.ink : Theme.text
-        button.layer?.backgroundColor = (tint == .amber ? Theme.amber : Theme.edge).cgColor
-        button.layer?.cornerRadius = 8
-        button.heightAnchor.constraint(equalToConstant: 34).isActive = true
-        button.widthAnchor.constraint(greaterThanOrEqualToConstant: 130).isActive = true
-        return button
-    }
 }
 
 extension NSColor {
     static var amber: NSColor { Theme.amber }
     static var edge: NSColor { Theme.edge }
-}
-
-final class ActionButton: NSButton {
-    private let handler: () -> Void
-    init(title: String, action: @escaping () -> Void) {
-        handler = action
-        super.init(frame: .zero)
-        self.title = title
-        self.bezelStyle = .rounded
-        self.target = self
-        self.action = #selector(fire)
-    }
-    required init?(coder: NSCoder) { fatalError() }
-    @objc private func fire() { handler() }
 }
 
 // -------------------------------------------------- command palette
@@ -613,6 +900,7 @@ final class CommandPalette: NSWindow, NSTableViewDataSource, NSTableViewDelegate
         table.headerView = nil
         table.backgroundColor = .clear
         table.rowHeight = 32
+        table.gridStyleMask = []
         table.dataSource = self
         table.delegate = self
         table.target = self

@@ -81,8 +81,10 @@ final class GutterView: NSRulerView {
             }
 
             let active = currentLine == lineNumber
+            // line numbers stay monospaced whatever the editor font is,
+            // so the column edge never wobbles
             let attrs: [NSAttributedString.Key: Any] = [
-                .font: Fonts.code(),
+                .font: Fonts.mono(max(Fonts.size - 2, 9)),
                 .foregroundColor: active ? Theme.amber : Theme.faint
             ]
             let s = NSAttributedString(string: "\(lineNumber)", attributes: attrs)
@@ -173,6 +175,7 @@ final class EditorView: NSView, NSTextViewDelegate {
     let textView = NSTextView()
     let scrollView = NSScrollView()
     private let minimap = MinimapView()
+    private var minimapWidth: NSLayoutConstraint!
     private var gutter: GutterView!
     private var completionWindow: CompletionWindow?
     private var hoverPopover: NSPopover?
@@ -240,6 +243,7 @@ final class EditorView: NSView, NSTextViewDelegate {
         minimap.translatesAutoresizingMaskIntoConstraints = false
         addSubview(minimap)
 
+        minimapWidth = minimap.widthAnchor.constraint(equalToConstant: Theme.minimapWidth)
         NSLayoutConstraint.activate([
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             scrollView.topAnchor.constraint(equalTo: topAnchor),
@@ -248,13 +252,25 @@ final class EditorView: NSView, NSTextViewDelegate {
             minimap.trailingAnchor.constraint(equalTo: trailingAnchor),
             minimap.topAnchor.constraint(equalTo: topAnchor),
             minimap.bottomAnchor.constraint(equalTo: bottomAnchor),
-            minimap.widthAnchor.constraint(equalToConstant: Theme.minimapWidth)
+            minimapWidth
         ])
 
         NotificationCenter.default.addObserver(
             self, selector: #selector(scrolled),
             name: NSView.boundsDidChangeNotification, object: scrollView.contentView)
         scrollView.contentView.postsBoundsChangedNotifications = true
+    }
+
+    /// In a narrow editor the minimap costs more than it gives, so it
+    /// steps aside. Only ever changed when the answer flips, so this
+    /// cannot start a layout loop.
+    override func setFrameSize(_ newSize: NSSize) {
+        super.setFrameSize(newSize)
+        let roomy = newSize.width >= 640
+        if minimap.isHidden == roomy {
+            minimap.isHidden = !roomy
+            minimapWidth.constant = roomy ? Theme.minimapWidth : 0
+        }
     }
 
     @objc private func scrolled() {

@@ -247,7 +247,14 @@ that are not finished. They are listed here rather than hidden.
   examples, the guidebook and the PNG check all reported failure and
   `build_macos_app.sh` refused to package. The scripts now carry their
   own time limit, read signatures with `od`, and run under `LC_ALL=C`.
-- **SPRFST Studio has never been compiled.** The whole editor is
+- **Studio's first compile found one error, and its first launch found
+  a broken layout.** The error was `NSRulerView`, which redeclares
+  `initWithCoder:` as non-failable. The layout was nested
+  `NSSplitView`s choosing divider positions before the window had a
+  size, which left the editor 140 points wide; the window is now laid
+  out with constraints and its own draggable dividers, and the chrome
+  is set in a handwriting face throughout.
+- **Studio had never been compiled until now.** The whole editor is
   written — 3,300 lines of Swift and AppKit in `ide/macos/Sources/` —
   and so are the bundle and disk image scripts, but this repository was
   developed on Linux, where `swiftc`, AppKit, `codesign` and `hdiutil`

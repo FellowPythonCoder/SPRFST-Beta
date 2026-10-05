@@ -19,7 +19,12 @@ final class GuidebookWindow: NSWindowController {
     private let runner = RunConsole()
 
     convenience init() {
-        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 1120, height: 760),
+        var size = NSSize(width: 1120, height: 760)
+        if let visible = NSScreen.main?.visibleFrame.size {
+            size.width = min(size.width, visible.width - 80)
+            size.height = min(size.height, visible.height - 80)
+        }
+        let window = NSWindow(contentRect: NSRect(origin: .zero, size: size),
                               styleMask: [.titled, .closable, .miniaturizable, .resizable],
                               backing: .buffered, defer: false)
         window.title = "SPRFST Guidebook"
@@ -66,22 +71,43 @@ final class GuidebookWindow: NSWindowController {
         readerScroll.drawsBackground = true
         readerScroll.backgroundColor = Theme.ink
 
-        let right = NSSplitView()
-        right.isVertical = false
-        right.dividerStyle = .thin
-        right.addArrangedSubview(readerScroll)
-        right.addArrangedSubview(runner)
+        // chapter list on the left, reader in the middle, runner below
+        let listWidth = listScroll.widthAnchor.constraint(equalToConstant: 250)
+        let runnerHeight = runner.heightAnchor.constraint(equalToConstant: 220)
+        let listDivider = DragDivider(.width, listWidth, sign: 1, from: 170, to: 420)
+        let runnerDivider = DragDivider(.height, runnerHeight, sign: 1, from: 60, to: 520)
 
-        let split = NSSplitView()
-        split.isVertical = true
-        split.dividerStyle = .thin
-        split.addArrangedSubview(listScroll)
-        split.addArrangedSubview(right)
-        split.fill(content)
-        DispatchQueue.main.async {
-            split.setPosition(250, ofDividerAt: 0)
-            right.setPosition(520, ofDividerAt: 0)
+        for view in [listScroll, readerScroll, runner] {
+            view.translatesAutoresizingMaskIntoConstraints = false
+            content.addSubview(view)
         }
+        content.addSubview(listDivider)
+        content.addSubview(runnerDivider)
+
+        NSLayoutConstraint.activate([
+            listWidth, runnerHeight,
+
+            listScroll.leadingAnchor.constraint(equalTo: content.leadingAnchor),
+            listScroll.topAnchor.constraint(equalTo: content.topAnchor, constant: 28),
+            listScroll.bottomAnchor.constraint(equalTo: content.bottomAnchor),
+
+            listDivider.leadingAnchor.constraint(equalTo: listScroll.trailingAnchor),
+            listDivider.topAnchor.constraint(equalTo: content.topAnchor),
+            listDivider.bottomAnchor.constraint(equalTo: content.bottomAnchor),
+
+            readerScroll.leadingAnchor.constraint(equalTo: listDivider.trailingAnchor),
+            readerScroll.trailingAnchor.constraint(equalTo: content.trailingAnchor),
+            readerScroll.topAnchor.constraint(equalTo: content.topAnchor, constant: 28),
+            readerScroll.bottomAnchor.constraint(equalTo: runnerDivider.topAnchor),
+
+            runnerDivider.leadingAnchor.constraint(equalTo: listDivider.trailingAnchor),
+            runnerDivider.trailingAnchor.constraint(equalTo: content.trailingAnchor),
+            runnerDivider.bottomAnchor.constraint(equalTo: runner.topAnchor),
+
+            runner.leadingAnchor.constraint(equalTo: listDivider.trailingAnchor),
+            runner.trailingAnchor.constraint(equalTo: content.trailingAnchor),
+            runner.bottomAnchor.constraint(equalTo: content.bottomAnchor)
+        ])
     }
 
     private func load() {

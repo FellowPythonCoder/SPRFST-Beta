@@ -399,7 +399,18 @@ keys:
 
 `⌘P` command palette, `⌘R` run, `⌘B` build, `⌘U` test, `⌘D` debug,
 `⌘\` toggle breakpoint, `⌃⌘F` format, `⌃⌘J` go to definition,
-`⌃⌘E` rename, `⇧⌘O` open folder, `` ⌃` `` terminal, `⌘0` guidebook.
+`⌃⌘E` rename, `⇧⌘O` open folder, `` ⌃` `` terminal, `⌘0` guidebook,
+`⌘1` `⌘2` `⌘3` hide or show the explorer, the inspector and the
+bottom panel, `⌘+` and `⌘-` text size.
+
+The three regions are dragged by the lines between them. The right
+hand side is one inspector with four tabs — problems, outline, git and
+the debugger — rather than four panels fighting over the same column.
+
+All of the chrome is set in a handwriting face, which is the point of
+the thing. If you want your code in it as well, open Settings with
+`⌘,` and choose **SPRFST Hand**; **Clean Code** keeps code monospaced
+and is the default.
 
 The app carries its own copy of the compiler, the standard library, the
 examples and the guidebook inside the bundle, so it works even if

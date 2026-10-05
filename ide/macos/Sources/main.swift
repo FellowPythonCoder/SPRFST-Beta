@@ -140,6 +140,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let fontPopup = NSPopUpButton()
         fontPopup.addItems(withTitles: Fonts.Face.allCases.map(\.rawValue))
+        fontPopup.toolTip = "SPRFST Hand writes code in the handwriting face too; the others keep code monospaced"
         fontPopup.selectItem(withTitle: Fonts.current.rawValue)
         fontPopup.target = self
         fontPopup.action = #selector(fontChanged(_:))
@@ -176,6 +177,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func sizeChanged(_ sender: NSSlider) {
         Fonts.size = CGFloat(sender.doubleValue.rounded())
+        studio?.currentEditor?.reloadSyntax()
+    }
+
+    @objc func biggerText(_ sender: Any?) { resize(by: 1) }
+    @objc func smallerText(_ sender: Any?) { resize(by: -1) }
+
+    private func resize(by delta: CGFloat) {
+        Fonts.size = min(max(Fonts.size + delta, 9), 28)
         studio?.currentEditor?.reloadSyntax()
     }
 
@@ -250,6 +259,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let viewMenu = NSMenu(title: "View")
         add(viewMenu, "Command palette", #selector(StudioWindowController.openCommandPalette(_:)), "p", [.command, .shift])
         add(viewMenu, "Terminal", #selector(StudioWindowController.focusTerminal(_:)), "`", [.control])
+        viewMenu.addItem(.separator())
+        add(viewMenu, "Explorer", #selector(StudioWindowController.toggleExplorer(_:)), "1", [.command])
+        add(viewMenu, "Inspector", #selector(StudioWindowController.toggleInspector(_:)), "2", [.command])
+        add(viewMenu, "Bottom panel", #selector(StudioWindowController.toggleBottom(_:)), "3", [.command])
+        viewMenu.addItem(.separator())
+        add(viewMenu, "Bigger text", #selector(biggerText(_:)), "+", [.command])
+        add(viewMenu, "Smaller text", #selector(smallerText(_:)), "-", [.command])
         viewMenu.addItem(.separator())
         add(viewMenu, "Enter full screen", #selector(NSWindow.toggleFullScreen(_:)), "f", [.command, .control, .shift])
         viewItem.submenu = viewMenu

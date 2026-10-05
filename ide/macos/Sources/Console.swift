@@ -96,7 +96,7 @@ final class TerminalPanel: NSView {
         wantsLayer = true
         layer?.backgroundColor = Theme.ink.cgColor
 
-        input.placeholderString = "sprfst run .    (a real shell — try sprfst test, git status, ls)"
+        input.placeholderString = "a real shell — sprfst run .  ·  sprfst test  ·  git status"
         input.font = Fonts.code()
         input.textColor = Theme.text
         input.backgroundColor = Theme.raised
@@ -227,6 +227,11 @@ final class RunConsole: NSView {
     required init?(coder: NSCoder) { fatalError() }
 
     var isRunning: Bool { task?.isRunning ?? false }
+
+    func clear() {
+        output.clear()
+        stats.stringValue = ""
+    }
 
     func stop() {
         task?.terminate()

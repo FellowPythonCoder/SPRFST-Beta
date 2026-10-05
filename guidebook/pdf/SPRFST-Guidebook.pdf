@@ -121,7 +121,7 @@ stream
 0.961 0.541 0.149 rg 72.0 470.0 52.0 3.0 re f
 BT /F2 42.0 Tf 0.98 0.98 0.99 rg 1 0 0 1 72.0 500.0 Tm (SPRFST) Tj ET
 BT /F1 15.0 Tf 0.961 0.541 0.149 rg 1 0 0 1 72.0 430.0 Tm (The Guidebook) Tj ET
-BT /F1 9.5 Tf 0.55 0.55 0.60 rg 1 0 0 1 72.0 150.0 Tm (Version 0.1.0-beta  04 October 2026) Tj ET
+BT /F1 9.5 Tf 0.55 0.55 0.60 rg 1 0 0 1 72.0 150.0 Tm (Version 0.1.0-beta  05 October 2026) Tj ET
 BT /F1 9.5 Tf 0.38 0.38 0.44 rg 1 0 0 1 72.0 132.0 Tm (Typeset by SPRFST. No library was used to write this file.) Tj ET
 endstream
 endobj
@@ -10755,7 +10755,7 @@ xref
 0000724354 00000 n 
 0000724518 00000 n 
 trailer
-<< /Size 200 /Root 1 0 R /Info << /Title (SPRFST - The Guidebook) /Producer (SPRFST 0.1.0-beta) /CreationDate (D:20261004232324Z) >> >>
+<< /Size 200 /Root 1 0 R /Info << /Title (SPRFST - The Guidebook) /Producer (SPRFST 0.1.0-beta) /CreationDate (D:20261005005520Z) >> >>
 startxref
 733075
 %%EOF
