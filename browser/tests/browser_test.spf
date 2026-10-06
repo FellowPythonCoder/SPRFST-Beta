@@ -119,6 +119,8 @@ test "search results become a native overview and normal links" {
     let doc = html.parse(rendered)
     testing.same(html.title_of(doc), "who is the richest man - Search", "the query is in the title")
     testing.same(count_of(doc, "a"), 2, "result links remain ordinary anchors")
+    testing.yes(search.render("<html><body>challenge</body></html>", "nothing").contains("No readable results"),
+                "an empty provider response is still a native search page")
 }
 
 ~~ ----------------------------------------------------------------- HTML

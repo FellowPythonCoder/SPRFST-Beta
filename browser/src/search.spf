@@ -79,7 +79,6 @@ fn collect(raw: Text) -> [Hit] {
 
 pub fn render(raw: Text, query: Text) -> Text {
     let hits = collect(raw)
-    if hits.len() == 0 { give raw }
 
     var out = "<html><head><title>" + escape(query) + " - Search</title>"
     out = out + "<style>"
@@ -92,11 +91,16 @@ pub fn render(raw: Text, query: Text) -> Text {
     out = out + "</style></head><body>"
     out = out + "<p class=\"url\">Search</p><h1>" + escape(query) + "</h1>"
 
-    let first = hits[0]
-    if first.snippet != "" {
-        out = out + "<section class=\"overview\"><h2>Overview</h2><p>" +
-              escape(first.snippet) + "</p><p class=\"url\">From " +
-              escape(first.title) + "</p></section>"
+    if hits.len() > 0 {
+        let first = hits[0]
+        if first.snippet != "" {
+            out = out + "<section class=\"overview\"><h2>Overview</h2><p>" +
+                  escape(first.snippet) + "</p><p class=\"url\">From " +
+                  escape(first.title) + "</p></section>"
+        }
+    } else {
+        out = out + "<section class=\"overview\"><h2>No readable results</h2>" +
+              "<p>The search provider did not return any ordinary result links.</p></section>"
     }
 
     out = out + "<h2>Search results</h2><ol>"
