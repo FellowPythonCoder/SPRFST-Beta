@@ -315,7 +315,7 @@ fi
 
 # ------------------------------------------------------------- browser
 printf "\n  ${DIM}browser${OFF}\n"
-if err=$("$SPRFST" check "$ROOT/browser/src/main.spf" 2>&1); then
+if err=$("$SPRFST" check "$ROOT/browser/engine/main.spf" 2>&1); then
     report "engine checks ($(printf '%s' "$err" | grep -oE '[0-9]+ files'))" ok
 else
     report "engine checks" no "$(printf '%s' "$err" | head -6)"

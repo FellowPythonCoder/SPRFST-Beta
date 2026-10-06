@@ -1,6 +1,6 @@
-// =====================================================================
-//  SPRFST Browser — where the application begins.
-// =====================================================================
+
+
+
 import AppKit
 
 final class BrowserDelegate: NSObject, NSApplicationDelegate {
@@ -25,7 +25,7 @@ final class BrowserDelegate: NSObject, NSApplicationDelegate {
 
     func applicationShouldTerminateAfterLastWindowClosed(_ app: NSApplication) -> Bool { true }
 
-    // Chosen as the default browser, or sent a link by another app.
+
     func application(_ application: NSApplication, open urls: [URL]) {
         guard let first = urls.first else { return }
         if let window = front {
@@ -46,8 +46,8 @@ final class BrowserDelegate: NSObject, NSApplicationDelegate {
         window.window?.makeKeyAndOrderFront(nil)
     }
 
-    // Menu items speak to whichever window is in front: no guessing at
-    // the responder chain, and no dead menu entries.
+
+
     @objc func pass(_ sender: NSMenuItem) {
         guard let action = sender.representedObject as? String, let window = front else { return }
         window.perform(NSSelectorFromString(action))

@@ -1,14 +1,14 @@
-~~ =====================================================================
-~~  SPRFST Browser — fetching
-~~
-~~  Plain HTTP is spoken here, by hand, over a socket: request line,
-~~  headers, chunked bodies and redirects.
-~~
-~~  SPRFST has no TLS of its own yet, so https is handed to curl, which
-~~  every Mac has. That is the one piece of the browser the language
-~~  does not do itself, and it is deliberate: a hand rolled TLS stack
-~~  would be the least trustworthy code in the program.
-~~ =====================================================================
+
+
+
+
+
+
+
+
+
+
+
 module fetch
 
 use std.net
@@ -51,8 +51,8 @@ pub object Store {
     }
 }
 
-~~ ------------------------------------------------------------ public
-~~ Fetch a page, following up to five redirects.
+
+
 pub fn get(target: uri.Url) -> Response {
     give follow(target, 5)
 }
@@ -77,7 +77,7 @@ fn follow(target: uri.Url, left: Int) -> Response {
     give answer
 }
 
-~~ --------------------------------------------------------- plain http
+
 fn over_tcp(target: uri.Url) -> Response {
     var answer = Response { address: target.full() }
     let socket = net.connect(target.host, target.port)
@@ -115,7 +115,7 @@ fn host_header(target: uri.Url) -> Text {
     give target.host + ":" + target.port.to_text()
 }
 
-~~ Split a raw HTTP message into status, headers and body.
+
 pub fn read_message(raw: Text, into: Response) -> Response {
     var answer = into
     var split = raw.index_of("\r\n\r\n")
@@ -157,7 +157,7 @@ pub fn read_message(raw: Text, into: Response) -> Response {
     answer.body = body
     answer.bytes = raw.len()
     answer.ok = answer.status >= 200 and answer.status < 400
-    ~~ a redirect carries its destination in `error` until it is followed
+
     if answer.status >= 300 and answer.status < 400 {
         answer.error = headers.get("location") ?? ""
     } else if not answer.ok {
@@ -166,7 +166,7 @@ pub fn read_message(raw: Text, into: Response) -> Response {
     give answer
 }
 
-~~ Chunked transfer: hex length, body, repeat until zero.
+
 pub fn unchunk(raw: Text) -> Text {
     var out: [Text] = []
     var i = 0
@@ -191,7 +191,7 @@ pub fn unchunk(raw: Text) -> Text {
         let digits = if semi >= 0 { line.slice(0, semi) } else { line }
         let size = from_hex(digits.trim())
         if size <= 0 { break }
-        if i + size > n { 
+        if i + size > n {
             out.push(raw.slice(i, n))
             break
         }
@@ -217,7 +217,7 @@ pub fn from_hex(digits: Text) -> Int {
     give total
 }
 
-~~ --------------------------------------------------------------- tls
+
 fn over_tls(target: uri.Url) -> Response {
     var answer = Response { address: target.full() }
     if not have_curl() {

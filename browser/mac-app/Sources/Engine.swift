@@ -1,15 +1,15 @@
-// =====================================================================
-//  The engine, as the window sees it.
-//
-//  Everything that makes a page — reading the address, fetching it,
-//  parsing it, blocking what should not load, styling and laying it
-//  out — happens in SPRFST, in browser/src. This file starts that
-//  program and speaks to it: one JSON request per line, one JSON
-//  answer per line. The window never parses HTML itself.
-// =====================================================================
+
+
+
+
+
+
+
+
+
 import AppKit
 
-// ------------------------------------------------------------- the page
+
 struct Item {
     var kind = "text"
     var x: CGFloat = 0
@@ -62,7 +62,7 @@ struct Page {
     static func blank() -> Page { Page() }
 }
 
-// --------------------------------------------------------- the process
+
 final class Engine {
     static let shared = Engine()
 
@@ -72,12 +72,12 @@ final class Engine {
     private let queue = DispatchQueue(label: "ai.sprfst.browser.engine")
     private var buffer = Data()
     private(set) var rules = 0
-    /// The engine's first line, read on the queue during start().
+
     private var greeting: String?
     private(set) var running = false
     var onTrouble: ((String) -> Void)?
 
-    // Where the engine and its interpreter live inside the application.
+
     private var paths: (binary: String, entry: String, home: String)? {
         guard let resources = Bundle.main.resourceURL else { return nil }
         let binary = resources.appendingPathComponent("bin/sprfst").path
@@ -87,14 +87,14 @@ final class Engine {
            FileManager.default.fileExists(atPath: entry) {
             return (binary, entry, home)
         }
-        // Running from a checkout: browser/macos/.build/... → repository root
+
         var here = URL(fileURLWithPath: CommandLine.arguments[0]).deletingLastPathComponent()
         for _ in 0..<6 {
             let b = here.appendingPathComponent("build/bin/sprfst").path
-            let e = here.appendingPathComponent("browser/src/main.spf").path
+            let e = here.appendingPathComponent("browser/engine/main.spf").path
             if FileManager.default.isExecutableFile(atPath: b),
                FileManager.default.fileExists(atPath: e) {
-                return (b, e, here.appendingPathComponent("browser/rules").path)
+                return (b, e, here.appendingPathComponent("browser/privacy-rules").path)
             }
             here = here.deletingLastPathComponent()
         }
@@ -137,9 +137,9 @@ final class Engine {
         fromEngine = output.fileHandleForReading
         running = true
 
-        // The handshake tells us the engine is alive and how many rules
-        // it loaded. It is read with a deadline: an engine that never
-        // speaks must not leave the application with no window.
+
+
+
         let waited = DispatchSemaphore(value: 0)
         queue.async { [weak self] in
             self?.greeting = self?.readLine()
@@ -168,8 +168,8 @@ final class Engine {
         }
     }
 
-    // One question, answered on the main queue. Requests are serialised,
-    // so the page you asked for last is the page you get last.
+
+
     func ask(_ request: [String: Any], then hand: @escaping (Page) -> Void) {
         queue.async { [weak self] in
             guard let self = self else { return }
@@ -204,7 +204,7 @@ final class Engine {
         return Engine.page(from: shape)
     }
 
-    // ------------------------------------------------------ line reading
+
     private func readLine() -> String? {
         guard let handle = fromEngine else { return nil }
         while true {
@@ -226,7 +226,7 @@ final class Engine {
         return shape
     }
 
-    // ------------------------------------------------- shape into a page
+
     static func page(from shape: [String: Any]) -> Page {
         var page = Page()
         page.ok = shape["ok"] as? Bool ?? false

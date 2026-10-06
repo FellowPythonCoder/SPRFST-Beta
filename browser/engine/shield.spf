@@ -1,23 +1,23 @@
-~~ =====================================================================
-~~  SPRFST Browser — the Shield
-~~
-~~  Requests are checked before they are made, so a blocked advert is
-~~  never fetched, never parsed and never laid out. Nothing is hidden
-~~  after the fact.
-~~
-~~  Rule syntax, which is ours and is plain text:
-~~
-~~      ||ads.example.com^        the host and every host under it
-~~      ||example.com/ads/        a host together with a path
-~~      /pagead/                  anywhere in the address
-~~      |http://tracker.          the address starts like this
-~~      .gif|                     the address ends like this
-~~      @@||example.com^          an exception: never block this
-~~      ||beacon.io^$third-party  only when it is not the site you are on
-~~      ##.ad-banner              hide these elements everywhere
-~~      news.example##.promo      hide these elements on one site
-~~      ~~ a comment
-~~ =====================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 module shield
 
 use std.fs
@@ -25,14 +25,14 @@ use uri
 
 pub object Rule {
     pattern: Text = ""
-    kind: Text = "part"        ~~ part, start or end
+    kind: Text = "part"
     third: Bool = false
     allow: Bool = false
 }
 
 pub object Shield {
     block_hosts: Map<Text, Bool> = [:]
-    third_hosts: Map<Text, Bool> = [:]   ~~ blocked only away from home
+    third_hosts: Map<Text, Bool> = [:]
     allow_hosts: Map<Text, Bool> = [:]
     rules: [Rule] = []
     hide_all: [Text] = []
@@ -43,7 +43,7 @@ pub object Shield {
     passed: Int = 0
     hidden: Int = 0
 
-    ~~ ---------------------------------------------------------- rules
+
     fn add(self, raw: Text) {
         var line = raw.trim()
         if line == "" or line.starts_with("~~") or line.starts_with("!") or line.starts_with("#!") {
@@ -114,9 +114,9 @@ pub object Shield {
         for line in text.lines() { self.add(line) }
     }
 
-    ~~ ------------------------------------------------------- matching
-    ~~ A host rule covers every host beneath it, so one entry for
-    ~~ "doubleclick.net" also covers "stats.g.doubleclick.net".
+
+
+
     fn host_listed(self, table: Map<Text, Bool>, host: Text) -> Bool {
         var rest = host
         while rest != "" {
@@ -135,7 +135,7 @@ pub object Shield {
         give address.contains(rule.pattern)
     }
 
-    ~~ Should this request be stopped? Exceptions are considered first.
+
     fn blocks(self, target: uri.Url, page_host: Text) -> Bool {
         if not self.enabled { give false }
         if not target.ok { give false }
@@ -156,7 +156,7 @@ pub object Shield {
         give false
     }
 
-    ~~ The same question, but it keeps the score.
+
     fn check(self, target: uri.Url, page_host: Text) -> Bool {
         let hit = self.blocks(target, page_host)
         if hit { self.blocked = self.blocked + 1 }
@@ -164,7 +164,7 @@ pub object Shield {
         give hit
     }
 
-    ~~ Selectors to drop from the document on this site.
+
     fn hiding(self, host: Text) -> [Text] {
         if not self.enabled { give [] }
         var out = self.hide_all.copy()
@@ -195,10 +195,10 @@ pub object Shield {
     }
 }
 
-~~ Build a shield from a rules file, falling back to a small built-in
-~~ list so the browser is never unprotected.
-~~ Build a shield from a rules file, falling back to the list that is
-~~ compiled in, so the browser is never unprotected.
+
+
+
+
 pub fn from_file(path: Text) -> Shield {
     var guard = Shield { }
     let text = fs.read(path)
@@ -206,7 +206,7 @@ pub fn from_file(path: Text) -> Shield {
     give guard
 }
 
-~~ The rules that ship inside the engine itself.
+
 pub fn built_in() -> Text {
     give [
         "||doubleclick.net^",

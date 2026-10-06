@@ -1,10 +1,10 @@
-// =====================================================================
-//  The window.
-//
-//  A top bar, a page, and a line at the bottom that tells you what the
-//  page cost you. Everything else is the engine's work; this file is
-//  chrome, and tries to be as little of it as possible.
-// =====================================================================
+
+
+
+
+
+
+
 import AppKit
 
 final class Tab {
@@ -46,7 +46,7 @@ final class BrowserWindow: NSWindowController, PageViewDelegate, NSTextFieldDele
     private var ember = true
     private var shieldOn = true
 
-    // ------------------------------------------------------------- set up
+
     convenience init() {
         let frame = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1280, height: 860)
         let size = NSRect(x: 0, y: 0,
@@ -73,9 +73,9 @@ final class BrowserWindow: NSWindowController, PageViewDelegate, NSTextFieldDele
         root.wantsLayer = true
         root.layer?.backgroundColor = Theme.ink.cgColor
 
-        // ----------------------------------------------------- the top bar
-        // A native translucent surface keeps the chrome branded without
-        // copying another browser's layout. The engine page remains ours.
+
+
+
         let bar = GlassSurface(material: .headerView)
         bar.translatesAutoresizingMaskIntoConstraints = false
         root.addSubview(bar)
@@ -111,13 +111,13 @@ final class BrowserWindow: NSWindowController, PageViewDelegate, NSTextFieldDele
                                 lensButton, emberButton, shieldButton]
         for view in pieces { bar.addSubview(view) }
 
-        // ------------------------------------------------------- the strip
+
         strip.accessories.addArrangedSubview(BarButton("+", kind: .quiet) { [weak self] in
             self?.openTab(at: nil)
         })
         root.addSubview(strip)
 
-        // -------------------------------------------------------- the page
+
         pageView.delegate = self
         scroller.translatesAutoresizingMaskIntoConstraints = false
         scroller.hasVerticalScroller = true
@@ -128,7 +128,7 @@ final class BrowserWindow: NSWindowController, PageViewDelegate, NSTextFieldDele
         scroller.scrollerStyle = .overlay
         root.addSubview(scroller)
 
-        // ------------------------------------------------------ the status
+
         let status = GlassSurface(material: .underWindowBackground)
         status.translatesAutoresizingMaskIntoConstraints = false
         let texts: [NSTextField] = [statusLeft, statusRight, findCount]
@@ -139,7 +139,7 @@ final class BrowserWindow: NSWindowController, PageViewDelegate, NSTextFieldDele
         root.addSubview(status)
         root.addSubview(progress)
 
-        // --------------------------------------------------------- finding
+
         findBar.translatesAutoresizingMaskIntoConstraints = false
         findBar.isHidden = true
         findField.translatesAutoresizingMaskIntoConstraints = false
@@ -240,7 +240,7 @@ final class BrowserWindow: NSWindowController, PageViewDelegate, NSTextFieldDele
             name: NSView.boundsDidChangeNotification, object: scroller.contentView)
     }
 
-    // ---------------------------------------------------------------- tabs
+
     func openTab(at place: String?) {
         nextId += 1
         let fresh = Tab(id: String(nextId))
@@ -289,7 +289,7 @@ final class BrowserWindow: NSWindowController, PageViewDelegate, NSTextFieldDele
         address.stringValue = tab.address
     }
 
-    // -------------------------------------------------------------- travel
+
     func open(_ what: String) {
         let asked = what.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !asked.isEmpty else { return }
@@ -358,7 +358,7 @@ final class BrowserWindow: NSWindowController, PageViewDelegate, NSTextFieldDele
         return String(format: "%.1f MB", Double(count) / 1048576)
     }
 
-    // ------------------------------------------------------------- actions
+
     @objc func addressEntered() {
         open(address.stringValue)
         window?.makeFirstResponder(pageView)
@@ -435,7 +435,7 @@ final class BrowserWindow: NSWindowController, PageViewDelegate, NSTextFieldDele
         tab.scroll = scroller.contentView.bounds.origin.y
     }
 
-    // ------------------------------------------------------ the page talks
+
     func pageView(_ view: PageView, didClick link: String) {
         if NSEvent.modifierFlags.contains(.command) {
             openTab(at: link)
@@ -454,7 +454,7 @@ final class BrowserWindow: NSWindowController, PageViewDelegate, NSTextFieldDele
     }
 }
 
-// ---------------------------------------------------------------- resizing
+
 extension BrowserWindow: NSWindowDelegate {
     func windowDidResize(_ notification: Notification) {
         resizeWork?.cancel()
@@ -467,10 +467,10 @@ extension BrowserWindow: NSWindowDelegate {
     }
 }
 
-// --------------------------------------------------------- liquid glass
-// Keep this effect in the native chrome only. Web content is still painted
-// by PageView from the SPRFST display list, so the branding cannot become a
-// second rendering engine.
+
+
+
+
 final class GlassSurface: NSVisualEffectView {
     init(material: NSVisualEffectView.Material, radius: CGFloat = 0) {
         super.init(frame: .zero)
@@ -490,8 +490,8 @@ final class GlassSurface: NSVisualEffectView {
 
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
-        // A restrained highlight gives the surface a liquid-glass edge
-        // without turning the controls into a copy of Safari or Chrome.
+
+
         let height = min(2.0, max(1.0, bounds.height * 0.08))
         let sheen = NSGradient(colors: [NSColor.white.withAlphaComponent(0.12),
                                          NSColor.white.withAlphaComponent(0.0)])
@@ -499,7 +499,7 @@ final class GlassSurface: NSVisualEffectView {
     }
 }
 
-// ------------------------------------------------------ the thinnest bar
+
 final class ProgressBar: NSView {
     private var fraction: CGFloat = 0
     private var timer: Timer?

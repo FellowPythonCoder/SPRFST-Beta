@@ -67,7 +67,7 @@ signed with an ad hoc signature rather than a paid certificate. Right
 click it in Applications and choose Open, once.
 
 WHAT IT BLOCKS
-$(grep -cvE '^\s*(~~|!|$)' "$ROOT/browser/rules/shield.rules" | tr -d ' ') rules, in Contents/Resources/engine/shield.rules. It is a
+$(grep -cvE '^\s*(~~|!|$)' "$ROOT/browser/privacy-rules/shield.rules" | tr -d ' ') rules, in Contents/Resources/engine/shield.rules. It is a
 plain text file; edit it and reopen the browser. sprfst://shield shows
 what was stopped on the page you are reading.
 
@@ -133,7 +133,7 @@ else
     echo "      cd \"$DEST\" && ./tools/build_browser_app.sh --install"
     echo
     echo "  The engine works on its own in the meantime:"
-    echo "      cd \"$DEST/browser\" && ../build/bin/sprfst run src/main.spf -- example.com"
+    echo "      cd \"$DEST/browser\" && ../build/bin/sprfst run engine/main.spf -- example.com"
 fi
 
 echo
@@ -141,12 +141,12 @@ read -r -p "  Press return to close. " _
 CMD
     chmod +x "$STAGE/Install SPRFST Browser.command"
 
-    RULES=$(grep -cvE '^\s*(~~|!|$)' "$ROOT/browser/rules/shield.rules" | tr -d ' ')
+    RULES=$(grep -cvE '^\s*(~~|!|$)' "$ROOT/browser/privacy-rules/shield.rules" | tr -d ' ')
     cat > "$STAGE/Read me.txt" <<TXT
 SPRFST Browser $VERSION
 
 A web browser whose engine is written in SPRFST — the language in this
-same image. Nine modules in "SPRFST Browser $VERSION/browser/src":
+same image. Nine modules in "SPRFST Browser $VERSION/browser/engine":
 
     uri.spf      addresses, and what a typed line means
     html.spf     the parser: tags, attributes, entities, bad markup
@@ -181,11 +181,11 @@ BEFORE YOU BUILD ANYTHING
 The engine reads pages on its own, in a terminal:
 
     cd ~/SPRFST-Browser && make
-    cd browser && ../build/bin/sprfst run src/main.spf -- example.com
-    ../build/bin/sprfst run src/main.spf -- --reader en.wikipedia.org/wiki/Web_browser
+    cd browser && ../build/bin/sprfst run engine/main.spf -- example.com
+    ../build/bin/sprfst run engine/main.spf -- --reader en.wikipedia.org/wiki/Web_browser
 
 WHAT IT BLOCKS
-$RULES rules in browser/rules/shield.rules, a plain text file you can
+$RULES rules in browser/privacy-rules/shield.rules, a plain text file you can
 edit. Adverts, trackers, consent walls, chat widgets, cryptominers.
 Nothing is sent to Google, including the search: DuckDuckGo's plain
 HTML endpoint is the default, and it is one line in sprfst://settings.

@@ -1,11 +1,11 @@
-~~ =====================================================================
-~~  SPRFST Browser — the Lens
-~~
-~~  Finds the part of a page that is actually the page: the block with
-~~  the most prose and the fewest links, which is a surprisingly good
-~~  definition of an article. What comes back is a new, small document
-~~  that the ordinary layout then draws.
-~~ =====================================================================
+
+
+
+
+
+
+
+
 module reader
 
 use html
@@ -16,7 +16,7 @@ pub object Pick {
     found: Bool = false
 }
 
-~~ How much of this subtree reads like prose.
+
 pub fn score_of(node: html.Node) -> Num {
     if node.kind != "element" { give 0.0 }
     var words = 0.0
@@ -66,7 +66,7 @@ fn count_of(text: Text, part: Text) -> Int {
     give n
 }
 
-~~ The best candidate under a document.
+
 pub fn find(document: html.Node) -> Pick {
     var best = Pick { }
     for tag in ["article", "main", "section", "div", "body"] {
@@ -80,7 +80,7 @@ pub fn find(document: html.Node) -> Pick {
     give best
 }
 
-~~ Keep the parts of a subtree worth reading.
+
 fn keep(node: html.Node, into: html.Node, depth: Int) {
     if depth > 24 { give }
     for kid in node.kids {
@@ -111,8 +111,8 @@ fn keep(node: html.Node, into: html.Node, depth: Int) {
     }
 }
 
-~~ Build the reading copy of a document. The title becomes an h1 so
-~~ the page still looks like a page.
+
+
 pub fn distil(document: html.Node, title: Text) -> html.Node {
     var body = html.Node { kind: "element", name: "body" }
     var root = html.Node { kind: "root", name: "#document" }

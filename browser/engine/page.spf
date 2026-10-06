@@ -1,10 +1,10 @@
-~~ =====================================================================
-~~  SPRFST Browser — opening a page
-~~
-~~  One call does the lot: work out what was typed, ask the Shield,
-~~  fetch, parse, gather the stylesheets, lay it out and keep a note of
-~~  what it cost. The window never does any of this itself.
-~~ =====================================================================
+
+
+
+
+
+
+
 module page
 
 use std.time
@@ -20,7 +20,7 @@ use search
 pub object Settings {
     search: Text = "https://duckduckgo.com/html/?q="
     engine_name: Text = "DuckDuckGo"
-    ember: Bool = true                 ~~ paint every page in our colours
+    ember: Bool = true
     shield_on: Bool = true
     reading: Bool = false
     width: Num = 860.0
@@ -70,7 +70,7 @@ pub object Session {
     cursor: Int = -1
     last: Result = Result { }
 
-    ~~ ------------------------------------------------------ history
+
     fn remember(self, address: Text) {
         while self.history.len() > self.cursor + 1 { self.history.pop() }
         self.history.push(address)
@@ -94,13 +94,13 @@ pub object Session {
     }
 }
 
-~~ What a typed line means: an address, or a search.
+
 pub fn address_for(typed: Text, settings: Settings) -> Text {
     let text = typed.trim()
     if text == "" { give settings.home }
     if uri.looks_like_address(text) {
-        ~~ uri.parse settles the scheme: https for the web, plain http
-        ~~ for a machine on this desk, which rarely has a certificate.
+
+
         give uri.parse(text).full()
     }
     give settings.search + encode(text)
@@ -126,7 +126,7 @@ fn hex(value: Int) -> Text {
     give digits.char_at(to_int(value / 16)) + digits.char_at(value % 16)
 }
 
-~~ ------------------------------------------------------------- open
+
 pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
     let started = time.clock()
     let typed_text = typed.trim()
@@ -156,9 +156,9 @@ pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
         out.blocked = 1
     } else {
         var answer = fetch.Response { }
-        ~~ A normal revisit is a cache hit too. `record` controls history,
-        ~~ not whether the network should be used; reload explicitly clears
-        ~~ the store before it gets here.
+
+
+
         let cached = session.store.look(address)
         if cached != nil {
             answer = cached ?? fetch.Response { }
@@ -182,10 +182,10 @@ pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
         }
     }
 
-    ~~ ------------------------------------------------- make a document
-    ~~ Search results get a small native page of their own instead of
-    ~~ exposing the search provider's heavy chrome. The first result's
-    ~~ snippet becomes the overview; every result remains a direct link.
+
+
+
+
     if searching and source != "" and (mime == "text/html" or mime == "") {
         source = search.render(source, typed_text)
         mime = "text/html"
@@ -211,7 +211,7 @@ pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
     if out.title == "" { out.title = here.site() }
     absolutise(document, here)
 
-    ~~ --------------------------------------------------- stylesheets
+
     var style_text: [Text] = []
     for node in document.all("style") { style_text.push(html.raw_text(node)) }
     for node in document.all("link") {
@@ -222,12 +222,12 @@ pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
         let sheet_url = uri.parse(href)
         out.requests = out.requests + 1
         if session.guard.check(sheet_url, here.host) { skip }
-        ~~ Pages are painted in one typeface, so a web font sheet is a
-        ~~ round trip that can change nothing. It is not fetched.
+
+
         if is_font_host(sheet_url.host) { skip }
         if style_text.len() >= 4 { skip }
-        ~~ Stylesheets share the page store. A resize, back/forward trip
-        ~~ or second tab should not pay for the same CSS again.
+
+
         let sheet_key = sheet_url.full()
         let cached_sheet = session.store.look(sheet_key)
         let answer = if cached_sheet != nil {
@@ -242,7 +242,7 @@ pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
     let sheet = css.parse(style_text.join("\n"))
     out.style_ms = (time.clock() - mark) * 1000.0
 
-    ~~ ------------------------------------- everything else the page wants
+
     for tag in ["img", "script", "iframe", "embed", "video", "audio", "source"] {
         for node in document.all(tag) {
             let src = node.attr("src")
@@ -259,7 +259,7 @@ pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
         for node in document.all("img") { node.name = "span" }
     }
 
-    ~~ ------------------------------------------------------ lay it out
+
     var shown = document
     if session.settings.reading {
         shown = reader.distil(document, out.title)
@@ -276,8 +276,8 @@ pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
     out.blocked = session.guard.blocked
     out.hidden = laid.hidden + session.guard.hidden
     out.ms = (time.clock() - started) * 1000.0
-    ~~ Keep the human query in the address bar and history. The network
-    ~~ address remains internal to the fetch/store path above.
+
+
     if searching { out.address = typed_text }
 
     if record {
@@ -291,7 +291,7 @@ pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
     give out
 }
 
-~~ Rewrite every link and image to an address that stands on its own.
+
 fn absolutise(document: html.Node, here: uri.Url) {
     var base = here
     for node in document.all("base") {
@@ -321,7 +321,7 @@ fn absolutise(document: html.Node, here: uri.Url) {
     }
 }
 
-~~ Hosts that serve nothing but typefaces.
+
 pub fn is_font_host(host: Text) -> Bool {
     let name = uri.strip_www(host)
     give name == "fonts.googleapis.com" or name == "fonts.gstatic.com" or
@@ -334,7 +334,7 @@ pub fn escape(text: Text) -> Text {
     give text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 }
 
-~~ ---------------------------------------------------- pages of ours
+
 pub fn problem(headline: Text, address: Text, detail: Text) -> Text {
     var out = "<html><head><title>" + escape(headline) + "</title></head><body>"
     out = out + "<h1>" + escape(headline) + "</h1>"
@@ -398,7 +398,7 @@ fn start_page(session: Session) -> Text {
                 "<span class=\"code\">css.spf</span> applies the useful visual rules sites actually need.</li>"
     out = out + "<li><b>Make pixels.</b> <span class=\"code\">layout.spf</span> turns text, links, images and rules into a " +
                 "display list. The native macOS window only paints that list.</li></ol>"
-    out = out + "<pre class=\"code\">browser/\n  src/       SPRFST engine: uri, fetch, html, css, layout, page\n  macos/     native window and display-list painter\n  rules/     plain-text Shield rules\n  tests/     offline engine tests and a local fixture\n  docs/      architecture notes and performance guidance</pre></section>"
+    out = out + "<pre class=\"code\">browser/\n  engine/       SPRFST engine: uri, fetch, html, css, layout, page\n  mac-app/     native window and display-list painter\n  privacy-rules/     plain-text Shield rules\n  tests/     offline engine tests and a local fixture\n  documentation/      architecture notes and performance guidance</pre></section>"
     out = out + "<section class=\"card\"><p class=\"label\">HONEST PERFORMANCE</p><h2>Fast by design, measured in the status bar</h2>"
     out = out + "<p class=\"muted\">The browser caches revisits, skips blocked work and reports fetch, parse, style and layout time. " +
                 "It aims for responsive reading, not an invented promise that every site loads in one second. " +

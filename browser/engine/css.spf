@@ -1,17 +1,17 @@
-~~ =====================================================================
-~~  SPRFST Browser — style
-~~
-~~  A cascade over the part of CSS that changes how a document reads:
-~~  colour, type, spacing, alignment and whether a thing is shown at
-~~  all. Selectors go as far as tag, class, id and descendant, which is
-~~  what the overwhelming majority of real rules are made of.
-~~ =====================================================================
+
+
+
+
+
+
+
+
 module css
 
-~~ The computed look of one element.
+
 pub object Style {
-    display: Text = "inline"       ~~ inline, block, list-item or none
-    colour: Int = -1               ~~ -1 means "take it from the parent"
+    display: Text = "inline"
+    colour: Int = -1
     background: Int = -1
     size: Num = 16.0
     weight: Int = 400
@@ -24,9 +24,9 @@ pub object Style {
     margin_bottom: Num = 0.0
     indent: Num = 0.0
     bullet: Text = ""
-    bar: Int = -1                  ~~ a rule down the left, for quotes
+    bar: Int = -1
     hidden: Bool = false
-    level: Int = 0                 ~~ heading level
+    level: Int = 0
 
     fn inherit(self) -> Style {
         give Style {
@@ -38,7 +38,7 @@ pub object Style {
 }
 
 pub object Rule {
-    parts: [Text] = []             ~~ compound selectors, outermost first
+    parts: [Text] = []
     weight: Int = 0
     order: Int = 0
     decls: Map<Text, Text> = [:]
@@ -52,7 +52,7 @@ pub object Sheet {
     fn count(self) -> Int => self.rules.len()
 }
 
-~~ ------------------------------------------------------------ colours
+
 pub fn rgb(r: Int, g: Int, b: Int) -> Int => r * 65536 + g * 256 + b
 
 pub fn colour_of(raw: Text) -> Int {
@@ -122,7 +122,7 @@ fn named(name: Text) -> Int {
     give -1
 }
 
-~~ ------------------------------------------------------------ lengths
+
 pub fn length(raw: Text, parent_size: Num) -> Num {
     var text = raw.trim().lower()
     if text == "" { give 0.0 }
@@ -135,18 +135,18 @@ pub fn length(raw: Text, parent_size: Num) -> Num {
     give text.to_num() ?? 0.0
 }
 
-~~ Where a part appears at or after an offset. Text.index_of always
-~~ starts at the beginning, and slicing the rest of a stylesheet on
-~~ every step would make parsing quadratic.
+
+
+
 pub fn index_of_from(text: Text, part: Text, from: Int) -> Int {
-    ~~ The native search avoids allocating a slice for every candidate
-    ~~ byte. Stylesheets are often much larger than the visible page.
+
+
     give text.index_of_from(part, from)
 }
 
-~~ ------------------------------------------------------------- parsing
-~~ Read a stylesheet. At-rules are skipped whole, except @media, whose
-~~ body is read as though the query had matched.
+
+
+
 pub fn parse(source: Text) -> Sheet {
     var sheet = Sheet { }
     var order = 0
@@ -161,7 +161,7 @@ pub fn parse(source: Text) -> Sheet {
         if selector.starts_with("@") {
             let head = selector.lower()
             if head.starts_with("@media") or head.starts_with("@supports") {
-                ~~ step inside and keep reading rules
+
                 i = brace + 1
                 skip
             }
@@ -264,8 +264,8 @@ fn weight_of(part: Text) -> Int {
     give score
 }
 
-~~ ------------------------------------------------------------ matching
-~~ One step of a selector against one element.
+
+
 pub fn part_matches(part: Text, tag: Text, id: Text, classes: [Text]) -> Bool {
     var rest = part
     if rest.starts_with("*") { rest = rest.slice(1, rest.len()) }

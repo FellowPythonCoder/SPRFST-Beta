@@ -60,7 +60,7 @@ trap 'kill $FIXTURE 2>/dev/null' EXIT
 # wait for the port, up to three seconds
 ready=0
 for _ in $(seq 1 30); do
-    if "$SPRFST" run browser/src/main.spf -- --plain "$BASE/" 2>/dev/null | grep -q "Daily Fixture"; then
+    if "$SPRFST" run browser/engine/main.spf -- --plain "$BASE/" 2>/dev/null | grep -q "Daily Fixture"; then
         ready=1; break
     fi
     sleep 0.1
@@ -68,7 +68,7 @@ done
 [ "$ready" = 1 ] || { echo "  the fixture server did not start"; exit 1; }
 
 OUT=$(mktemp)
-SPRFST_BROWSER_HOME="$ROOT/browser/rules" "$SPRFST" run browser/src/main.spf -- \
+SPRFST_BROWSER_HOME="$ROOT/browser/privacy-rules" "$SPRFST" run browser/engine/main.spf -- \
     --plain "$BASE/" > "$OUT" 2>&1
 
 check   "the article is read"            "$OUT" "Paragraph 14."
@@ -84,7 +84,7 @@ check   "five requests were stopped"     "$OUT" "5 blocked"
 check   "four elements were hidden"      "$OUT" "4 hidden"
 
 READER=$(mktemp)
-SPRFST_BROWSER_HOME="$ROOT/browser/rules" "$SPRFST" run browser/src/main.spf -- \
+SPRFST_BROWSER_HOME="$ROOT/browser/privacy-rules" "$SPRFST" run browser/engine/main.spf -- \
     --plain --reader "$BASE/" > "$READER" 2>&1
 check   "the lens keeps the article"     "$READER" "Paragraph 9."
 absent  "the lens drops the navigation"  "$READER" "Weather"
@@ -92,15 +92,15 @@ absent  "the lens drops the sidebar"     "$READER" "Most read"
 
 SERVE=$(mktemp)
 printf '{"do":"open","tab":"0","url":"%s/"}\n{"do":"open","tab":"0","url":"%s/moved"}\n{"do":"back","tab":"0"}\n{"do":"bye"}\n' \
-    "$BASE" "$BASE" | SPRFST_BROWSER_HOME="$ROOT/browser/rules" \
-    "$SPRFST" run browser/src/main.spf -- --serve > "$SERVE" 2>&1
+    "$BASE" "$BASE" | SPRFST_BROWSER_HOME="$ROOT/browser/privacy-rules" \
+    "$SPRFST" run browser/engine/main.spf -- --serve > "$SERVE" 2>&1
 check   "the service answers"            "$SERVE" '"service":"sprfst-browser"'
 check   "a redirect is followed"         "$SERVE" '"status":200'
 check   "going back is from the store"   "$SERVE" '"cached":true'
 check   "the display list has positions" "$SERVE" '"k":"text"'
 
 NOTFOUND=$(mktemp)
-SPRFST_BROWSER_HOME="$ROOT/browser/rules" "$SPRFST" run browser/src/main.spf -- \
+SPRFST_BROWSER_HOME="$ROOT/browser/privacy-rules" "$SPRFST" run browser/engine/main.spf -- \
     --plain "$BASE/nowhere" > "$NOTFOUND" 2>&1
 check   "a 404 is still a page"          "$NOTFOUND" "404"
 

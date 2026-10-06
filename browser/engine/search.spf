@@ -1,0 +1,153 @@
+module search
+
+use html
+use uri
+use std.http
+
+pub object Hit {
+    title: Text = ""
+    url: Text = ""
+    host: Text = ""
+    snippet: Text = ""
+}
+
+fn has_class(node: html.Node, wanted: Text) -> Bool {
+    give node.classes().contains(wanted)
+}
+
+fn first_class(node: html.Node, wanted: Text) -> html.Node {
+    if node.kind == "element" and has_class(node, wanted) { give node }
+    for kid in node.kids {
+        let found = first_class(kid, wanted)
+        if found.name != "" { give found }
+    }
+    give html.Node { }
+}
+
+fn collect_groups(node: html.Node, into: [Hit]) {
+    if node.kind == "element" and has_class(node, "result") {
+        let title_node = first_class(node, "result__a")
+        if title_node.name != "" {
+            let url = direct_url(title_node.attr("href"))
+            let title = html.squash(title_node.inner_text()).trim()
+            if (url.starts_with("http://") or url.starts_with("https://")) and title != "" {
+                let snippet_node = first_class(node, "result__snippet")
+                var snippet = ""
+                if snippet_node.name != "" { snippet = html.squash(snippet_node.inner_text()).trim() }
+                let parsed = uri.parse(url)
+                into.push(Hit {
+                    title: title,
+                    url: url,
+                    host: if parsed.host == "" { url } else { parsed.host },
+                    snippet: snippet
+                })
+            }
+        }
+        give
+    }
+    for kid in node.kids { collect_groups(kid, into) }
+}
+
+fn direct_url(raw: Text) -> Text {
+    var url = raw.trim()
+    if url.starts_with("//") { url = "https:" + url }
+    let encoded = url.index_of("uddg=")
+    if encoded >= 0 {
+        url = url.slice(encoded + 5, url.len())
+        let amp = url.index_of("&")
+        if amp >= 0 { url = url.slice(0, amp) }
+        url = http.url_decode(url)
+    }
+    if url.starts_with("/") { give "https://duckduckgo.com" + url }
+    give url
+}
+
+fn escape(text: Text) -> Text {
+    give text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+}
+
+fn attribute(text: Text) -> Text {
+    give escape(text).replace("\"", "&quot;")
+}
+
+fn collect(raw: Text) -> [Hit] {
+    let document = html.parse(raw)
+    var out: [Hit] = []
+    collect_groups(document, out)
+    if out.len() == 0 {
+        var title_nodes: [html.Node] = []
+        var snippet_nodes: [html.Node] = []
+        gather(document, "result__a", title_nodes)
+        gather(document, "result__snippet", snippet_nodes)
+        var i = 0
+        while i < title_nodes.len() and out.len() < 8 {
+            let node = title_nodes[i]
+            let url = direct_url(node.attr("href"))
+            let title = html.squash(node.inner_text()).trim()
+            if (url.starts_with("http://") or url.starts_with("https://")) and title != "" {
+                var snippet = ""
+                if i < snippet_nodes.len() { snippet = html.squash(snippet_nodes[i].inner_text()).trim() }
+                let parsed = uri.parse(url)
+                out.push(Hit {
+                    title: title,
+                    url: url,
+                    host: if parsed.host == "" { url } else { parsed.host },
+                    snippet: snippet
+                })
+            }
+            i = i + 1
+        }
+    }
+    while out.len() > 8 { out.pop() }
+    give out
+}
+
+fn gather(node: html.Node, wanted: Text, into: [html.Node]) {
+    if node.kind == "element" and has_class(node, wanted) { into.push(node) }
+    for kid in node.kids { gather(kid, wanted, into) }
+}
+
+pub fn render(raw: Text, query: Text) -> Text {
+    let hits = collect(raw)
+    var out = "<html><head><title>" + escape(query) + " - SPRFST Search</title>"
+    out = out + "<style>"
+    out = out + "body{{background:#0b0b0d;color:#f4f4f2;font-family:Helvetica;margin-left:34px;margin-right:34px}}"
+    out = out + ".brand{{color:#ffa136;font-size:13px;font-weight:bold;margin-bottom:6px}}"
+    out = out + ".query{{color:#f4f4f2;font-size:29px;font-weight:bold;margin-bottom:4px}}"
+    out = out + ".meta{{color:#bdbdc3;font-size:12px;margin-bottom:18px}}"
+    out = out + ".overview{{background:#161618;margin-top:16px;margin-bottom:22px;padding-left:18px}}"
+    out = out + ".overview h2{{color:#ffc46b;font-size:19px;margin-bottom:8px}}"
+    out = out + ".overview p{{color:#f4f4f2;margin-bottom:7px}}"
+    out = out + ".overview a{{color:#ffc46b;font-weight:bold}}"
+    out = out + ".result{{background:#121214;margin-top:12px;margin-bottom:12px;padding-left:18px}}"
+    out = out + ".result-link{{color:#f4f4f2;text-decoration:none}}"
+    out = out + ".result h3{{color:#ffc46b;font-size:19px;margin-bottom:3px}}"
+    out = out + ".url{{color:#83d18a;font-size:13px;margin-bottom:5px}}"
+    out = out + ".snippet{{color:#d4d4d8;font-size:15px;margin-bottom:8px}}"
+    out = out + ".open{{color:#ffa136;font-size:12px;font-weight:bold}}"
+    out = out + "</style></head><body>"
+    out = out + "<p class=\"brand\">SPRFST SEARCH</p><h1 class=\"query\">" + escape(query) + "</h1>"
+    out = out + "<p class=\"meta\">" + hits.len().to_text() + " readable results · direct links · dark mode</p>"
+
+    if hits.len() > 0 {
+        let first = hits[0]
+        if first.snippet != "" {
+            out = out + "<section class=\"overview\"><h2>Overview</h2><p>" +
+                  escape(first.snippet) + "</p><p class=\"meta\">Source: " +
+                  escape(first.title) + " · <a href=\"" + attribute(first.url) + "\">Open source</a></p></section>"
+        }
+    } else {
+        out = out + "<section class=\"overview\"><h2>No readable results</h2>" +
+              "<p>The provider did not return ordinary result links. Try a shorter query or a direct domain.</p></section>"
+    }
+
+    out = out + "<h2>Results</h2><ol>"
+    for hit in hits {
+        out = out + "<li class=\"result\"><a class=\"result-link\" href=\"" + attribute(hit.url) + "\"><h3>" +
+              escape(hit.title) + "</h3><p class=\"url\">" + escape(hit.host) + "</p></a>"
+        if hit.snippet != "" { out = out + "<p class=\"snippet\">" + escape(hit.snippet) + "</p>" }
+        out = out + "<a class=\"open\" href=\"" + attribute(hit.url) + "\">Open website</a></li>"
+    }
+    out = out + "</ol></body></html>"
+    give out
+}

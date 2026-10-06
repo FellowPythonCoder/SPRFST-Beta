@@ -1,13 +1,13 @@
-~~ =====================================================================
-~~  SPRFST Browser — the engine's front door
-~~
-~~      sprfst run src/main.spf -- http://example.com     read it here
-~~      sprfst run src/main.spf -- --serve                drive the window
-~~
-~~  In the first form the page is drawn in the terminal. In the second
-~~  the engine answers one JSON request per line, which is how the Mac
-~~  application talks to it.
-~~ =====================================================================
+
+
+
+
+
+
+
+
+
+
 use std.io
 use std.sys
 use std.json
@@ -22,9 +22,9 @@ use layout
 use fetch
 use page
 
-~~ ---------------------------------------------------------- colours
-~~ Ember is our own reading palette: deep black, soft white, amber.
-~~ With it off the page keeps whatever colours it asked for.
+
+
+
 fn ink(ember: Bool) -> Int { if ember { give 0x0B0B0D } give 0xFFFFFF }
 fn paper_text(ember: Bool) -> Int { if ember { give 0xE8E8E6 } give 0x111111 }
 fn link_colour(ember: Bool) -> Int { if ember { give 0xFFA136 } give 0x1A4FD0 }
@@ -38,9 +38,9 @@ fn luminance(colour: Int) -> Num {
     give (r * 0.299 + g * 0.587 + b * 0.114) / 255.0
 }
 
-~~ Settle a painted item against the theme. Text is deliberately
-~~ separate from surfaces: a site's black background must not become white
-~~ just because its words are being made readable in Ember.
+
+
+
 fn resolve_colour(raw: Int, ember: Bool) -> Int {
     if raw == -1 { give paper_text(ember) }
     if raw == -2 { give link_colour(ember) }
@@ -65,7 +65,7 @@ fn background_colour(raw: Int, ember: Bool) -> Int {
     give raw
 }
 
-~~ ------------------------------------------------------------- JSON
+
 fn items_of(drawn: layout.Page, ember: Bool) -> [Any] {
     var out: [Any] = []
     for item in drawn.items {
@@ -131,11 +131,11 @@ fn answer_of(result: page.Result, session: page.Session) -> Map<Text, Any> {
     give out
 }
 
-~~ ------------------------------------------------------ the service
+
 fn serve(first: page.Session) {
-    ~~ Every tab in the window is a session of its own: its own history
-    ~~ and its own settings, sharing one shield and one store so that a
-    ~~ page already read is instant in any of them.
+
+
+
     var sessions: Map<Text, page.Session> = ["0": first]
     var session = first
     var width = session.settings.width
@@ -215,9 +215,9 @@ fn serve(first: page.Session) {
     }
 }
 
-~~ -------------------------------------------------- the terminal eye
-~~ The same display list, printed. Useful on its own, and it means the
-~~ engine can be checked without a window anywhere near it.
+
+
+
 fn show(result: page.Result, colour: Bool) {
     let amber = if colour { "\e[38;5;214m" } else { "" }
     let grey = if colour { "\e[38;5;245m" } else { "" }
@@ -283,7 +283,7 @@ fn spaces(n: Int) -> Text {
     give " ".repeat(n)
 }
 
-~~ --------------------------------------------------------------- main
+
 fn main() {
     var session = page.Session { }
     session.guard = shield.from_file(rules_path())
@@ -323,17 +323,17 @@ fn main() {
     if result.error != "" { sys.exit(1) }
 }
 
-~~ The rules live beside the engine, wherever it was installed. The
-~~ application sets SPRFST_BROWSER_HOME; from a terminal the usual
-~~ places are tried, and failing everything the built-in list is used.
+
+
+
 fn rules_path() -> Text {
     let home = sys.env("SPRFST_BROWSER_HOME") ?? ""
     var tries: [Text] = []
     if home != "" { tries.push(home + "/shield.rules") }
     tries.push("shield.rules")
-    tries.push("rules/shield.rules")
-    tries.push("browser/rules/shield.rules")
-    tries.push(path.join(path.dirname(path.abs("x")), "rules/shield.rules"))
+    tries.push("privacy-rules/shield.rules")
+    tries.push("browser/privacy-rules/shield.rules")
+    tries.push(path.join(path.dirname(path.abs("x")), "privacy-rules/shield.rules"))
     for candidate in tries {
         if fs.exists(candidate) { give candidate }
     }

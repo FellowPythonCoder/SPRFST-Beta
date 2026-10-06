@@ -1,11 +1,11 @@
-// =====================================================================
-//  The painter.
-//
-//  The engine hands over a display list: every word, rule, bullet and
-//  picture with a position already worked out. This view draws that
-//  list and nothing else. It makes no decisions about the page, which
-//  is why a page cannot surprise it.
-// =====================================================================
+
+
+
+
+
+
+
+
 import AppKit
 
 protocol PageViewDelegate: AnyObject {
@@ -37,7 +37,7 @@ final class PageView: NSView {
     override var isOpaque: Bool { true }
     override var acceptsFirstResponder: Bool { true }
 
-    // ------------------------------------------------------------ content
+
     func show(_ page: Page) {
         self.page = page
         pictures.removeAll(keepingCapacity: true)
@@ -66,7 +66,7 @@ final class PageView: NSView {
         return out.joined(separator: "\n")
     }
 
-    // -------------------------------------------------------------- find
+
     func refreshMatches() {
         findMatches = []
         guard !findTerm.isEmpty else { return }
@@ -86,10 +86,10 @@ final class PageView: NSView {
         needsDisplay = true
     }
 
-    // ------------------------------------------------------------ drawing
+
     override func draw(_ dirty: CGRect) {
-        // Fill what is ours, never the rectangle we were handed: since
-        // macOS 14 that rectangle can be larger than this view.
+
+
         page.background.setFill()
         bounds.intersection(dirty).fill()
 
@@ -143,8 +143,8 @@ final class PageView: NSView {
             let where_ = CGRect(x: box.minX + (box.width - size.width) / 2,
                                 y: box.minY + (box.height - size.height) / 2,
                                 width: size.width, height: size.height)
-            // Medium interpolation is substantially cheaper while a long
-            // page is scrolling, and still looks clean at display scale.
+
+
             picture.draw(in: where_, from: .zero, operation: .sourceOver, fraction: 1,
                          respectFlipped: true, hints: [.interpolation: NSImageInterpolation.medium])
             return
@@ -172,9 +172,9 @@ final class PageView: NSView {
         if item.mono {
             face = Fonts.mono(item.size)
         } else {
-            // The engine measures in Helvetica, so the window draws in
-            // Helvetica; anything else and the lines would break in the
-            // wrong places.
+
+
+
             let name = item.weight >= 600
                 ? (item.italic ? "Helvetica-BoldOblique" : "Helvetica-Bold")
                 : (item.italic ? "Helvetica-Oblique" : "Helvetica")
@@ -186,7 +186,7 @@ final class PageView: NSView {
         return face
     }
 
-    // ------------------------------------------------------------ pictures
+
     private func fetchPictures() {
         let wanted = Set(page.items.filter { $0.kind == "image" && !$0.src.isEmpty }.map { $0.src })
         for address in wanted where !asked.contains(address) {
@@ -213,7 +213,7 @@ final class PageView: NSView {
         }
     }
 
-    // -------------------------------------------------------- the pointer
+
     override func updateTrackingAreas() {
         super.updateTrackingAreas()
         if let old = tracking { removeTrackingArea(old) }
@@ -225,9 +225,9 @@ final class PageView: NSView {
     }
 
     private func item(at point: CGPoint) -> Int {
-        // Mouse-move events arrive far more often than paints. Keep the
-        // hit-test list to links instead of scanning every word, rule and
-        // image on a long page.
+
+
+
         for index in linkIndices.reversed()
         where page.items[index].rect.insetBy(dx: -1, dy: -2).contains(point) {
             return index

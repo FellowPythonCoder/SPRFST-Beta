@@ -1,13 +1,13 @@
-~~ =====================================================================
-~~  A page of the modern web, served locally, so the browser can be
-~~  tested against the thing it was built for: an article buried in
-~~  adverts, trackers, a consent wall and a chat widget.
-~~
-~~      sprfst run tests/fixture.spf -- 8099
-~~
-~~  tools/browser_live.sh starts it, reads it with the browser, and
-~~  checks that what came out is the article and nothing else.
-~~ =====================================================================
+
+
+
+
+
+
+
+
+
+
 use std.io
 use std.http
 use std.sys

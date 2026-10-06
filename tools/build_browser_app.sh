@@ -7,7 +7,7 @@
 #      ./tools/build_browser_app.sh --stage    lay the bundle out only
 #      ./tools/build_browser_app.sh --skip-tests   build unverified
 #
-#  The bundle carries the engine — browser/src/*.spf — and the sprfst
+#  The bundle carries the engine — browser/engine/*.spf — and the sprfst
 #  interpreter that runs it. The window is Swift and AppKit; every
 #  decision about a page is taken in SPRFST.
 # =====================================================================
@@ -135,17 +135,17 @@ step "bundling the engine"
 mkdir -p "$APP/Contents/Resources/bin" "$APP/Contents/Resources/engine"
 cp build/bin/sprfst "$APP/Contents/Resources/bin/sprfst"
 chmod +x "$APP/Contents/Resources/bin/sprfst"
-cp browser/src/*.spf        "$APP/Contents/Resources/engine/"
-cp browser/rules/*.rules    "$APP/Contents/Resources/engine/"
+cp browser/engine/*.spf        "$APP/Contents/Resources/engine/"
+cp browser/privacy-rules/*.rules    "$APP/Contents/Resources/engine/"
 cp -R std                   "$APP/Contents/Resources/std"
 cp browser/README.md        "$APP/Contents/Resources/README.md" 2>/dev/null || true
-if [ -d browser/docs ]; then
+if [ -d browser/documentation ]; then
     mkdir -p "$APP/Contents/Resources/docs"
-    cp browser/docs/*.md "$APP/Contents/Resources/docs/"
+    cp browser/documentation/*.md "$APP/Contents/Resources/docs/"
 fi
 printf '    %s engine modules, %s block rules\n' \
-    "$(ls browser/src/*.spf | wc -l | tr -d ' ')" \
-    "$(grep -cvE '^\s*(~~|!|$)' browser/rules/shield.rules | tr -d ' ')"
+    "$(ls browser/engine/*.spf | wc -l | tr -d ' ')" \
+    "$(grep -cvE '^\s*(~~|!|$)' browser/privacy-rules/shield.rules | tr -d ' ')"
 
 if [ "$STAGE_ONLY" = 1 ]; then
     cat > "$DIST/STAGING-browser.txt" <<TXT
@@ -169,7 +169,7 @@ fi
 
 # --------------------------------------------------------------- swift
 step "compiling the window (Swift, $ARCH)"
-SOURCES=(browser/macos/Sources/*.swift
+SOURCES=(browser/mac-app/Sources/*.swift
          ide/macos/Sources/Theme.swift
          ide/macos/Sources/Chrome.swift
          ide/macos/Sources/LogoView.swift)

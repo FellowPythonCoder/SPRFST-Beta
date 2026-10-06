@@ -1,10 +1,10 @@
-~~ =====================================================================
-~~  The browser's own test suite.  From the browser folder:  sprfst test
-~~
-~~  Everything here runs offline: the engine is fed text and asked what
-~~  it made of it.  The one test that needs a server is in
-~~  tools/browser_live.sh, which starts the fixture and reads a page.
-~~ =====================================================================
+
+
+
+
+
+
+
 use std.testing
 use uri
 use html
@@ -16,7 +16,7 @@ use fetch
 use page
 use search
 
-~~ ------------------------------------------------------------- helpers
+
 fn lay(source: Text, width: Num) -> layout.Page {
     let doc = html.parse(source)
     var sheet = css.Sheet { }
@@ -54,7 +54,7 @@ fn count_of(node: html.Node, name: Text) -> Int {
     give collect(node, name).len()
 }
 
-~~ ------------------------------------------------------------ addresses
+
 test "an address comes apart correctly" {
     let u = uri.parse("https://news.example.co.uk:8443/a/b?q=1&r=2#top")
     testing.same(u.scheme, "https", "scheme")
@@ -117,13 +117,13 @@ test "search results become a native overview and normal links" {
     testing.yes(rendered.contains("https://www.youtube.com/"), "redirect URLs are decoded")
     testing.no(rendered.contains("/l/?uddg="), "provider redirects are not exposed")
     let doc = html.parse(rendered)
-    testing.same(html.title_of(doc), "who is the richest man - Search", "the query is in the title")
-    testing.same(count_of(doc, "a"), 2, "result links remain ordinary anchors")
+    testing.same(html.title_of(doc), "who is the richest man - SPRFST Search", "the query is in the title")
+    testing.same(count_of(doc, "a"), 5, "result links and overview source remain ordinary anchors")
     testing.yes(search.render("<html><body>challenge</body></html>", "nothing").contains("No readable results"),
                 "an empty provider response is still a native search page")
 }
 
-~~ ----------------------------------------------------------------- HTML
+
 test "the parser builds the tree a browser would" {
     let doc = html.parse("<!doctype html><html><head><title>Hi</title></head>" +
                          "<body><p class='a b'>One<br>Two</p><img src=x.png alt=pic>" +
@@ -161,7 +161,7 @@ test "comments and malformed tags do not derail it" {
     testing.yes(doc.inner_text().contains("open"), "an unclosed tag still holds its words")
 }
 
-~~ ------------------------------------------------------------------ CSS
+
 test "the style sheet is understood" {
     let sheet = css.parse("p, .lead {{ color: #ff0000; font-size: 18px }}" +
                           "@media print {{ p {{ color: blue }} }}" +
@@ -191,7 +191,7 @@ test "a selector matches the way it should" {
     testing.no(css.part_matches("#top", "div", "bottom", []), "the wrong id")
 }
 
-~~ --------------------------------------------------------------- shield
+
 test "the shield blocks what it is told to" {
     var guard = shield.Shield { }
     for line in ["||ads.example.com^", "||tracker.io^$third-party",
@@ -238,7 +238,7 @@ test "the built-in list is real and loads" {
 }
 
 test "the shipped rules file parses" {
-    var guard = shield.from_file("rules/shield.rules")
+    var guard = shield.from_file("privacy-rules/shield.rules")
     testing.yes(guard.loaded > 300, "the file holds a few hundred rules")
     testing.yes(guard.check(uri.parse("https://www.googletagmanager.com/gtm.js"), "news.site"), "a tag manager")
     testing.yes(guard.check(uri.parse("https://cdn.taboola.com/x.js"), "news.site"), "a content farm")
@@ -246,7 +246,7 @@ test "the shipped rules file parses" {
     testing.yes(guard.hiding("any.site").len() > 40, "and plenty to hide")
 }
 
-~~ --------------------------------------------------------------- layout
+
 test "words are placed, wrapped and measured" {
     let drawn = lay("<p>" + "word ".repeat(60) + "</p>", 400.0)
     testing.yes(drawn.words >= 60, "every word is placed")
@@ -327,7 +327,7 @@ test "links carry their address down to the display list" {
     testing.same(drawn.links, 1, "and the page counted it")
 }
 
-~~ --------------------------------------------------------------- reader
+
 test "the lens finds the article and drops the furniture" {
     var body = ["<body>",
         "<nav><a href='/'>Home</a> <a href='/a'>News</a> <a href='/b'>Sport</a></nav>",
@@ -352,10 +352,10 @@ test "the lens leaves alone a page that is already plain" {
     testing.yes(html.squash(lens.inner_text()).contains("few words"), "nothing is lost")
 }
 
-~~ ------------------------------------------------------- pages and trips
+
 test "the internal pages are real pages" {
     var session = page.Session { }
-    session.guard = shield.from_file("rules/shield.rules")
+    session.guard = shield.from_file("privacy-rules/shield.rules")
     for address in ["sprfst://start", "sprfst://about", "sprfst://settings",
                     "sprfst://trail", "sprfst://shield"] {
         let result = page.open(session, address, 800.0, true)

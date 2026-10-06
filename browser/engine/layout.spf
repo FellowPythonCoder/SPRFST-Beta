@@ -1,22 +1,22 @@
-~~ =====================================================================
-~~  SPRFST Browser — layout
-~~
-~~  Turns a styled document into a flat list of things to draw at
-~~  absolute positions: block boxes stacked down the page, words
-~~  flowed into lines and broken at the right edge.
-~~
-~~  Text is measured here rather than in the window, so the engine owns
-~~  the layout and the window only paints. The measurements are the
-~~  advance widths of Helvetica, which is what the window draws with.
-~~ =====================================================================
+
+
+
+
+
+
+
+
+
+
+
 module layout
 
 use html
 use css
 
-~~ One thing to draw.
+
 pub object Item {
-    kind: Text = "text"            ~~ text, rect, rule, image or bullet
+    kind: Text = "text"
     x: Num = 0.0
     y: Num = 0.0
     w: Num = 0.0
@@ -47,11 +47,11 @@ pub object Page {
     links: Int = 0
     images: Int = 0
     hidden: Int = 0
-    headings: [Text] = []          ~~ "level|text" for the outline
+    headings: [Text] = []
 }
 
-~~ ----------------------------------------------------------- metrics
-~~ Helvetica advance widths, per thousand, for space to ~.
+
+
 fn advances() -> [Int] {
     give [278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,
           556,556,556,556,556,556,556,556,556,556,278,278,584,584,584,556,
@@ -88,7 +88,7 @@ pub object Ruler {
 
 pub fn ruler() -> Ruler => Ruler { table: advances() }
 
-~~ Characters, not bytes: a UTF-8 lead byte starts one.
+
 pub fn char_count(text: Text) -> Int {
     var n = 0
     var i = 0
@@ -100,8 +100,8 @@ pub fn char_count(text: Text) -> Int {
     give n
 }
 
-~~ --------------------------------------------------- the house style
-~~ What each tag looks like before the page says anything.
+
+
 pub fn defaults(tag: Text, parent: css.Style) -> css.Style {
     var out = parent.inherit()
     out.display = if html.is_block(tag) { "block" } else { "inline" }
@@ -135,9 +135,9 @@ pub fn defaults(tag: Text, parent: css.Style) -> css.Style {
     give out
 }
 
-~~ ------------------------------------------------------- rule lookup
-~~ Rules are bucketed by the last thing in the selector, so an element
-~~ only ever considers the handful of rules that could match it.
+
+
+
 pub object Index {
     by_key: Map<Text, [css.Rule]> = [:]
     loose: [css.Rule] = []
@@ -214,16 +214,16 @@ fn rule_matches(rule: css.Rule, chain: [Crumb]) -> Bool {
     give true
 }
 
-~~ --------------------------------------------------------- the frame
+
 pub object Frame {
     page: Page = Page { }
     rule_index: Index = Index { }
     measure: Ruler = Ruler { }
     hide: [Text] = []
-    hide_tag: Map<Text, Bool> = [:]      ~~ the simple ones, sorted once
+    hide_tag: Map<Text, Bool> = [:]
     hide_id: Map<Text, Bool> = [:]
     hide_class: Map<Text, Bool> = [:]
-    hide_rest: [Text] = []               ~~ anything compound, matched the long way
+    hide_rest: [Text] = []
     width: Num = 800.0
     margin: Num = 28.0
     left: Num = 0.0
@@ -236,7 +236,7 @@ pub object Frame {
     counters: [Int] = []
     canvas: Int = -1
 
-    ~~ ------------------------------------------------ inline building
+
     fn room(self) -> Num => self.width - self.margin - self.left
 
     fn add_word(self, word: Text, style: css.Style, link: Text) {
@@ -266,15 +266,15 @@ pub object Frame {
         if self.pen > 0.0 { self.pending_space = true }
     }
 
-    ~~ Settle the pending line onto the page.
+
     fn end_line(self) {
         if self.line.len() == 0 {
             self.pending_space = false
             give
         }
         let height = if self.tallest > 0.0 { self.tallest } else { 18.0 }
-        ~~ Everything on a line shares one baseline, whatever its size,
-        ~~ and each item's y is the top of its own box above that line.
+
+
         let base = self.y + height * 0.78
         for item in self.line {
             item.y = base - item.size * 0.78
@@ -296,7 +296,7 @@ pub object Frame {
         }
     }
 
-    ~~ --------------------------------------------------- block boxes
+
     fn space_down(self, amount: Num) {
         self.end_line()
         self.y = self.y + amount
@@ -321,7 +321,7 @@ pub object Frame {
             self.page.hidden = self.page.hidden + 1
             give
         }
-        ~~ The page can say so itself, and often does.
+
         if node.has("hidden") or node.attr("aria-hidden").lower() == "true" {
             self.page.hidden = self.page.hidden + 1
             give
@@ -423,7 +423,7 @@ pub object Frame {
         }
     }
 
-    ~~ Inside an <a> every word carries the address with it.
+
     fn linked_walk(self, node: html.Node, style: css.Style, chain: [Crumb], link: Text) {
         if node.kind == "text" {
             self.link_run(node.text, style, link)
@@ -444,7 +444,7 @@ pub object Frame {
     fn link_run(self, raw: Text, style: css.Style, link: Text) {
         var linked = style.inherit()
         linked.underline = true
-        linked.colour = -2                      ~~ -2 asks the theme for the link colour
+        linked.colour = -2
         self.emit_words(raw, linked, link)
         if link != "" { self.page.links = self.page.links + 1 }
     }
@@ -487,8 +487,8 @@ pub object Frame {
         self.y = self.y + 6.0
     }
 
-    ~~ The mark joins the item's first line rather than being placed
-    ~~ on its own, so it sits on the same baseline as the words.
+
+
     fn bullet(self, style: css.Style) {
         let mark = if self.counters.len() > 0 {
             "{self.counters[self.counters.len() - 1]}."
@@ -521,7 +521,7 @@ pub object Frame {
         self.page.images = self.page.images + 1
     }
 
-    ~~ ------------------------------------------------------- styling
+
     fn apply_rules(self, style: css.Style, chain: [Crumb], node: html.Node) {
         let here = chain[chain.len() - 1]
         var winners: [css.Rule] = []
@@ -548,9 +548,9 @@ pub object Frame {
         }
     }
 
-    ~~ A hiding rule is read once, not once per element: a page with
-    ~~ seventy rules and two thousand elements would otherwise spend
-    ~~ all its time pulling the same selectors apart.
+
+
+
     fn sort_hiding(self) {
         for selector in self.hide {
             let one = selector.trim()
@@ -587,7 +587,7 @@ pub object Frame {
     }
 }
 
-~~ One declaration, applied to a computed style.
+
 pub fn set_property(style: css.Style, name: Text, raw: Text) {
     let value = raw.trim()
     let lower = value.lower()
@@ -634,8 +634,8 @@ fn first_word(value: Text) -> Text {
     give bits[0]
 }
 
-~~ ---------------------------------------------------------- the run
-~~ Lay a document out at a given width.
+
+
 pub fn run(document: html.Node, sheet: css.Sheet, hide: [Text], width: Num) -> Page {
     var frame = Frame {
         width: width,

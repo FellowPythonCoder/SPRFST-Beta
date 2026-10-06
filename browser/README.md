@@ -5,13 +5,13 @@ A web browser whose engine is written in SPRFST.
 Not a wrapper around WebKit, not a window with someone else's engine in
 it. The address parser, the HTML parser, the style engine, the layout
 engine, the blocker, the cache and the reader are all SPRFST source in
-`browser/src`. The window is AppKit, and all it does is paint a display
+`browser/engine`. The window is AppKit, and all it does is paint a display
 list the engine hands it and send back what you clicked.
 
 ```
-sprfst run src/main.spf -- example.com          read a page in the terminal
-sprfst run src/main.spf -- --reader bbc.co.uk   the Lens: article only
-sprfst run src/main.spf -- --serve              the service the window drives
+sprfst run engine/main.spf -- example.com          read a page in the terminal
+sprfst run engine/main.spf -- --reader bbc.co.uk   the Lens: article only
+sprfst run engine/main.spf -- --serve              the service the window drives
 ```
 
 ---
@@ -20,19 +20,19 @@ sprfst run src/main.spf -- --serve              the service the window drives
 
 | file | lines | what it is |
 |------|-------|------------|
-| `src/uri.spf` | 212 | addresses: parse, resolve, tidy; what a typed line means |
-| `src/html.spf` | 457 | the parser: tags, attributes, entities, comments, bad markup |
-| `src/css.spf` | 305 | selectors, declarations, colours, lengths, a sheet index |
-| `src/shield.spf` | 259 | the blocker, its rule format, and the counts it keeps |
-| `src/layout.spf` | 662 | Helvetica metrics, lines, blocks, lists, images → display list |
-| `src/fetch.spf` | 284 | HTTP/1.1 over a socket, chunked bodies, redirects, a store |
-| `src/reader.spf` | 137 | the Lens: score every element, keep the article |
-| `src/page.spf` | 492 | one trip: address in, laid out page out, plus the internal pages |
-| `src/search.spf` | 116 | native search results, overview and direct destination links |
-| `src/main.spf` | 341 | the terminal view and the JSON service |
-| `rules/shield.rules` | 413 rules | adverts, trackers, consent walls, chat, miners |
-| `macos/Sources/*.swift` | 1 179 | the window: painter, engine bridge, chrome |
-| `docs/ARCHITECTURE.md` | — | the full source map, pipeline and performance notes |
+| `engine/uri.spf` | 212 | addresses: parse, resolve, tidy; what a typed line means |
+| `engine/html.spf` | 457 | the parser: tags, attributes, entities, comments, bad markup |
+| `engine/css.spf` | 305 | selectors, declarations, colours, lengths, a sheet index |
+| `engine/shield.spf` | 259 | the blocker, its rule format, and the counts it keeps |
+| `engine/layout.spf` | 662 | Helvetica metrics, lines, blocks, lists, images → display list |
+| `engine/fetch.spf` | 284 | HTTP/1.1 over a socket, chunked bodies, redirects, a store |
+| `engine/reader.spf` | 137 | the Lens: score every element, keep the article |
+| `engine/page.spf` | 492 | one trip: address in, laid out page out, plus the internal pages |
+| `engine/search.spf` | 116 | native search results, overview and direct destination links |
+| `engine/main.spf` | 341 | the terminal view and the JSON service |
+| `privacy-rules/shield.rules` | 413 rules | adverts, trackers, consent walls, chat, miners |
+| `mac-app/Sources/*.swift` | 1 179 | the window: painter, engine bridge, chrome |
+| `documentation/ARCHITECTURE.md` | — | the full source map, pipeline and performance notes |
 
 Tests: `tests/browser_test.spf` (31, offline) and `tools/browser_live.sh`
 (19, against a server started for the purpose).
@@ -53,8 +53,8 @@ enabled.
 ## Project organization
 
 Browser-owned files live under this directory: SPRFST engine modules in
-`src/`, native macOS chrome in `macos/`, filtering rules in `rules/`,
-offline and fixture tests in `tests/`, and code documentation in `docs/`.
+`engine/`, native macOS chrome in `mac-app/`, filtering rules in `privacy-rules/`,
+offline and fixture tests in `tests/`, and code documentation in `documentation/`.
 The compiler and runtime remain at the repository root because they are the
 language that runs the engine; moving them into the browser would make the
 project less organized and would break the other SPRFST examples.
@@ -104,7 +104,7 @@ fonts, not in a tracker, not in an SDK.
 
 ## The rule format
 
-`rules/shield.rules`, plain text, one rule per line:
+`privacy-rules/shield.rules`, plain text, one rule per line:
 
 ```
 ||ads.example.com^        the host and every host under it

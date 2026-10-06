@@ -2,16 +2,16 @@
 
 The browser is intentionally split into two small halves:
 
-- `browser/src` is the browser engine. It is written in SPRFST and owns
+- `browser/engine` is the browser engine. It is written in SPRFST and owns
   navigation, fetching, parsing, styling, blocking, layout, caching and the
   display list.
-- `browser/macos/Sources` is the native macOS shell. It owns the window,
+- `browser/mac-app/Sources` is the native macOS shell. It owns the window,
   controls, tabs, scrolling, image decoding and painting. It does not parse
   HTML or run a second browser engine.
 
 The project remains part of the repository because the compiler and runtime
 are needed to build and run SPRFST. Browser-specific source and assets stay
-under `browser/`, organized as `src/`, `macos/`, `rules/`, `tests/` and `docs/`.
+under `browser/`, organized as `engine/`, `mac-app/`, `privacy-rules/`, `tests/` and `documentation/`.
 
 ## A page's path through the engine
 
@@ -93,7 +93,7 @@ On macOS, package the native application with:
 ./tools/build_browser_app.sh --install
 ```
 
-The packager copies `browser/src/*.spf`, the Shield rules, the interpreter and
+The packager copies `browser/engine/*.spf`, the Shield rules, the interpreter and
 this browser documentation into the application resources. The browser code
 is therefore visible and inspectable in the finished project rather than
 hidden behind a web view.
