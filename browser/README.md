@@ -20,19 +20,21 @@ sprfst run src/main.spf -- --serve              the service the window drives
 
 | file | lines | what it is |
 |------|-------|------------|
-| `src/uri.spf` | 213 | addresses: parse, resolve, tidy; what a typed line means |
+| `src/uri.spf` | 212 | addresses: parse, resolve, tidy; what a typed line means |
 | `src/html.spf` | 457 | the parser: tags, attributes, entities, comments, bad markup |
-| `src/css.spf` | 313 | selectors, declarations, colours, lengths, a sheet index |
+| `src/css.spf` | 305 | selectors, declarations, colours, lengths, a sheet index |
 | `src/shield.spf` | 259 | the blocker, its rule format, and the counts it keeps |
-| `src/layout.spf` | 647 | Helvetica metrics, lines, blocks, lists, images → display list |
-| `src/fetch.spf` | 283 | HTTP/1.1 over a socket, chunked bodies, redirects, a store |
+| `src/layout.spf` | 662 | Helvetica metrics, lines, blocks, lists, images → display list |
+| `src/fetch.spf` | 284 | HTTP/1.1 over a socket, chunked bodies, redirects, a store |
 | `src/reader.spf` | 137 | the Lens: score every element, keep the article |
-| `src/page.spf` | 437 | one trip: address in, laid out page out, plus the internal pages |
-| `src/main.spf` | 305 | the terminal view and the JSON service |
+| `src/page.spf` | 492 | one trip: address in, laid out page out, plus the internal pages |
+| `src/search.spf` | 116 | native search results, overview and direct destination links |
+| `src/main.spf` | 341 | the terminal view and the JSON service |
 | `rules/shield.rules` | 413 rules | adverts, trackers, consent walls, chat, miners |
 | `macos/Sources/*.swift` | 1 179 | the window: painter, engine bridge, chrome |
+| `docs/ARCHITECTURE.md` | — | the full source map, pipeline and performance notes |
 
-Tests: `tests/browser_test.spf` (30, offline) and `tools/browser_live.sh`
+Tests: `tests/browser_test.spf` (31, offline) and `tools/browser_live.sh`
 (19, against a server started for the purpose).
 
 ```sh
@@ -40,11 +42,26 @@ cd browser && sprfst test
 ./tools/browser_live.sh
 ```
 
-The first command should report 30 passing engine tests; the second
+The first command should report 31 passing engine tests; the second
 runs 19 checks against the local fixture server. These command examples
 have no trailing `#` comments because zsh, the default shell on macOS,
 passes an inline `#` as an argument unless interactive comments are
 enabled.
+
+---
+
+## Project organization
+
+Browser-owned files live under this directory: SPRFST engine modules in
+`src/`, native macOS chrome in `macos/`, filtering rules in `rules/`,
+offline and fixture tests in `tests/`, and code documentation in `docs/`.
+The compiler and runtime remain at the repository root because they are the
+language that runs the engine; moving them into the browser would make the
+project less organized and would break the other SPRFST examples.
+
+The start page repeats this source map and explains the load pipeline in
+plain language, so the browser can document itself without a separate web
+site or an embedded documentation engine.
 
 ---
 

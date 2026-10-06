@@ -356,25 +356,54 @@ pub fn internal(address: Text, session: Session) -> Text {
 }
 
 fn start_page(session: Session) -> Text {
-    var out = "<html><head><title>SPRFST</title></head><body>"
-    out = out + "<h1 style=\"color:#ffa136\">SPRFST</h1>"
-    out = out + "<p style=\"color:#9a9aa0\">A browser written in SPRFST. " +
-                "Type an address, or words to look up with " + session.settings.engine_name + ".</p>"
-    out = out + "<hr>"
-    out = out + "<h3>Pages of this browser</h3><ul>"
-    out = out + "<li><a href=\"sprfst://shield\">The Shield</a> — what has been blocked</li>"
-    out = out + "<li><a href=\"sprfst://trail\">The Trail</a> — where you have been</li>"
-    out = out + "<li><a href=\"sprfst://settings\">Settings</a></li>"
-    out = out + "<li><a href=\"sprfst://about\">About</a></li>"
-    out = out + "</ul>"
-    out = out + "<h3>Somewhere to start</h3><ul>"
-    out = out + "<li><a href=\"http://example.com\">example.com</a> — the smallest page on the web</li>"
-    out = out + "<li><a href=\"https://en.wikipedia.org/wiki/Web_browser\">Wikipedia: web browser</a></li>"
-    out = out + "<li><a href=\"https://news.ycombinator.com\">Hacker News</a></li>"
-    out = out + "<li><a href=\"https://developer.mozilla.org/en-US/docs/Web/HTML\">MDN: HTML</a></li>"
-    out = out + "</ul>"
-    out = out + "<p style=\"color:#6a6a70\">" + session.guard.loaded.to_text() +
-                " block rules are loaded. No page here reports anything to anyone.</p>"
+    var out = "<html><head><title>SPRFST Browser</title><style>"
+    out = out + "body{{background:#0b0b0d;color:#f4f4f2;font-family:Helvetica;margin-left:32px;margin-right:32px}}"
+    out = out + ".hero{{background:#161618;margin-top:18px;margin-bottom:18px;padding-left:22px}}"
+    out = out + ".eyebrow{{color:#ffa136;font-size:12px;font-weight:bold;margin-bottom:8px}}"
+    out = out + ".hero h1{{color:#f4f4f2;font-size:34px;margin-bottom:8px}}"
+    out = out + ".muted{{color:#c7c7cc;font-size:15px}}"
+    out = out + ".card{{background:#161618;margin-top:12px;margin-bottom:12px;padding-left:18px}}"
+    out = out + ".card h2{{color:#ffa136;font-size:21px;margin-bottom:8px}}"
+    out = out + ".card h3{{color:#f4f4f2;font-size:17px;margin-bottom:4px}}"
+    out = out + ".card a{{color:#ffc46b;font-weight:bold}}"
+    out = out + ".label{{color:#8a8a90;font-size:12px;font-family:monospace}}"
+    out = out + ".code{{color:#e8e8e6;font-family:monospace;font-size:13px}}"
+    out = out + "</style></head><body>"
+    out = out + "<section class=\"hero\"><p class=\"eyebrow\">SPRFST BROWSER · NATIVE ENGINE</p>"
+    out = out + "<h1>Browse at your pace.</h1>"
+    out = out + "<p class=\"muted\">A calm, private browser written in SPRFST. " +
+                "Search or type an address above. Pages are parsed, styled and painted here — " +
+                "without JavaScript or a hidden web view.</p></section>"
+    out = out + "<section class=\"card\"><p class=\"label\">READY TO EXPLORE</p><h2>Start somewhere</h2>"
+    out = out + "<p><a href=\"https://www.youtube.com/\">YouTube</a> · " +
+                "<a href=\"https://en.wikipedia.org/wiki/Web_browser\">Wikipedia</a> · " +
+                "<a href=\"https://news.ycombinator.com\">Hacker News</a> · " +
+                "<a href=\"https://developer.mozilla.org/en-US/docs/Web/HTML\">MDN HTML</a></p>"
+    out = out + "<p class=\"muted\">For a search, type natural language such as " +
+                "<b>who is the richest man</b> in the address bar. The native results page keeps " +
+                "the overview and opens result links normally.</p></section>"
+    out = out + "<section class=\"card\"><p class=\"label\">YOUR BROWSER</p><h2>Tools that stay out of the way</h2><ul>"
+    out = out + "<li><a href=\"sprfst://shield\">The Shield</a> — blocks requests before they are fetched.</li>"
+    out = out + "<li><a href=\"sprfst://trail\">The Trail</a> — a private session history with page costs.</li>"
+    out = out + "<li><a href=\"sprfst://settings\">Settings</a> — Ember dark mode, images, search and Lens.</li>"
+    out = out + "<li><a href=\"sprfst://about\">About</a> — limits, measurements and the engine promise.</li>"
+    out = out + "</ul><p class=\"muted\">" + session.guard.loaded.to_text() +
+                " Shield rules are loaded. Nothing on this page reports anything to anyone.</p></section>"
+    out = out + "<section class=\"card\"><p class=\"label\">HOW IT WORKS</p><h2>The browser code, in one page</h2>"
+    out = out + "<ol><li><b>Address and search.</b> <span class=\"code\">uri.spf</span> recognizes domains; " +
+                "<span class=\"code\">page.spf</span> sends ordinary words to the chosen search endpoint.</li>"
+    out = out + "<li><b>Fetch and protect.</b> <span class=\"code\">fetch.spf</span> handles HTTP, redirects and the " +
+                "shared response store. <span class=\"code\">shield.spf</span> removes blocked requests and elements.</li>"
+    out = out + "<li><b>Read the document.</b> <span class=\"code\">html.spf</span> accepts imperfect markup; " +
+                "<span class=\"code\">css.spf</span> applies the useful visual rules sites actually need.</li>"
+    out = out + "<li><b>Make pixels.</b> <span class=\"code\">layout.spf</span> turns text, links, images and rules into a " +
+                "display list. The native macOS window only paints that list.</li></ol>"
+    out = out + "<pre class=\"code\">browser/\n  src/       SPRFST engine: uri, fetch, html, css, layout, page\n  macos/     native window and display-list painter\n  rules/     plain-text Shield rules\n  tests/     offline engine tests and a local fixture\n  docs/      architecture notes and performance guidance</pre></section>"
+    out = out + "<section class=\"card\"><p class=\"label\">HONEST PERFORMANCE</p><h2>Fast by design, measured in the status bar</h2>"
+    out = out + "<p class=\"muted\">The browser caches revisits, skips blocked work and reports fetch, parse, style and layout time. " +
+                "It aims for responsive reading, not an invented promise that every site loads in one second. " +
+                "JavaScript-heavy apps, media and advanced CSS may be incomplete.</p></section>"
+    out = out + "<p class=\"muted\">SPRFST keeps the engine in SPRFST. The window is branding, controls and paint — not another browser engine.</p>"
     out = out + "</body></html>"
     give out
 }

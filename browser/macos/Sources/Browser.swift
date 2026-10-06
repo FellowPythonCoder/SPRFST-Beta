@@ -35,7 +35,7 @@ final class BrowserWindow: NSWindowController, PageViewDelegate, NSTextFieldDele
     private var lensButton: BarButton!
     private var emberButton: BarButton!
     private var shieldButton: BarButton!
-    private let findBar = NSView()
+    private let findBar = GlassSurface(material: .hudWindow, radius: 8)
     private let findField = NSTextField()
     private let findCount = label("", Fonts.ui(11), Theme.faint)
     private var stripHeight: NSLayoutConstraint!
@@ -57,7 +57,9 @@ final class BrowserWindow: NSWindowController, PageViewDelegate, NSTextFieldDele
                               backing: .buffered, defer: false)
         window.title = "SPRFST"
         window.titlebarAppearsTransparent = true
-        window.backgroundColor = Theme.ink
+        window.titleVisibility = .hidden
+        window.isOpaque = false
+        window.backgroundColor = .clear
         window.minSize = NSSize(width: 680, height: 420)
         window.center()
         self.init(window: window)
@@ -72,10 +74,10 @@ final class BrowserWindow: NSWindowController, PageViewDelegate, NSTextFieldDele
         root.layer?.backgroundColor = Theme.ink.cgColor
 
         // ----------------------------------------------------- the top bar
-        let bar = NSView()
+        // A native translucent surface keeps the chrome branded without
+        // copying another browser's layout. The engine page remains ours.
+        let bar = GlassSurface(material: .headerView)
         bar.translatesAutoresizingMaskIntoConstraints = false
-        bar.wantsLayer = true
-        bar.layer?.backgroundColor = Theme.panel.cgColor
         root.addSubview(bar)
 
         backButton = BarButton("‹", kind: .quiet) { [weak self] in self?.goBack() }
@@ -85,13 +87,8 @@ final class BrowserWindow: NSWindowController, PageViewDelegate, NSTextFieldDele
         emberButton = BarButton("Ember", kind: .primary) { [weak self] in self?.toggleEmber() }
         shieldButton = BarButton("Shield", kind: .quiet) { [weak self] in self?.showShield() }
 
-        let holder = NSView()
+        let holder = GlassSurface(material: .hudWindow, radius: 9)
         holder.translatesAutoresizingMaskIntoConstraints = false
-        holder.wantsLayer = true
-        holder.layer?.backgroundColor = Theme.raised.cgColor
-        holder.layer?.cornerRadius = 8
-        holder.layer?.borderWidth = 1
-        holder.layer?.borderColor = Theme.edge.cgColor
 
         address.translatesAutoresizingMaskIntoConstraints = false
         address.isBordered = false
@@ -132,10 +129,8 @@ final class BrowserWindow: NSWindowController, PageViewDelegate, NSTextFieldDele
         root.addSubview(scroller)
 
         // ------------------------------------------------------ the status
-        let status = NSView()
+        let status = GlassSurface(material: .underWindowBackground)
         status.translatesAutoresizingMaskIntoConstraints = false
-        status.wantsLayer = true
-        status.layer?.backgroundColor = Theme.panel.cgColor
         let texts: [NSTextField] = [statusLeft, statusRight, findCount]
         for text in texts { text.translatesAutoresizingMaskIntoConstraints = false }
         statusLeft.lineBreakMode = .byTruncatingMiddle
@@ -146,11 +141,6 @@ final class BrowserWindow: NSWindowController, PageViewDelegate, NSTextFieldDele
 
         // --------------------------------------------------------- finding
         findBar.translatesAutoresizingMaskIntoConstraints = false
-        findBar.wantsLayer = true
-        findBar.layer?.backgroundColor = Theme.raised.cgColor
-        findBar.layer?.cornerRadius = 8
-        findBar.layer?.borderWidth = 1
-        findBar.layer?.borderColor = Theme.edge.cgColor
         findBar.isHidden = true
         findField.translatesAutoresizingMaskIntoConstraints = false
         findField.isBordered = false
@@ -474,6 +464,38 @@ extension BrowserWindow: NSWindowDelegate {
         }
         resizeWork = work
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.12, execute: work)
+    }
+}
+
+// --------------------------------------------------------- liquid glass
+// Keep this effect in the native chrome only. Web content is still painted
+// by PageView from the SPRFST display list, so the branding cannot become a
+// second rendering engine.
+final class GlassSurface: NSVisualEffectView {
+    init(material: NSVisualEffectView.Material, radius: CGFloat = 0) {
+        super.init(frame: .zero)
+        self.material = material
+        blendingMode = .withinWindow
+        state = .active
+        appearance = NSAppearance(named: .darkAqua)
+        wantsLayer = true
+        layer?.cornerRadius = radius
+        layer?.masksToBounds = radius > 0
+        layer?.borderWidth = radius > 0 ? 1 : 0
+        layer?.borderColor = Theme.edge.withAlphaComponent(0.85).cgColor
+        clipToBounds()
+    }
+
+    required init?(coder: NSCoder) { fatalError("not loaded from a nib") }
+
+    override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
+        // A restrained highlight gives the surface a liquid-glass edge
+        // without turning the controls into a copy of Safari or Chrome.
+        let height = min(2.0, max(1.0, bounds.height * 0.08))
+        let sheen = NSGradient(colors: [NSColor.white.withAlphaComponent(0.12),
+                                         NSColor.white.withAlphaComponent(0.0)])
+        sheen?.draw(in: NSRect(x: 0, y: 0, width: bounds.width, height: height), angle: 0)
     }
 }
 

@@ -139,6 +139,10 @@ cp browser/src/*.spf        "$APP/Contents/Resources/engine/"
 cp browser/rules/*.rules    "$APP/Contents/Resources/engine/"
 cp -R std                   "$APP/Contents/Resources/std"
 cp browser/README.md        "$APP/Contents/Resources/README.md" 2>/dev/null || true
+if [ -d browser/docs ]; then
+    mkdir -p "$APP/Contents/Resources/docs"
+    cp browser/docs/*.md "$APP/Contents/Resources/docs/"
+fi
 printf '    %s engine modules, %s block rules\n' \
     "$(ls browser/src/*.spf | wc -l | tr -d ' ')" \
     "$(grep -cvE '^\s*(~~|!|$)' browser/rules/shield.rules | tr -d ' ')"

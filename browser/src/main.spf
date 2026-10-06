@@ -38,7 +38,9 @@ fn luminance(colour: Int) -> Num {
     give (r * 0.299 + g * 0.587 + b * 0.114) / 255.0
 }
 
-~~ Settle an item's colour against the theme.
+~~ Settle a painted item against the theme. Text is deliberately
+~~ separate from surfaces: a site's black background must not become white
+~~ just because its words are being made readable in Ember.
 fn resolve_colour(raw: Int, ember: Bool) -> Int {
     if raw == -1 { give paper_text(ember) }
     if raw == -2 { give link_colour(ember) }
@@ -46,8 +48,20 @@ fn resolve_colour(raw: Int, ember: Bool) -> Int {
     if raw == -4 { give link_colour(ember) }
     if raw == -5 { give 0x2A2A2E }
     if not ember { give raw }
-    ~~ in Ember, text the page wanted dark becomes our soft white
     if luminance(raw) < 0.45 { give paper_text(ember) }
+    give raw
+}
+
+fn text_colour(raw: Int, ember: Bool, linked: Bool) -> Int {
+    if not ember { give raw }
+    if linked { give link_colour(ember) }
+    give paper_text(ember)
+}
+
+fn background_colour(raw: Int, ember: Bool) -> Int {
+    if raw < 0 { give ink(ember) }
+    if not ember { give raw }
+    if luminance(raw) > 0.55 { give panel(ember) }
     give raw
 }
 
@@ -62,7 +76,14 @@ fn items_of(drawn: layout.Page, ember: Bool) -> [Any] {
         one.set("w", item.w)
         one.set("h", item.h)
         if item.text != "" { one.set("t", item.text) }
-        one.set("c", resolve_colour(item.colour, ember))
+        let paint = if item.kind == "text" or item.kind == "bullet" {
+            text_colour(item.colour, ember, item.link != "")
+        } else if item.kind == "rect" {
+            background_colour(item.colour, ember)
+        } else {
+            resolve_colour(item.colour, ember)
+        }
+        one.set("c", paint)
         if item.size != 16.0 { one.set("s", item.size) }
         if item.weight != 400 { one.set("b", item.weight) }
         if item.italic { one.set("i", true) }
@@ -84,9 +105,7 @@ fn answer_of(result: page.Result, session: page.Session) -> Map<Text, Any> {
     out.set("status", result.status)
     out.set("height", result.page.height)
     out.set("width", result.page.width)
-    let page_background = if result.page.background >= 0 {
-        resolve_colour(result.page.background, ember)
-    } else { ink(ember) }
+    let page_background = background_colour(result.page.background, ember)
     out.set("background", page_background)
     out.set("text", paper_text(ember))
     out.set("quiet", quiet(ember))

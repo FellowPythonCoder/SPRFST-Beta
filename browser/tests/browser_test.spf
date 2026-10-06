@@ -363,6 +363,11 @@ test "the internal pages are real pages" {
         testing.yes(result.page.items.len() > 5, "{address} has something on it")
         testing.yes(result.title != "", "{address} has a title")
     }
+    let start = page.open(session, "sprfst://start", 800.0, false)
+    let words = text_of(start.page)
+    testing.yes(words.contains("Browse at your pace"), "the start page has a clear welcome")
+    testing.yes(words.contains("browser code"), "the start page explains the engine")
+    testing.yes(words.contains("browser/"), "the start page includes the source map")
 }
 
 test "a page that cannot be reached says so, as a page" {

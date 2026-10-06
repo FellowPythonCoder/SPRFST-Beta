@@ -363,6 +363,14 @@ pub object Frame {
         if block {
             self.space_down(style.margin_top)
             self.left = self.left + style.indent
+            var backdrop = -1
+            if style.background >= 0 {
+                backdrop = self.page.items.len()
+                self.page.items.push(Item {
+                    kind: "rect", x: self.left - 8.0, y: self.y,
+                    w: self.room() + 16.0, h: 1.0, colour: style.background
+                })
+            }
             if style.display == "list-item" { self.bullet(style) }
             if style.bar >= 0 {
                 let top = self.y
@@ -377,6 +385,9 @@ pub object Frame {
             }
             if style.align == "center" { self.centre_line() }
             self.end_line()
+            if backdrop >= 0 {
+                self.page.items[backdrop].h = self.y - self.page.items[backdrop].y + style.margin_bottom
+            }
             self.left = self.left - style.indent
             self.y = self.y + style.margin_bottom
             if style.level > 0 {
