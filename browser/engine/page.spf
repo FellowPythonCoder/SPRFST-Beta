@@ -16,6 +16,7 @@ use layout
 use fetch
 use reader
 use search
+use javascript
 
 pub object Settings {
     search: Text = "https://duckduckgo.com/html/?q="
@@ -186,6 +187,10 @@ pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
 
 
 
+    if not searching and source != "" and (mime == "text/html" or mime == "") {
+        source = javascript.enhance(source, out.address)
+        mime = "text/html"
+    }
     if searching and source != "" and (mime == "text/html" or mime == "") {
         source = search.render(source, typed_text)
         mime = "text/html"

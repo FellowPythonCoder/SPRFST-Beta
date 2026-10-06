@@ -147,11 +147,14 @@ browser; `sprfst://shield` says how many rules were understood.
 
 This is the honest list. Nothing here is hidden behind a spinner.
 
-**There is no JavaScript engine.** Scripts are not fetched and not run.
-A page that builds itself in the browser arrives empty; a page that is
-HTML arrives whole. This is also why it is fast and why nothing can
-track you between pages. Writing a JS engine is a larger project than
-the browser.
+**JavaScript is optional and deliberately limited.** If Node.js is installed,
+`engine/javascript-runner.js` can load a small, time-limited compatibility
+sandbox for classic inline and external scripts. It supports simple
+`document.write` and basic DOM output while SPRFST still owns HTML parsing,
+dark mode and layout. ES modules, complex frameworks, Web APIs and scripts
+that need a real browser DOM may still fall back to their server HTML or
+`noscript` content. Without Node.js, the page remains fully usable through
+its HTML and CSS.
 
 **No TLS of its own.** The SPRFST runtime has no TLS, so `https://` is
 handed to `curl`, which every Mac has. `http://` goes over a raw socket

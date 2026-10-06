@@ -136,6 +136,7 @@ mkdir -p "$APP/Contents/Resources/bin" "$APP/Contents/Resources/engine"
 cp build/bin/sprfst "$APP/Contents/Resources/bin/sprfst"
 chmod +x "$APP/Contents/Resources/bin/sprfst"
 cp browser/engine/*.spf        "$APP/Contents/Resources/engine/"
+cp browser/engine/*.js         "$APP/Contents/Resources/engine/"
 cp browser/privacy-rules/*.rules    "$APP/Contents/Resources/engine/"
 cp -R std                   "$APP/Contents/Resources/std"
 cp browser/README.md        "$APP/Contents/Resources/README.md" 2>/dev/null || true

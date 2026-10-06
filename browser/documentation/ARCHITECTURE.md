@@ -48,6 +48,14 @@ DuckDuckGo's plain HTML endpoint, and `search.spf` turns the result anchors
 into a native result page. The first provider result's snippet becomes the
 overview; the destination URL is decoded and placed on ordinary links.
 
+When Node.js is available, `javascript.spf` sends classic inline and external
+scripts to `javascript-runner.js`. The helper uses a short-lived, restricted
+Node VM with a small DOM surface, limits external scripts to eight resources
+and one megabyte each, and gives each script 250 milliseconds. This is a
+compatibility enhancement, not a replacement for the SPRFST parser or layout
+engine. Pages that need a complete browser DOM continue with HTML, CSS and
+`noscript` fallbacks.
+
 ## Module guide
 
 | Module | Responsibility |

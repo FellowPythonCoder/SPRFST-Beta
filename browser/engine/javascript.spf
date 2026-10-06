@@ -1,0 +1,42 @@
+module javascript
+
+use std.fs
+use std.path
+use std.sys
+use std.time
+
+var node_checked = false
+var node_available = false
+
+pub fn enhance(source: Text, base: Text) -> Text {
+    if source == "" or not source.contains("<script") { give source }
+    if not have_node() { give source }
+    let input = path.join("/tmp", "sprfst-js-" + time.now().to_text() + ".html")
+    fs.write(input, source)
+    let command = "node " + shell_quote(helper()) + " " + shell_quote(input) + " " + shell_quote(base)
+    let output = sys.run(command)
+    fs.remove(input)
+    if output.trim() == "" { give source }
+    give output
+}
+
+fn helper() -> Text {
+    let home = sys.env("SPRFST_BROWSER_HOME") ?? ""
+    if home.ends_with("privacy-rules") {
+        give path.join(path.dirname(home), "engine/javascript-runner.js")
+    }
+    if home != "" { give path.join(home, "javascript-runner.js") }
+    give "browser/engine/javascript-runner.js"
+}
+
+fn have_node() -> Bool {
+    if not node_checked {
+        node_available = sys.run("command -v node 2>/dev/null").trim() != ""
+        node_checked = true
+    }
+    give node_available
+}
+
+fn shell_quote(text: Text) -> Text {
+    give "'" + text.replace("'", "'\\''") + "'"
+}
