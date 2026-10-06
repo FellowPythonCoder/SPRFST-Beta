@@ -23,6 +23,13 @@ pub object Style {
     margin_top: Num = 0.0
     margin_bottom: Num = 0.0
     indent: Num = 0.0
+    padding_top: Num = 0.0
+    padding_bottom: Num = 0.0
+    padding_left: Num = 0.0
+    padding_right: Num = 0.0
+    radius: Num = 0.0
+    border_width: Num = 0.0
+    border_colour: Int = -1
     bullet: Text = ""
     bar: Int = -1
     hidden: Bool = false

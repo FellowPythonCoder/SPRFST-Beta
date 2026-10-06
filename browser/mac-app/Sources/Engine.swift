@@ -23,6 +23,9 @@ struct Item {
     var italic = false
     var underline = false
     var mono = false
+    var radius: CGFloat = 0
+    var borderWidth: CGFloat = 0
+    var borderColour: NSColor?
     var link = ""
     var src = ""
 
@@ -273,6 +276,9 @@ final class Engine {
             item.italic = one["i"] as? Bool ?? false
             item.underline = one["u"] as? Bool ?? false
             item.mono = one["m"] as? Bool ?? false
+            item.radius = CGFloat(one["r"] as? Double ?? 0)
+            item.borderWidth = CGFloat(one["bw"] as? Double ?? 0)
+            item.borderColour = colour(one["bc"])
             item.link = one["l"] as? String ?? ""
             item.src = one["src"] as? String ?? ""
             page.items.append(item)

@@ -358,7 +358,8 @@ pub fn internal(address: Text, session: Session) -> Text {
 fn start_page(session: Session) -> Text {
     var out = "<html><head><title>SPRFST Browser</title><style>"
     out = out + "body{{background:#0b0b0d;color:#f4f4f2;font-family:Helvetica;margin-left:32px;margin-right:32px}}"
-    out = out + ".hero{{background:#161618;margin-top:18px;margin-bottom:18px;padding-left:22px}}"
+    out = out + ".hero{{background:#161618;margin-top:18px;margin-bottom:18px;padding:18px 22px;border:1px solid #303038;border-radius:24px}}"
+    out = out + ".hero-mark{{border-radius:28px;border:1px solid #4a4a52}}"
     out = out + ".eyebrow{{color:#ffa136;font-size:12px;font-weight:bold;margin-bottom:8px}}"
     out = out + ".hero h1{{color:#f4f4f2;font-size:34px;margin-bottom:8px}}"
     out = out + ".muted{{color:#c7c7cc;font-size:15px}}"
@@ -370,6 +371,7 @@ fn start_page(session: Session) -> Text {
     out = out + ".code{{color:#e8e8e6;font-family:monospace;font-size:13px}}"
     out = out + "</style></head><body>"
     out = out + "<section class=\"hero\"><p class=\"eyebrow\">SPRFST BROWSER · NATIVE ENGINE</p>"
+    out = out + "<img class=\"hero-mark\" src=\"sprfst://start-mark\" width=\"180\" height=\"180\" alt=\"SPRFST mark\">"
     out = out + "<h1>Browse at your pace.</h1>"
     out = out + "<p class=\"muted\">A calm, private browser written in SPRFST. " +
                 "Search or type an address above. Pages are parsed, styled and painted here — " +
@@ -398,7 +400,7 @@ fn start_page(session: Session) -> Text {
                 "<span class=\"code\">css.spf</span> applies the useful visual rules sites actually need.</li>"
     out = out + "<li><b>Make pixels.</b> <span class=\"code\">layout.spf</span> turns text, links, images and rules into a " +
                 "display list. The native macOS window only paints that list.</li></ol>"
-    out = out + "<pre class=\"code\">browser/\n  engine/       SPRFST engine: uri, fetch, html, css, layout, page\n  mac-app/     native window and display-list painter\n  privacy-rules/     plain-text Shield rules\n  tests/     offline engine tests and a local fixture\n  documentation/      architecture notes and performance guidance</pre></section>"
+    out = out + "<pre class=\"code\">browser/\n  engine/       SPRFST engine: uri, fetch, html, css, layout, page\n  mac-app/     native window and display-list painter\n  privacy-rules/     plain-text Shield rules\n  tests/     offline engine tests and a local fixture\n  visuals/   local SPRFST branding assets\n  documentation/      architecture notes and performance guidance</pre></section>"
     out = out + "<section class=\"card\"><p class=\"label\">HONEST PERFORMANCE</p><h2>Fast by design, measured in the status bar</h2>"
     out = out + "<p class=\"muted\">The browser caches revisits, skips blocked work and reports fetch, parse, style and layout time. " +
                 "It aims for responsive reading, not an invented promise that every site loads in one second. " +

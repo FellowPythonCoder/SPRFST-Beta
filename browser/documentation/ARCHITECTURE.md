@@ -11,7 +11,7 @@ The browser is intentionally split into two small halves:
 
 The project remains part of the repository because the compiler and runtime
 are needed to build and run SPRFST. Browser-specific source and assets stay
-under `browser/`, organized as `engine/`, `mac-app/`, `privacy-rules/`, `tests/` and `documentation/`.
+under `browser/`, organized as `engine/`, `mac-app/`, `privacy-rules/`, `tests/`, `visuals/` and `documentation/`.
 
 ## A page's path through the engine
 

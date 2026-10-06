@@ -285,6 +285,23 @@ test "the page's own style sheet is obeyed" {
     testing.yes(found, "the word was laid out")
 }
 
+test "cards and controls get visible native surfaces" {
+    let drawn = lay("<style>.panel{{background:#202124;padding:14px;border:2px solid #4a4a52;border-radius:14px}}" +
+                    ".panel input{{background:#303134;color:#ffffff;padding:8px;border-radius:8px}}" +
+                    "</style><section class='panel'><h2>Search</h2>" +
+                    "<input placeholder='Search the web'><button>Open website</button></section>", 600.0)
+    var surfaces = 0
+    var rounded = false
+    for item in drawn.items {
+        if item.kind == "rect" { surfaces = surfaces + 1 }
+        if item.radius >= 8.0 { rounded = true }
+    }
+    testing.yes(surfaces >= 2, "the page has surface boxes")
+    testing.yes(rounded, "surfaces have rounded corners")
+    testing.yes(text_of(drawn).contains("Search"), "the input is visible")
+    testing.yes(text_of(drawn).contains("Open website"), "the button is visible")
+}
+
 test "display none and hidden things are not laid out" {
     let drawn = lay("<p>shown</p><p style='display:none'>gone</p>" +
                     "<div hidden>also gone</div><script>var x = 1</script>", 600.0)

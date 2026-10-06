@@ -143,6 +143,10 @@ if [ -d browser/documentation ]; then
     mkdir -p "$APP/Contents/Resources/docs"
     cp browser/documentation/*.md "$APP/Contents/Resources/docs/"
 fi
+if [ -d browser/visuals ]; then
+    mkdir -p "$APP/Contents/Resources/visuals"
+    cp browser/visuals/* "$APP/Contents/Resources/visuals/"
+fi
 printf '    %s engine modules, %s block rules\n' \
     "$(ls browser/engine/*.spf | wc -l | tr -d ' ')" \
     "$(grep -cvE '^\s*(~~|!|$)' browser/privacy-rules/shield.rules | tr -d ' ')"

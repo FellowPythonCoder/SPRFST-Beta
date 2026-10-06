@@ -59,6 +59,8 @@ fn text_colour(raw: Int, ember: Bool, linked: Bool) -> Int {
 }
 
 fn background_colour(raw: Int, ember: Bool) -> Int {
+    if raw == -3 { give panel(ember) }
+    if raw == -5 { give 0x2A2A2E }
     if raw < 0 { give ink(ember) }
     if not ember { give raw }
     if luminance(raw) > 0.55 { give panel(ember) }
@@ -86,6 +88,9 @@ fn items_of(drawn: layout.Page, ember: Bool) -> [Any] {
         one.set("c", paint)
         if item.size != 16.0 { one.set("s", item.size) }
         if item.weight != 400 { one.set("b", item.weight) }
+        if item.radius > 0.0 { one.set("r", item.radius) }
+        if item.border_width > 0.0 { one.set("bw", item.border_width) }
+        if item.border_colour >= 0 { one.set("bc", background_colour(item.border_colour, ember)) }
         if item.italic { one.set("i", true) }
         if item.underline { one.set("u", true) }
         if item.mono { one.set("m", true) }

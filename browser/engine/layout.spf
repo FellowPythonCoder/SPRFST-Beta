@@ -28,6 +28,9 @@ pub object Item {
     italic: Bool = false
     underline: Bool = false
     mono: Bool = false
+    radius: Num = 0.0
+    border_width: Num = 0.0
+    border_colour: Int = -1
     link: Text = ""
     src: Text = ""
 }
@@ -337,6 +340,11 @@ pub object Frame {
             give
         }
 
+        if tag == "input" or tag == "button" or tag == "select" or tag == "textarea" {
+            self.place_control(node, style)
+            chain.pop()
+            give
+        }
         let link = if tag == "a" { node.attr("href") } else { "" }
         if tag == "br" {
             self.end_line()
@@ -362,13 +370,17 @@ pub object Frame {
         let block = style.display == "block" or style.display == "list-item"
         if block {
             self.space_down(style.margin_top)
-            self.left = self.left + style.indent
+            self.y = self.y + style.padding_top
+            self.left = self.left + style.indent + style.padding_left
             var backdrop = -1
-            if style.background >= 0 {
+            if style.background >= 0 or style.border_width > 0.0 {
                 backdrop = self.page.items.len()
                 self.page.items.push(Item {
-                    kind: "rect", x: self.left - 8.0, y: self.y,
-                    w: self.room() + 16.0, h: 1.0, colour: style.background
+                    kind: "rect", x: self.left - style.padding_left - 8.0, y: self.y,
+                    w: self.room() + style.padding_left + style.padding_right + 16.0,
+                    h: 1.0, colour: if style.background >= 0 { style.background } else { -1 },
+                    radius: style.radius, border_width: style.border_width,
+                    border_colour: style.border_colour
                 })
             }
             if style.display == "list-item" { self.bullet(style) }
@@ -386,10 +398,10 @@ pub object Frame {
             if style.align == "center" { self.centre_line() }
             self.end_line()
             if backdrop >= 0 {
-                self.page.items[backdrop].h = self.y - self.page.items[backdrop].y + style.margin_bottom
+                self.page.items[backdrop].h = self.y - self.page.items[backdrop].y + style.padding_bottom
             }
-            self.left = self.left - style.indent
-            self.y = self.y + style.margin_bottom
+            self.left = self.left - style.indent - style.padding_left
+            self.y = self.y + style.padding_bottom + style.margin_bottom
             if style.level > 0 {
                 self.page.headings.push("{style.level}|" + html.squash(node.inner_text()).trim())
             }
@@ -515,12 +527,53 @@ pub object Frame {
         self.end_line()
         self.page.items.push(Item {
             kind: "image", x: self.left, y: self.y, w: wide, h: high,
-            text: alt, src: src, size: style.size, colour: -5
+            text: alt, src: src, size: style.size, colour: -5,
+            radius: style.radius, border_width: style.border_width,
+            border_colour: style.border_colour
         })
         self.y = self.y + high + 8.0
         self.page.images = self.page.images + 1
     }
 
+
+    fn place_control(self, node: html.Node, style: css.Style) {
+        self.end_line()
+        let tag = node.name
+        var label = node.attr("value")
+        if label == "" { label = node.attr("placeholder") }
+        if label == "" { label = html.squash(node.inner_text()).trim() }
+        if label == "" {
+            if tag == "input" { label = "Enter text" }
+            else if tag == "select" { label = "Choose an option" }
+            else { label = "Button" }
+        }
+        var wide = node.attr("width").to_num() ?? 0.0
+        if wide <= 0.0 { wide = node.attr("size").to_num() ?? 0.0 }
+        if wide > 0.0 and wide < 30.0 { wide = wide * style.size * 0.62 + 24.0 }
+        if wide <= 0.0 {
+            wide = if tag == "input" or tag == "textarea" { 220.0 } else {
+                self.measure.width_of(label, style.size, style.weight, style.mono) + 30.0
+            }
+        }
+        if wide > self.room() { wide = self.room() }
+        let high = math.max(30.0, style.size * 1.9)
+        let fill = if style.background >= 0 { style.background } else { -3 }
+        let edge = if style.border_colour >= 0 { style.border_colour } else { 0x4A4A52 }
+        self.page.items.push(Item {
+            kind: "rect", x: self.left, y: self.y, w: wide, h: high,
+            colour: fill, radius: if style.radius > 0.0 { style.radius } else { 8.0 },
+            border_width: if style.border_width > 0.0 { style.border_width } else { 1.0 },
+            border_colour: edge
+        })
+        self.page.items.push(Item {
+            kind: "text", x: self.left + 12.0, y: self.y + style.size * 0.22,
+            w: wide - 24.0, h: style.size * 1.45, text: label,
+            colour: style.colour, size: style.size, weight: style.weight,
+            italic: style.italic, mono: style.mono
+        })
+        self.y = self.y + high + 8.0
+        self.page.words = self.page.words + 1
+    }
 
     fn apply_rules(self, style: css.Style, chain: [Crumb], node: html.Node) {
         let here = chain[chain.len() - 1]
@@ -622,10 +675,62 @@ pub fn set_property(style: css.Style, name: Text, raw: Text) {
     }
     if name == "margin-top" { style.margin_top = css.length(value, style.size) }
     if name == "margin-bottom" { style.margin_bottom = css.length(value, style.size) }
-    if name == "margin-left" or name == "padding-left" {
-        style.indent = style.indent + css.length(value, style.size)
-    }
+    if name == "margin-left" { style.indent = style.indent + css.length(value, style.size) }
+    if name == "padding" { set_padding(style, value) }
+    if name == "padding-top" { style.padding_top = css.length(value, style.size) }
+    if name == "padding-bottom" { style.padding_bottom = css.length(value, style.size) }
+    if name == "padding-left" { style.padding_left = css.length(value, style.size) }
+    if name == "padding-right" { style.padding_right = css.length(value, style.size) }
+    if name == "border-radius" { style.radius = css.length(first_word(value), style.size) }
+    if name == "border-width" { style.border_width = css.length(first_word(value), style.size) }
+    if name == "border-color" { style.border_colour = css.colour_of(first_word(value)) }
+    if name == "border" { set_border(style, value) }
     if name == "visibility" and lower == "hidden" { style.display = "none" }
+}
+
+fn set_padding(style: css.Style, value: Text) {
+    let bits = value.trim().split(" ")
+    var one = 0.0
+    var two = 0.0
+    var three = 0.0
+    var four = 0.0
+    if bits.len() >= 1 { one = css.length(bits[0], style.size) }
+    if bits.len() >= 2 { two = css.length(bits[1], style.size) }
+    if bits.len() >= 3 { three = css.length(bits[2], style.size) }
+    if bits.len() >= 4 { four = css.length(bits[3], style.size) }
+    if bits.len() == 1 {
+        style.padding_top = one
+        style.padding_right = one
+        style.padding_bottom = one
+        style.padding_left = one
+    }
+    if bits.len() == 2 {
+        style.padding_top = one
+        style.padding_bottom = one
+        style.padding_left = two
+        style.padding_right = two
+    }
+    if bits.len() == 3 {
+        style.padding_top = one
+        style.padding_left = two
+        style.padding_right = two
+        style.padding_bottom = three
+    }
+    if bits.len() >= 4 {
+        style.padding_top = one
+        style.padding_right = two
+        style.padding_bottom = three
+        style.padding_left = four
+    }
+}
+
+fn set_border(style: css.Style, value: Text) {
+    for bit in value.split(" ") {
+        let amount = css.length(bit, style.size)
+        if amount > 0.0 { style.border_width = amount }
+        let colour = css.colour_of(bit)
+        if colour >= 0 { style.border_colour = colour }
+    }
 }
 
 fn first_word(value: Text) -> Text {

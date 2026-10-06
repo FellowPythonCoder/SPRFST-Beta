@@ -54,7 +54,8 @@ enabled.
 
 Browser-owned files live under this directory: SPRFST engine modules in
 `engine/`, native macOS chrome in `mac-app/`, filtering rules in `privacy-rules/`,
-offline and fixture tests in `tests/`, and code documentation in `documentation/`.
+offline and fixture tests in `tests/`, visuals in `visuals/`, and code documentation in
+`documentation/`.
 The compiler and runtime remain at the repository root because they are the
 language that runs the engine; moving them into the browser would make the
 project less organized and would break the other SPRFST examples.

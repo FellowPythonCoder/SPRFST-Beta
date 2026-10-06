@@ -98,8 +98,7 @@ final class PageView: NSView {
             guard item.rect.intersects(band) else { continue }
             switch item.kind {
             case "rect":
-                item.colour.setFill()
-                item.rect.fill()
+                drawSurface(item)
             case "rule":
                 item.colour.withAlphaComponent(0.45).setFill()
                 CGRect(x: item.x, y: item.y, width: item.w, height: max(1, item.h)).fill()
@@ -108,6 +107,20 @@ final class PageView: NSView {
             default:
                 drawWords(item, index: index)
             }
+        }
+    }
+
+    private func drawSurface(_ item: Item) {
+        let radius = min(item.radius, min(item.rect.width, item.rect.height) / 2)
+        let surface = NSBezierPath(roundedRect: item.rect,
+                                   xRadius: max(0, radius),
+                                   yRadius: max(0, radius))
+        item.colour.setFill()
+        surface.fill()
+        if item.borderWidth > 0 {
+            (item.borderColour ?? item.colour.withAlphaComponent(0.45)).setStroke()
+            surface.lineWidth = item.borderWidth
+            surface.stroke()
         }
     }
 
@@ -145,14 +158,25 @@ final class PageView: NSView {
                                 width: size.width, height: size.height)
 
 
+            let radius = min(item.radius, min(box.width, box.height) / 2)
+            let clip = NSBezierPath(roundedRect: box, xRadius: max(0, radius), yRadius: max(0, radius))
+            NSGraphicsContext.current?.cgContext.saveGState()
+            clip.addClip()
             picture.draw(in: where_, from: .zero, operation: .sourceOver, fraction: 1,
                          respectFlipped: true, hints: [.interpolation: NSImageInterpolation.medium])
+            NSGraphicsContext.current?.cgContext.restoreGState()
+            if item.borderWidth > 0 {
+                (item.borderColour ?? item.colour.withAlphaComponent(0.45)).setStroke()
+                clip.lineWidth = item.borderWidth
+                clip.stroke()
+            }
             return
         }
         item.colour.withAlphaComponent(0.6).setStroke()
+        let radius = item.radius > 0 ? item.radius : 6
         let frame = NSBezierPath(roundedRect: item.rect.insetBy(dx: 0.5, dy: 0.5),
-                                 xRadius: 6, yRadius: 6)
-        frame.lineWidth = 1
+                                 xRadius: radius, yRadius: radius)
+        frame.lineWidth = item.borderWidth > 0 ? item.borderWidth : 1
         frame.stroke()
         if !item.text.isEmpty {
             let face = Fonts.ui(11)
@@ -190,6 +214,14 @@ final class PageView: NSView {
     private func fetchPictures() {
         let wanted = Set(page.items.filter { $0.kind == "image" && !$0.src.isEmpty }.map { $0.src })
         for address in wanted where !asked.contains(address) {
+            if address.hasPrefix("sprfst://start-mark") {
+                asked.insert(address)
+                if let url = Bundle.main.url(forResource: "start-mark", withExtension: "png", subdirectory: "visuals"),
+                   let picture = NSImage(contentsOf: url) {
+                    pictures[address] = picture
+                }
+                continue
+            }
             guard let url = URL(string: address), url.scheme == "http" || url.scheme == "https"
             else { continue }
             asked.insert(address)
