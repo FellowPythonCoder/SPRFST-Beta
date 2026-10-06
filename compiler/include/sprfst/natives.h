@@ -63,6 +63,8 @@ X(TEXT_ENDS,     "@Text","ends_with",  "(Text) -> Bool",          "True when the
 X(TEXT_REPLACE,  "@Text","replace",    "(Text, Text) -> Text",    "Replace every occurrence")                            \
 X(TEXT_SLICE,    "@Text","slice",      "(Int, Int) -> Text",      "Substring between two byte offsets")                  \
 X(TEXT_INDEX_OF, "@Text","index_of",   "(Text) -> Int",           "Byte offset of a part, or -1")                        \
+X(TEXT_INDEX_FROM,"@Text","index_of_from","(Text, Int) -> Int",  "Byte offset of a part at or after an offset, or -1")     \
+X(TEXT_CODE_FROM, "@Text","index_code_from","(Int, Int) -> Int", "Byte offset of a byte at or after an offset, or -1")      \
 X(TEXT_REPEAT,   "@Text","repeat",     "(Int) -> Text",           "Repeat the text n times")                             \
 X(TEXT_PAD_LEFT, "@Text","pad_left",   "(Int, Text?) -> Text",     "Pad on the left to a width")                          \
 X(TEXT_PAD_RIGHT,"@Text","pad_right",  "(Int, Text?) -> Text",     "Pad on the right to a width")                         \

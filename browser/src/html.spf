@@ -87,11 +87,8 @@ fn is_name_byte(c: Int) -> Bool {
 }
 
 fn find_byte(source: Text, want: Int, from: Int, upto: Int) -> Int {
-    var i = from
-    while i < upto {
-        if source.code_at(i) == want { give i }
-        i = i + 1
-    }
+    let found = source.index_code_from(want, from)
+    if found >= 0 and found < upto { give found }
     give -1
 }
 
@@ -335,15 +332,8 @@ fn lower_eq(source: Text, at: Int, want: Text) -> Bool {
 }
 
 pub fn find_text(source: Text, want: Text, from: Int, upto: Int) -> Int {
-    let first = want.code_at(0)
-    let width = want.len()
-    var i = from
-    while i + width <= upto {
-        if source.code_at(i) == first {
-            if source.slice(i, i + width) == want { give i }
-        }
-        i = i + 1
-    }
+    let found = source.index_of_from(want, from)
+    if found >= 0 and found + want.len() <= upto { give found }
     give -1
 }
 

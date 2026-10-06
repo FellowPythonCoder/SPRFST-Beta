@@ -15,6 +15,7 @@ use shield
 use layout
 use fetch
 use reader
+use search
 
 pub object Settings {
     search: Text = "https://duckduckgo.com/html/?q="
@@ -128,7 +129,9 @@ fn hex(value: Int) -> Text {
 ~~ ------------------------------------------------------------- open
 pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
     let started = time.clock()
-    let address = address_for(typed, session.settings)
+    let typed_text = typed.trim()
+    let searching = typed_text != "" and not uri.looks_like_address(typed_text)
+    let address = address_for(typed_text, session.settings)
     let target = uri.parse(address)
     session.guard.enabled = session.settings.shield_on
     session.guard.reset_counts()
@@ -180,6 +183,13 @@ pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
     }
 
     ~~ ------------------------------------------------- make a document
+    ~~ Search results get a small native page of their own instead of
+    ~~ exposing the search provider's heavy chrome. The first result's
+    ~~ snippet becomes the overview; every result remains a direct link.
+    if searching and source != "" and (mime == "text/html" or mime == "") {
+        source = search.render(source, typed_text)
+        mime = "text/html"
+    }
     var mark = time.clock()
     var document = html.Node { }
     if mime != "text/html" and mime != "application/xhtml+xml" and mime != "" {
@@ -266,6 +276,9 @@ pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
     out.blocked = session.guard.blocked
     out.hidden = laid.hidden + session.guard.hidden
     out.ms = (time.clock() - started) * 1000.0
+    ~~ Keep the human query in the address bar and history. The network
+    ~~ address remains internal to the fetch/store path above.
+    if searching { out.address = typed_text }
 
     if record {
         session.remember(out.address)

@@ -39,6 +39,8 @@ test "text behaves" {
     testing.same("abc".reverse(), "cba", "reverse")
     testing.yes("hello".contains("ell"), "contains")
     testing.same("{1 + 1} fish", "2 fish", "interpolation")
+    testing.same("a,b,c".index_of_from(",", 2), 3, "native search from an offset")
+    testing.same("a<b>c".index_code_from(62, 2), 3, "native byte search from an offset")
 }
 
 test "lists keep their order" {

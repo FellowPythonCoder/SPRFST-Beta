@@ -204,8 +204,9 @@ pub fn unchunk(raw: Text) -> Text {
 pub fn from_hex(digits: Text) -> Int {
     var total = 0
     var i = 0
-    while i < digits.len() {
-        let c = digits.lower().code_at(i)
+    let lower = digits.lower()
+    while i < lower.len() {
+        let c = lower.code_at(i)
         var value = -1
         if c >= 48 and c <= 57 { value = c - 48 }
         if c >= 97 and c <= 102 { value = c - 87 }
@@ -274,10 +275,10 @@ fn last_index_of(text: Text, part: Text) -> Int {
     var found = -1
     var from = 0
     while from < text.len() {
-        let at = text.slice(from, text.len()).index_of(part)
+        let at = text.index_of_from(part, from)
         if at < 0 { break }
-        found = from + at
-        from = found + 1
+        found = at
+        from = at + 1
     }
     give found
 }

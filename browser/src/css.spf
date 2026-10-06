@@ -139,17 +139,9 @@ pub fn length(raw: Text, parent_size: Num) -> Num {
 ~~ starts at the beginning, and slicing the rest of a stylesheet on
 ~~ every step would make parsing quadratic.
 pub fn index_of_from(text: Text, part: Text, from: Int) -> Int {
-    let first = part.code_at(0)
-    let width = part.len()
-    let n = text.len()
-    var i = if from < 0 { 0 } else { from }
-    while i + width <= n {
-        if text.code_at(i) == first {
-            if text.slice(i, i + width) == part { give i }
-        }
-        i = i + 1
-    }
-    give -1
+    ~~ The native search avoids allocating a slice for every candidate
+    ~~ byte. Stylesheets are often much larger than the visible page.
+    give text.index_of_from(part, from)
 }
 
 ~~ ------------------------------------------------------------- parsing

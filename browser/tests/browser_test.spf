@@ -14,6 +14,7 @@ use layout
 use reader
 use fetch
 use page
+use search
 
 ~~ ------------------------------------------------------------- helpers
 fn lay(source: Text, width: Num) -> layout.Page {
@@ -102,6 +103,22 @@ test "typing words is not typing an address" {
                 "words go to the chosen engine")
     testing.same(page.address_for("example.com", settings), "https://example.com/", "an address is opened")
     testing.yes(page.address_for("a b", settings).contains("a+b"), "spaces are encoded")
+}
+
+test "search results become a native overview and normal links" {
+    let raw = "<div class='result results_links'>" +
+              "<a class='result__a' href='/l/?uddg=https%3A%2F%2Fwww.youtube.com%2F'>YouTube</a>" +
+              "<a class='result__snippet'>YouTube is a video sharing service.</a></div>" +
+              "<div class='result'><a class='result__a' href='https://example.com/about'>About</a>" +
+              "<a class='result__snippet'>A second result.</a></div>"
+    let rendered = search.render(raw, "who is the richest man")
+    testing.yes(rendered.contains("Overview"), "the best result gets an overview")
+    testing.yes(rendered.contains("YouTube is a video sharing service"), "the snippet is shown")
+    testing.yes(rendered.contains("https://www.youtube.com/"), "redirect URLs are decoded")
+    testing.no(rendered.contains("/l/?uddg="), "provider redirects are not exposed")
+    let doc = html.parse(rendered)
+    testing.same(html.title_of(doc), "who is the richest man - Search", "the query is in the title")
+    testing.same(count_of(doc, "a"), 2, "result links remain ordinary anchors")
 }
 
 ~~ ----------------------------------------------------------------- HTML

@@ -188,11 +188,10 @@ pub fn last_index_of(text: Text, part: Text) -> Int {
     var found = -1
     var from = 0
     while from < text.len() {
-        let rest = text.slice(from, text.len())
-        let at = rest.index_of(part)
+        let at = text.index_of_from(part, from)
         if at < 0 { break }
-        found = from + at
-        from = found + 1
+        found = at
+        from = at + 1
     }
     give found
 }

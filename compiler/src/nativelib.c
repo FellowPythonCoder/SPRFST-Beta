@@ -674,6 +674,25 @@ static Value native_dispatch(VM *vm, int id, Value *args, int nargs, bool *ok) {
         return mktextn(vm, s + a, (int)(b - a));
     }
     case NF_TEXT_INDEX_OF: { const char *s = txt(A(0)); const char *q = strstr(s, txt(A(1))); return v_int(q ? (int64_t)(q - s) : -1); }
+    case NF_TEXT_INDEX_FROM: {
+        const char *s = txt(A(0));
+        const char *part = txt(A(1));
+        int64_t from = INT(2);
+        size_t n = strlen(s);
+        if (from < 0) from = 0;
+        if ((uint64_t)from > n) return v_int(-1);
+        const char *q = strstr(s + from, part);
+        return v_int(q ? (int64_t)(q - s) : -1);
+    }
+    case NF_TEXT_CODE_FROM: {
+        const char *s = txt(A(0));
+        int64_t code = INT(1), from = INT(2);
+        size_t n = strlen(s);
+        if (from < 0) from = 0;
+        if (code < 0 || code > 255 || (uint64_t)from >= n) return v_int(-1);
+        const unsigned char *q = memchr(s + from, (unsigned char)code, n - (size_t)from);
+        return v_int(q ? (int64_t)(q - (const unsigned char *)s) : -1);
+    }
     case NF_TEXT_REPEAT: {
         const char *s = txt(A(0));
         int64_t k = INT(1);
