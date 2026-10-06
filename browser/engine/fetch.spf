@@ -57,6 +57,10 @@ pub fn get(target: uri.Url) -> Response {
     give follow(target, 5)
 }
 
+pub task get_async(target: uri.Url) -> Response {
+    give get(target)
+}
+
 fn follow(target: uri.Url, left: Int) -> Response {
     let started = time.clock()
     var answer = if target.is_secure() { over_tls(target) } else { over_tcp(target) }

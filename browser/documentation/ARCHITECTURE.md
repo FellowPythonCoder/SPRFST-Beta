@@ -67,9 +67,10 @@ overview; the destination URL is decoded and placed on ordinary links.
 
 The main optimization rule is to avoid work that cannot affect the visible
 page. The Shield runs before subresources are fetched, the response store
-serves revisits, stylesheets share that store, and native C-backed text search
-avoids repeated temporary slices in hot parser loops. The macOS painter caches
-images and only hit-tests known links.
+serves revisits, up to four uncached stylesheets are fetched concurrently with
+SPRFST tasks, and native C-backed text search avoids repeated temporary slices
+in hot parser loops. The macOS painter caches images and only hit-tests known
+links.
 
 The service reports fetch, parse, style and layout timings for every response.
 Those measurements are more useful than a universal promise: a local article,

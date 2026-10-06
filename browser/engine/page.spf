@@ -214,6 +214,7 @@ pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
 
     var style_text: [Text] = []
     for node in document.all("style") { style_text.push(html.raw_text(node)) }
+    var sheet_urls: [uri.Url] = []
     for node in document.all("link") {
         let rel = node.attr("rel").lower()
         if not rel.contains("stylesheet") { skip }
@@ -222,22 +223,26 @@ pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
         let sheet_url = uri.parse(href)
         out.requests = out.requests + 1
         if session.guard.check(sheet_url, here.host) { skip }
-
-
         if is_font_host(sheet_url.host) { skip }
-        if style_text.len() >= 4 { skip }
-
-
-        let sheet_key = sheet_url.full()
-        let cached_sheet = session.store.look(sheet_key)
-        let answer = if cached_sheet != nil {
-            cached_sheet ?? fetch.Response { }
-        } else {
-            let fresh = fetch.get(sheet_url)
-            if fresh.ok { session.store.keep(sheet_key, fresh) }
-            fresh
+        let cached_sheet = session.store.look(sheet_url.full())
+        if cached_sheet != nil {
+            style_text.push((cached_sheet ?? fetch.Response { }).body)
+            skip
         }
-        if answer.ok { style_text.push(answer.body) }
+        if sheet_urls.len() >= 4 { skip }
+        sheet_urls.push(sheet_url)
+    }
+    var sheet_jobs: [Future<fetch.Response>] = []
+    for sheet_url in sheet_urls { sheet_jobs.push(spawn fetch.get_async(sheet_url)) }
+    var sheet_index = 0
+    while sheet_index < sheet_jobs.len() {
+        let answer = await sheet_jobs[sheet_index]
+        let sheet_key = sheet_urls[sheet_index].full()
+        if answer.ok {
+            session.store.keep(sheet_key, answer)
+            style_text.push(answer.body)
+        }
+        sheet_index = sheet_index + 1
     }
     let sheet = css.parse(style_text.join("\n"))
     out.style_ms = (time.clock() - mark) * 1000.0
