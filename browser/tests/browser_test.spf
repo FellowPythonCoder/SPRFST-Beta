@@ -304,8 +304,10 @@ test "cards and controls get visible native surfaces" {
 
 test "display none and hidden things are not laid out" {
     let drawn = lay("<p>shown</p><p style='display:none'>gone</p>" +
-                    "<div hidden>also gone</div><script>var x = 1</script>", 600.0)
+                    "<div hidden>also gone</div><script>var x = 1</script>" +
+                    "<noscript>JavaScript is disabled, but this fallback is readable.</noscript>", 600.0)
     testing.yes(text_of(drawn).contains("shown"), "the visible paragraph")
+    testing.yes(text_of(drawn).contains("fallback"), "the no-script fallback")
     testing.no(text_of(drawn).contains("gone"), "nothing hidden is drawn")
     testing.no(text_of(drawn).contains("var"), "no script text")
 }
@@ -316,6 +318,12 @@ test "cosmetic rules remove elements before layout" {
     testing.no(text_of(drawn).contains("buy"), "the banner is gone")
     testing.yes(text_of(drawn).contains("article"), "the article stays")
     testing.same(drawn.hidden, 1, "and it was counted")
+}
+
+test "embedded content has an honest visible fallback" {
+    let drawn = lay("<applet code='legacy.class'></applet><iframe src='frame.html'></iframe>", 600.0)
+    testing.yes(text_of(drawn).contains("Java content"), "java has a visible fallback")
+    testing.yes(text_of(drawn).contains("Embedded page"), "frames have a visible surface")
 }
 
 test "lists, rules and images each leave their mark" {

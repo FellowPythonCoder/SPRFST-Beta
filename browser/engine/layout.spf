@@ -133,7 +133,7 @@ pub fn defaults(tag: Text, parent: css.Style) -> css.Style {
     if tag == "td" or tag == "th" { out.display = "inline" }
     if tag == "tr" { out.display = "block" }
     if tag == "center" { out.align = "center" }
-    if tag == "script" or tag == "style" or tag == "head" or tag == "noscript" or
+    if tag == "script" or tag == "style" or tag == "head" or
        tag == "template" or tag == "svg" { out.hidden = true }
     give out
 }
@@ -344,6 +344,13 @@ pub object Frame {
             self.place_control(node, style)
             chain.pop()
             give
+        }
+        if tag == "iframe" or tag == "embed" or tag == "applet" {
+            if node.inner_text().trim() == "" {
+                self.place_embedded(node, style)
+                chain.pop()
+                give
+            }
         }
         let link = if tag == "a" { node.attr("href") } else { "" }
         if tag == "br" {
@@ -570,6 +577,27 @@ pub object Frame {
             w: wide - 24.0, h: style.size * 1.45, text: label,
             colour: style.colour, size: style.size, weight: style.weight,
             italic: style.italic, mono: style.mono
+        })
+        self.y = self.y + high + 8.0
+        self.page.words = self.page.words + 1
+    }
+
+    fn place_embedded(self, node: html.Node, style: css.Style) {
+        self.end_line()
+        var label = "Embedded content"
+        if node.name == "applet" { label = "Java content requires an external runtime" }
+        if node.name == "iframe" { label = "Embedded page: " + node.attr("src") }
+        if node.name == "embed" { label = "Embedded media: " + node.attr("src") }
+        let wide = self.room()
+        let high = 42.0
+        self.page.items.push(Item {
+            kind: "rect", x: self.left, y: self.y, w: wide, h: high,
+            colour: -3, radius: 10.0, border_width: 1.0, border_colour: 0x4A4A52
+        })
+        self.page.items.push(Item {
+            kind: "text", x: self.left + 14.0, y: self.y + 12.0,
+            w: wide - 28.0, h: style.size * 1.45, text: label,
+            colour: style.colour, size: style.size, italic: true
         })
         self.y = self.y + high + 8.0
         self.page.words = self.page.words + 1

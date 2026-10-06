@@ -132,7 +132,8 @@ pub fn is_block(tag: Text) -> Bool {
          tag == "ul" or tag == "body" or tag == "html" or tag == "tr" or
          tag == "td" or tag == "th" or tag == "thead" or tag == "tbody" or
          tag == "dt" or tag == "dd" or tag == "figure" or
-         tag == "hgroup" or tag == "menu" or tag == "dir"
+         tag == "hgroup" or tag == "menu" or tag == "dir" or
+         tag == "applet" or tag == "object" or tag == "iframe"
 }
 
 
