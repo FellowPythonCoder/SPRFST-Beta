@@ -141,6 +141,7 @@ pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
     var out = Result { address: address, reading: session.settings.reading }
     var source = ""
     var mime = "text/html"
+    var scripted = false
 
     if target.scheme == "file" {
         if fs.exists(target.path) {
@@ -176,6 +177,7 @@ pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
         if cached != nil {
             answer = cached ?? fetch.Response { }
             answer.cached = true
+            scripted = answer.enhanced
         } else {
             answer = fetch.get(target)
             if answer.ok { session.store.keep(address, answer) }
@@ -199,9 +201,18 @@ pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
 
 
 
-    if not searching and source != "" and (mime == "text/html" or mime == "") {
+    if not searching and not scripted and source != "" and (mime == "text/html" or mime == "") {
         source = javascript.enhance(source, out.address)
         mime = "text/html"
+        if target.ok and not target.is_internal() {
+            let stored = session.store.look(address)
+            if stored != nil {
+                var enhanced = stored ?? fetch.Response { }
+                enhanced.body = source
+                enhanced.enhanced = true
+                session.store.keep(address, enhanced)
+            }
+        }
     }
     if searching and source != "" and (mime == "text/html" or mime == "") {
         source = search.render(source, typed_text)
@@ -241,25 +252,42 @@ pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
         out.requests = out.requests + 1
         if session.guard.check(sheet_url, here.host) { skip }
         if is_font_host(sheet_url.host) { skip }
-        let cached_sheet = session.store.look(sheet_url.full())
+        let sheet_key = sheet_url.full()
+        let cached_sheet = session.store.look(sheet_key)
         if cached_sheet != nil {
             style_text.push((cached_sheet ?? fetch.Response { }).body)
             skip
         }
-        if sheet_urls.len() >= 4 { skip }
+        if sheet_urls.len() > 0 {
+            var already_seen = false
+            for seen in sheet_urls {
+                if seen.full() == sheet_key { already_seen = true; break }
+            }
+            if already_seen { skip }
+        }
         sheet_urls.push(sheet_url)
     }
-    var sheet_jobs: [Future<fetch.Response>] = []
-    for sheet_url in sheet_urls { sheet_jobs.push(spawn fetch.get_async(sheet_url)) }
-    var sheet_index = 0
-    while sheet_index < sheet_jobs.len() {
-        let answer = await sheet_jobs[sheet_index]
-        let sheet_key = sheet_urls[sheet_index].full()
-        if answer.ok {
-            session.store.keep(sheet_key, answer)
-            style_text.push(answer.body)
+    var batch_start = 0
+    while batch_start < sheet_urls.len() {
+        var sheet_jobs: [Future<fetch.Response>] = []
+        var batch_end = batch_start + 4
+        if batch_end > sheet_urls.len() { batch_end = sheet_urls.len() }
+        var launch = batch_start
+        while launch < batch_end {
+            sheet_jobs.push(spawn fetch.get_async(sheet_urls[launch]))
+            launch = launch + 1
         }
-        sheet_index = sheet_index + 1
+        var sheet_index = 0
+        while sheet_index < sheet_jobs.len() {
+            let answer = await sheet_jobs[sheet_index]
+            let sheet_key = sheet_urls[batch_start + sheet_index].full()
+            if answer.ok {
+                session.store.keep(sheet_key, answer)
+                style_text.push(answer.body)
+            }
+            sheet_index = sheet_index + 1
+        }
+        batch_start = batch_end
     }
     let sheet = css.parse(style_text.join("\n"))
     out.style_ms = (time.clock() - mark) * 1000.0

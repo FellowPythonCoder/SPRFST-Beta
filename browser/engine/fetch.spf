@@ -27,6 +27,7 @@ pub object Response {
     ms: Num = 0.0
     error: Text = ""
     cached: Bool = false
+    enhanced: Bool = false
     secure: Bool = false
 }
 
@@ -245,7 +246,7 @@ fn over_tls(target: uri.Url) -> Response {
         give answer
     }
     let marker = "@@SPRFST@@"
-    let command = "curl -sS -L --max-time 20 --compressed " +
+    let command = "curl -sS -L --connect-timeout 5 --max-time 15 --compressed " +
                   "-A 'SPRFST-Browser/0.1' " +
                   "-w '\\n" + marker + "%{{http_code}}\\t%{{content_type}}\\t%{{url_effective}}' " +
                   shell_quote(target.full()) + " 2>/dev/null"

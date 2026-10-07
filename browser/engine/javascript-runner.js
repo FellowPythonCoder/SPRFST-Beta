@@ -86,20 +86,24 @@ const vm = require("node:vm");
     }
   }
 
-  const downloaded = await Promise.all(external.slice(0, 8).map(async (url) => {
-    try {
-      if (url.startsWith("file:")) {
-        const text = fs.readFileSync(new URL(url), "utf8");
+  const downloaded = [];
+  for (let start = 0; start < external.length; start += 8) {
+    const batch = await Promise.all(external.slice(start, start + 8).map(async (url) => {
+      try {
+        if (url.startsWith("file:")) {
+          const text = fs.readFileSync(new URL(url), "utf8");
+          return text.length <= 1000000 ? text : "";
+        }
+        const response = await fetch(url, { signal: AbortSignal.timeout(3000) });
+        if (!response.ok) return "";
+        const text = await response.text();
         return text.length <= 1000000 ? text : "";
+      } catch (_) {
+        return "";
       }
-      const response = await fetch(url, { signal: AbortSignal.timeout(3000) });
-      if (!response.ok) return "";
-      const text = await response.text();
-      return text.length <= 1000000 ? text : "";
-    } catch (_) {
-      return "";
-    }
-  }));
+    }));
+    downloaded.push(...batch);
+  }
 
   for (const code of downloaded.concat(inline)) {
     if (!code.trim()) continue;
