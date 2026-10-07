@@ -231,7 +231,7 @@ fn over_tls(target: uri.Url) -> Response {
     let marker = "@@SPRFST@@"
     let command = "curl -sS -L --max-time 20 --compressed " +
                   "-A 'SPRFST-Browser/0.1' " +
-                  "-w '\\n" + marker + "%{{http_code}} %{{content_type}} %{{url_effective}}' " +
+                  "-w '\\n" + marker + "%{{http_code}}\\t%{{content_type}}\\t%{{url_effective}}' " +
                   shell_quote(target.full()) + " 2>/dev/null"
     let out = sys.run(command)
     let at = last_index_of(out, marker)
@@ -243,7 +243,7 @@ fn over_tls(target: uri.Url) -> Response {
     }
     answer.body = out.slice(0, at)
     if answer.body.ends_with("\n") { answer.body = answer.body.slice(0, answer.body.len() - 1) }
-    let trailer = out.slice(at + marker.len(), out.len()).trim().split(" ")
+    let trailer = out.slice(at + marker.len(), out.len()).trim().split("\t")
     if trailer.len() >= 1 { answer.status = trailer[0].to_int() ?? 0 }
     if trailer.len() >= 2 {
         let kind = trailer[1]

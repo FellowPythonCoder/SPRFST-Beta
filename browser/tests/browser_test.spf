@@ -429,6 +429,12 @@ test "the settings page reflects the settings" {
     testing.yes(text_of(again.page).contains("on"), "and when it is on, it says so")
 }
 
+test "content type keeps html when it has a charset" {
+    let answer = fetch.read_message("HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n<html>ok</html>", fetch.Response { })
+    testing.same(answer.mime, "text/html", "charset does not change the mime")
+    testing.same(answer.body, "<html>ok</html>", "the html body is kept")
+}
+
 test "nothing is fetched twice in a row" {
     var store = fetch.Store { }
     var answer = fetch.Response { address: "http://x/", body: "<p>hi</p>", status: 200 }
