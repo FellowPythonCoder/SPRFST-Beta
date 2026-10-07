@@ -88,6 +88,10 @@ const vm = require("node:vm");
 
   const downloaded = await Promise.all(external.slice(0, 8).map(async (url) => {
     try {
+      if (url.startsWith("file:")) {
+        const text = fs.readFileSync(new URL(url), "utf8");
+        return text.length <= 1000000 ? text : "";
+      }
       const response = await fetch(url, { signal: AbortSignal.timeout(3000) });
       if (!response.ok) return "";
       const text = await response.text();

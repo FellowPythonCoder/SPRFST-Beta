@@ -222,9 +222,14 @@ final class PageView: NSView {
                 }
                 continue
             }
-            guard let url = URL(string: address), url.scheme == "http" || url.scheme == "https"
+            guard let url = URL(string: address),
+                  url.scheme == "http" || url.scheme == "https" || url.scheme == "file"
             else { continue }
             asked.insert(address)
+            if url.scheme == "file" {
+                if let picture = NSImage(contentsOf: url) { pictures[address] = picture }
+                continue
+            }
             let key = address as NSString
             if let cached = Self.imageCache.object(forKey: key) {
                 pictures[address] = cached

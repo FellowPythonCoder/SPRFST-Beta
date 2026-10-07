@@ -6,6 +6,8 @@
 
 module uri
 
+use std.http
+
 pub object Url {
     scheme: Text = "http"
     host: Text = ""
@@ -18,6 +20,7 @@ pub object Url {
 
     fn origin(self) -> Text {
         if self.scheme == "sprfst" { give "sprfst://" + self.host }
+        if self.scheme == "file" { give "file://" }
         var out = self.scheme + "://" + self.host
         if self.port != default_port(self.scheme) {
             out = out + ":" + self.port.to_text()
@@ -140,7 +143,8 @@ pub fn parse(raw: Text) -> Url {
 
     if path == "" { path = "/" }
     out.path = tidy(path)
-    out.ok = out.host != ""
+    if out.scheme == "file" { out.path = http.url_decode(out.path) }
+    out.ok = if out.scheme == "file" { out.path != "" } else { out.host != "" }
     give out
 }
 

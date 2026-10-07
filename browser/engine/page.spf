@@ -8,6 +8,7 @@
 module page
 
 use std.time
+use std.fs
 use uri
 use html
 use css
@@ -141,7 +142,18 @@ pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
     var source = ""
     var mime = "text/html"
 
-    if target.is_internal() or address.starts_with("sprfst:") {
+    if target.scheme == "file" {
+        if fs.exists(target.path) {
+            source = fs.read(target.path) ?? ""
+            out.status = 200
+            out.bytes = source.len()
+            mime = local_mime(target.path)
+        } else {
+            source = problem("This local page did not load", address, "The file does not exist.")
+            out.status = 0
+            out.error = "file not found"
+        }
+    } else if target.is_internal() or address.starts_with("sprfst:") {
         source = internal(address, session)
         out.status = 200
         out.secure = true
@@ -338,6 +350,16 @@ pub fn is_font_host(host: Text) -> Bool {
          name == "use.typekit.net" or name == "p.typekit.net" or
          name == "fast.fonts.net" or name == "cloud.typography.com" or
          name == "use.fontawesome.com" or name == "maxcdn.bootstrapcdn.com"
+}
+
+fn local_mime(file: Text) -> Text {
+    let lower = file.lower()
+    if lower.ends_with(".css") { give "text/css" }
+    if lower.ends_with(".json") { give "application/json" }
+    if lower.ends_with(".xml") { give "application/xml" }
+    if lower.ends_with(".svg") { give "image/svg+xml" }
+    if lower.ends_with(".txt") { give "text/plain" }
+    give "text/html"
 }
 
 pub fn escape(text: Text) -> Text {

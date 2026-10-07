@@ -14,6 +14,7 @@ module fetch
 use std.net
 use std.sys
 use std.time
+use std.fs
 use uri
 
 pub object Response {
@@ -54,7 +55,22 @@ pub object Store {
 
 
 pub fn get(target: uri.Url) -> Response {
+    if target.scheme == "file" { give over_file(target) }
     give follow(target, 5)
+}
+
+fn over_file(target: uri.Url) -> Response {
+    var answer = Response { address: target.full() }
+    if not fs.exists(target.path) {
+        answer.error = "file not found"
+        give answer
+    }
+    answer.body = fs.read(target.path) ?? ""
+    answer.bytes = answer.body.len()
+    answer.mime = if target.path.lower().ends_with(".css") { "text/css" } else { "text/html" }
+    answer.status = 200
+    answer.ok = true
+    give answer
 }
 
 pub task get_async(target: uri.Url) -> Response {
