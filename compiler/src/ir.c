@@ -325,7 +325,33 @@ static void lower_call(Lower *L, Expr *e, int dest) {
     reg_release(L, cmark);
 }
 
+/* `a?.b()` calls the method only when `a` is there, and is nil when it
+   is not. Without this the method runs on nil, and a native that hands
+   back a default — "" from a text method, 0 from a number one — makes
+   the whole chain look like it succeeded. The `??` that follows then
+   never fires, which is the opposite of what the reader expects. */
+static void lower_method_with(Lower *L, Expr *e, int dest, int recv_reg);
+
 static void lower_method(Lower *L, Expr *e, int dest) {
+    if (!e->as.method.optional || !e->as.method.recv) {
+        lower_method_with(L, e, dest, -1);
+        return;
+    }
+    int mark = reg_mark(L);
+    int r = reg_alloc(L);
+    lower_expr_to(L, e->as.method.recv, r);
+    int cond = reg_alloc(L);
+    emit(L, OP_ISNIL, cond, r, 0);
+    int br = emit(L, OP_BRTRUE, 0, cond, 0);
+    lower_method_with(L, e, dest, r);
+    int done = emit(L, OP_JUMP, 0, 0, 0);
+    patch(L, br, here(L));
+    emit(L, OP_NIL, dest, 0, 0);
+    patch(L, done, here(L));
+    reg_release(L, mark);
+}
+
+static void lower_method_with(Lower *L, Expr *e, int dest, int recv_reg) {
     int nid = e->as.method.builtin;
     /* enum variant construction  Color.Custom(1,2,3) */
     if (nid == -2) {
@@ -349,7 +375,8 @@ static void lower_method(Lower *L, Expr *e, int dest) {
         int nargs = 0;
         if (e->as.method.recv) {
             int sr = reg_alloc(L);
-            lower_expr_to(L, e->as.method.recv, sr);
+            if (recv_reg >= 0) emit(L, OP_MOVE, sr, recv_reg, 0);
+            else lower_expr_to(L, e->as.method.recv, sr);
             nargs = 1;
         }
         lower_args(L, &e->as.method.args, base + nargs);
@@ -365,7 +392,8 @@ static void lower_method(Lower *L, Expr *e, int dest) {
         int nargs = 0;
         if (e->as.method.recv) {
             int sr = reg_alloc(L);
-            lower_expr_to(L, e->as.method.recv, sr);
+            if (recv_reg >= 0) emit(L, OP_MOVE, sr, recv_reg, 0);
+            else lower_expr_to(L, e->as.method.recv, sr);
             nargs = 1;
         }
         lower_args(L, &e->as.method.args, base + nargs);
@@ -379,8 +407,10 @@ static void lower_method(Lower *L, Expr *e, int dest) {
     /* dynamic dispatch by name */
     int base = L->next_reg;
     int sr = reg_alloc(L);
-    if (e->as.method.recv) lower_expr_to(L, e->as.method.recv, sr);
-    else emit(L, OP_NIL, sr, 0, 0);
+    if (e->as.method.recv) {
+        if (recv_reg >= 0) emit(L, OP_MOVE, sr, recv_reg, 0);
+        else lower_expr_to(L, e->as.method.recv, sr);
+    } else emit(L, OP_NIL, sr, 0, 0);
     lower_args(L, &e->as.method.args, base + 1);
     int nargs = 1 + e->as.method.args.len;
     if (L->next_reg < base + nargs) L->next_reg = base + nargs;
@@ -511,7 +541,18 @@ static void lower_expr_to(Lower *L, Expr *e, int dest) {
             int mark = reg_mark(L);
             int o = reg_alloc(L);
             lower_expr_to(L, e->as.field.obj, o);
-            emit(L, OP_GETFIELD, dest, o, e->as.field.field_index);
+            if (e->as.field.optional) {
+                int cond = reg_alloc(L);
+                emit(L, OP_ISNIL, cond, o, 0);
+                int br = emit(L, OP_BRTRUE, 0, cond, 0);
+                emit(L, OP_GETFIELD, dest, o, e->as.field.field_index);
+                int done = emit(L, OP_JUMP, 0, 0, 0);
+                patch(L, br, here(L));
+                emit(L, OP_NIL, dest, 0, 0);
+                patch(L, done, here(L));
+            } else {
+                emit(L, OP_GETFIELD, dest, o, e->as.field.field_index);
+            }
             reg_release(L, mark);
             break;
         }

@@ -123,6 +123,35 @@ test "the standard library modules work" {
     testing.yes(core.between(5.0, 1.0, 10.0), "between")
 }
 
+~~ Two bugs that hid for a long time because no test had a loop body
+~~ with more than one line in it, and none checked what ?. does with a
+~~ receiver that is not there.
+test "a range loop with a long body still runs" {
+    var seen: [Int] = []
+    for n in 1...4 {
+        let doubled = n * 2
+        seen.push(doubled)
+    }
+    testing.same(seen, [2, 4, 6, 8], "inclusive range, four turns")
+
+    var counted = 0
+    for _n in 0..5 {
+        counted = counted + 1
+        if counted > 99 { break }
+    }
+    testing.same(counted, 5, "exclusive range, five turns")
+}
+
+test "a safe call on nothing gives nothing" {
+    let missing: Text? = nil
+    let there: Text? = "ada"
+    testing.same(missing?.upper() ?? "none", "none", "method on nil")
+    testing.same(there?.upper() ?? "none", "ADA", "method on a value")
+    testing.same(missing?.slice(0, 1)?.upper() ?? "?", "?", "a whole chain")
+    testing.yes(missing?.len() == nil, "the result really is nil")
+    testing.same(there?.len() ?? 0, 3, "and a real length when there is one")
+}
+
 bench "list building" {
     var xs: [Int] = []
     var i = 0

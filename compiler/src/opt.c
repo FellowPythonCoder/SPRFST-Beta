@@ -164,6 +164,18 @@ static int dead_code(IRProgram *p, IRFunc *f) {
                     if (in->b >= 0 && in->b < nregs) read[in->b] = true;
                 } else if (in->a >= 0 && in->a < nregs) read[in->a] = true;
                 break;
+            case OP_RANGE: {
+                /* c is not a plain register here: it packs the upper bound's
+                   register with the inclusive flag, (reg << 1) | inclusive.
+                   Decoding it is what keeps the bound alive — read as a plain
+                   register it names the wrong one, and the CONST that loads
+                   the bound is then removed as dead. The loop that follows
+                   runs zero times. */
+                if (in->b >= 0 && in->b < nregs) read[in->b] = true;
+                int hi = in->c >> 1;
+                if (hi >= 0 && hi < nregs) read[hi] = true;
+                break;
+            }
             case OP_SETFIELD:
                 if (in->a >= 0 && in->a < nregs) read[in->a] = true;
                 if (in->c >= 0 && in->c < nregs) read[in->c] = true;
