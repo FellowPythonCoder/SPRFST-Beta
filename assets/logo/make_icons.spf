@@ -1,0 +1,140 @@
+~~ The SPRFST mark, drawn by SPRFST.
+~~ Run with:  sprfst run assets/logo/make_icons.spf
+use std.io
+use std.draw
+use std.math
+use std.fs
+
+const INK = 11            ~~ #0B0B0D deep black
+const EDGE = 29           ~~ #1D1D20 panel edge
+
+~~ The bolt outline, in a 512 x 512 design space.
+fn bolt_points() -> [[Num]] {
+    give [[300.0, 64.0], [186.0, 272.0], [266.0, 272.0], [212.0, 448.0],
+          [430.0, 214.0], [336.0, 214.0], [404.0, 64.0]]
+}
+
+~~ Amber gradient sampled across the diagonal, so the icon has depth.
+fn amber_at(x: Int, y: Int, size: Int) -> Int {
+    let t = math.clamp((x + y).to_num() / (2.0 * size.to_num()), 0.0, 1.0)
+    if t < 0.45 {
+        let u = t / 0.45
+        give draw.rgb((255.0).to_int(),
+                      (196.0 + (161.0 - 196.0) * u).to_int(),
+                      (107.0 + (54.0 - 107.0) * u).to_int())
+    }
+    let u = (t - 0.45) / 0.55
+    give draw.rgb((255.0 + (232.0 - 255.0) * u).to_int(),
+                  (161.0 + (118.0 - 161.0) * u).to_int(),
+                  (54.0 + (26.0 - 54.0) * u).to_int())
+}
+
+~~ Scanline fill with the even-odd rule, written out in full so the
+~~ drawing does not depend on anything outside the language.
+fn fill_poly(canvas: Any, pts: [[Num]], colour: Int, scale: Num, size: Int) {
+    var lowest = 1000000.0
+    var highest = 0.0
+    for p in pts {
+        if p[1] < lowest { lowest = p[1] }
+        if p[1] > highest { highest = p[1] }
+    }
+    let top = math.max(0.0, lowest * scale).to_int()
+    let bottom = math.min((size - 1).to_num(), highest * scale).to_int()
+
+    var y = top
+    while y <= bottom {
+        let yc = y.to_num() + 0.5
+        var crossings = []
+        var i = 0
+        while i < pts.len() {
+            let a = pts[i]
+            let b = pts[(i + 1) % pts.len()]
+            let ay = a[1] * scale
+            let by = b[1] * scale
+            if (ay <= yc and by > yc) or (by <= yc and ay > yc) {
+                let t = (yc - ay) / (by - ay)
+                crossings.push(a[0] * scale + t * (b[0] * scale - a[0] * scale))
+            }
+            i = i + 1
+        }
+        let xs = crossings.sort()
+        var k = 0
+        while k + 1 < xs.len() {
+            var x = math.max(0.0, xs[k]).to_int()
+            let x2 = math.min((size - 1).to_num(), xs[k + 1]).to_int()
+            while x <= x2 {
+                draw.pixel(canvas, x, y, if colour < 0 { amber_at(x, y, size) } else { colour })
+                x = x + 1
+            }
+            k = k + 2
+        }
+        y = y + 1
+    }
+}
+
+fn rounded_background(canvas: Any, size: Int, radius: Num) {
+    let bg = draw.rgb(INK, INK, 13)
+    var y = 0
+    while y < size {
+        var x = 0
+        while x < size {
+            let fx = x.to_num()
+            let fy = y.to_num()
+            let s = size.to_num()
+            var inside = true
+            ~~ clip the four corners to a circle of the given radius
+            if fx < radius and fy < radius {
+                inside = (fx - radius) * (fx - radius) + (fy - radius) * (fy - radius) <= radius * radius
+            }
+            if fx > s - radius and fy < radius {
+                inside = (fx - (s - radius)) * (fx - (s - radius)) + (fy - radius) * (fy - radius) <= radius * radius
+            }
+            if fx < radius and fy > s - radius {
+                inside = (fx - radius) * (fx - radius) + (fy - (s - radius)) * (fy - (s - radius)) <= radius * radius
+            }
+            if fx > s - radius and fy > s - radius {
+                inside = (fx - (s - radius)) * (fx - (s - radius)) + (fy - (s - radius)) * (fy - (s - radius)) <= radius * radius
+            }
+            if inside { draw.pixel(canvas, x, y, bg) }
+            x = x + 1
+        }
+        y = y + 1
+    }
+}
+
+fn draw_mark(size: Int) -> Any {
+    let canvas = draw.canvas(size, size)
+    draw.clear(canvas, draw.rgb(0, 0, 0))
+    let scale = size.to_num() / 512.0
+    rounded_background(canvas, size, 112.0 * scale)
+
+    ~~ speed trails behind the bolt
+    if size >= 64 {
+        let trail = draw.rgb(44, 32, 20)
+        draw.line(canvas, (96.0 * scale).to_int(), (196.0 * scale).to_int(),
+                          (208.0 * scale).to_int(), (196.0 * scale).to_int(), trail)
+        draw.line(canvas, (72.0 * scale).to_int(), (256.0 * scale).to_int(),
+                          (168.0 * scale).to_int(), (256.0 * scale).to_int(), draw.rgb(36, 27, 18))
+        draw.line(canvas, (104.0 * scale).to_int(), (316.0 * scale).to_int(),
+                          (196.0 * scale).to_int(), (316.0 * scale).to_int(), draw.rgb(30, 23, 16))
+    }
+
+    ~~ the bolt, shaded with the amber gradient (-1 means "use the gradient")
+    fill_poly(canvas, bolt_points(), -1, scale, size)
+    give canvas
+}
+
+fn main() {
+    let sizes = [16, 32, 64, 128, 256, 512, 1024]
+    fs.mkdir("assets/logo/png")
+    for size in sizes {
+        let canvas = draw_mark(size)
+        let name = "assets/logo/png/sprfst-{size}.png"
+        if draw.save_png(canvas, name) {
+            io.say("wrote {name}")
+        } else {
+            io.say("could not write {name}")
+        }
+    }
+    io.say("done — {sizes.len()} sizes")
+}

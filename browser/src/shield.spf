@@ -1,0 +1,259 @@
+~~ =====================================================================
+~~  SPRFST Browser — the Shield
+~~
+~~  Requests are checked before they are made, so a blocked advert is
+~~  never fetched, never parsed and never laid out. Nothing is hidden
+~~  after the fact.
+~~
+~~  Rule syntax, which is ours and is plain text:
+~~
+~~      ||ads.example.com^        the host and every host under it
+~~      ||example.com/ads/        a host together with a path
+~~      /pagead/                  anywhere in the address
+~~      |http://tracker.          the address starts like this
+~~      .gif|                     the address ends like this
+~~      @@||example.com^          an exception: never block this
+~~      ||beacon.io^$third-party  only when it is not the site you are on
+~~      ##.ad-banner              hide these elements everywhere
+~~      news.example##.promo      hide these elements on one site
+~~      ~~ a comment
+~~ =====================================================================
+module shield
+
+use std.fs
+use uri
+
+pub object Rule {
+    pattern: Text = ""
+    kind: Text = "part"        ~~ part, start or end
+    third: Bool = false
+    allow: Bool = false
+}
+
+pub object Shield {
+    block_hosts: Map<Text, Bool> = [:]
+    third_hosts: Map<Text, Bool> = [:]   ~~ blocked only away from home
+    allow_hosts: Map<Text, Bool> = [:]
+    rules: [Rule] = []
+    hide_all: [Text] = []
+    hide_site: Map<Text, [Text]> = [:]
+    enabled: Bool = true
+    loaded: Int = 0
+    blocked: Int = 0
+    passed: Int = 0
+    hidden: Int = 0
+
+    ~~ ---------------------------------------------------------- rules
+    fn add(self, raw: Text) {
+        var line = raw.trim()
+        if line == "" or line.starts_with("~~") or line.starts_with("!") or line.starts_with("#!") {
+            give
+        }
+
+        let cosmetic = line.index_of("##")
+        if cosmetic >= 0 {
+            let site = line.slice(0, cosmetic).trim().lower()
+            let selector = line.slice(cosmetic + 2, line.len()).trim()
+            if selector == "" { give }
+            if site == "" {
+                self.hide_all.push(selector)
+            } else {
+                var list = self.hide_site.get(site) ?? []
+                list.push(selector)
+                self.hide_site.set(site, list)
+            }
+            self.loaded = self.loaded + 1
+            give
+        }
+
+        var allow = false
+        if line.starts_with("@@") {
+            allow = true
+            line = line.slice(2, line.len())
+        }
+
+        var third = false
+        let money = line.index_of("$")
+        if money > 0 {
+            let options = line.slice(money + 1, line.len()).lower()
+            line = line.slice(0, money)
+            for option in options.split(",") {
+                let name = option.trim()
+                if name == "third-party" or name == "3p" { third = true }
+            }
+        }
+
+        if line.starts_with("||") {
+            var host = line.slice(2, line.len()).lower()
+            if host.ends_with("^") { host = host.slice(0, host.len() - 1) }
+            if host.contains("/") {
+                self.rules.push(Rule { pattern: host, kind: "part", third: third, allow: allow })
+            } else if host != "" {
+                if allow { self.allow_hosts.set(host, true) }
+                else if third { self.third_hosts.set(host, true) }
+                else { self.block_hosts.set(host, true) }
+            }
+            self.loaded = self.loaded + 1
+            give
+        }
+
+        var kind = "part"
+        if line.starts_with("|") {
+            kind = "start"
+            line = line.slice(1, line.len())
+        } else if line.ends_with("|") {
+            kind = "end"
+            line = line.slice(0, line.len() - 1)
+        }
+        if line == "" { give }
+        self.rules.push(Rule { pattern: line.lower(), kind: kind, third: third, allow: allow })
+        self.loaded = self.loaded + 1
+    }
+
+    fn load(self, text: Text) {
+        for line in text.lines() { self.add(line) }
+    }
+
+    ~~ ------------------------------------------------------- matching
+    ~~ A host rule covers every host beneath it, so one entry for
+    ~~ "doubleclick.net" also covers "stats.g.doubleclick.net".
+    fn host_listed(self, table: Map<Text, Bool>, host: Text) -> Bool {
+        var rest = host
+        while rest != "" {
+            if table.has(rest) { give true }
+            let dot = rest.index_of(".")
+            if dot < 0 { break }
+            rest = rest.slice(dot + 1, rest.len())
+        }
+        give false
+    }
+
+    fn matches(self, rule: Rule, address: Text, third: Bool) -> Bool {
+        if rule.third and not third { give false }
+        if rule.kind == "start" { give address.starts_with(rule.pattern) }
+        if rule.kind == "end" { give address.ends_with(rule.pattern) }
+        give address.contains(rule.pattern)
+    }
+
+    ~~ Should this request be stopped? Exceptions are considered first.
+    fn blocks(self, target: uri.Url, page_host: Text) -> Bool {
+        if not self.enabled { give false }
+        if not target.ok { give false }
+        if target.is_internal() { give false }
+
+        let address = target.full().lower()
+        let third = uri.site_of(target.host) != uri.site_of(page_host)
+
+        if self.host_listed(self.allow_hosts, target.host) { give false }
+        for rule in self.rules {
+            if rule.allow and self.matches(rule, address, third) { give false }
+        }
+        if self.host_listed(self.block_hosts, target.host) { give true }
+        if third and self.host_listed(self.third_hosts, target.host) { give true }
+        for rule in self.rules {
+            if not rule.allow and self.matches(rule, address, third) { give true }
+        }
+        give false
+    }
+
+    ~~ The same question, but it keeps the score.
+    fn check(self, target: uri.Url, page_host: Text) -> Bool {
+        let hit = self.blocks(target, page_host)
+        if hit { self.blocked = self.blocked + 1 }
+        else { self.passed = self.passed + 1 }
+        give hit
+    }
+
+    ~~ Selectors to drop from the document on this site.
+    fn hiding(self, host: Text) -> [Text] {
+        if not self.enabled { give [] }
+        var out = self.hide_all.copy()
+        var rest = uri.strip_www(host)
+        while rest != "" {
+            for selector in self.hide_site.get(rest) ?? [] { out.push(selector) }
+            let dot = rest.index_of(".")
+            if dot < 0 { break }
+            rest = rest.slice(dot + 1, rest.len())
+        }
+        give out
+    }
+
+    fn note_hidden(self, howmany: Int) {
+        self.hidden = self.hidden + howmany
+    }
+
+    fn reset_counts(self) {
+        self.blocked = 0
+        self.passed = 0
+        self.hidden = 0
+    }
+
+    fn summary(self) -> Text {
+        if not self.enabled { give "shield off" }
+        if self.blocked == 0 and self.hidden == 0 { give "nothing to block" }
+        give "{self.blocked} blocked, {self.hidden} hidden"
+    }
+}
+
+~~ Build a shield from a rules file, falling back to a small built-in
+~~ list so the browser is never unprotected.
+~~ Build a shield from a rules file, falling back to the list that is
+~~ compiled in, so the browser is never unprotected.
+pub fn from_file(path: Text) -> Shield {
+    var guard = Shield { }
+    let text = fs.read(path)
+    guard.load(text ?? built_in())
+    give guard
+}
+
+~~ The rules that ship inside the engine itself.
+pub fn built_in() -> Text {
+    give [
+        "||doubleclick.net^",
+        "||googlesyndication.com^",
+        "||googleadservices.com^",
+        "||google-analytics.com^",
+        "||googletagmanager.com^",
+        "||googletagservices.com^",
+        "||adservice.google.com^",
+        "||adnxs.com^",
+        "||criteo.com^",
+        "||criteo.net^",
+        "||taboola.com^",
+        "||outbrain.com^",
+        "||scorecardresearch.com^",
+        "||quantserve.com^",
+        "||rubiconproject.com^",
+        "||pubmatic.com^",
+        "||openx.net^",
+        "||casalemedia.com^",
+        "||moatads.com^",
+        "||amazon-adsystem.com^",
+        "||connect.facebook.net^",
+        "||hotjar.com^",
+        "||mixpanel.com^",
+        "||segment.io^",
+        "||branch.io^",
+        "||crazyegg.com^",
+        "/pagead/",
+        "/doubleclick/",
+        "/adservice/",
+        "/banner_ad",
+        "/advertisement.",
+        "##.ad",
+        "##.ads",
+        "##.advert",
+        "##.advertisement",
+        "##.ad-banner",
+        "##.ad-slot",
+        "##.ad-container",
+        "##.sponsored",
+        "##.promo-banner",
+        "##.newsletter-popup",
+        "##.cookie-banner",
+        "##.cookie-consent",
+        "##.paywall",
+        "##.subscribe-overlay",
+        "##.social-share"
+    ].join("\n")
+}

@@ -1,0 +1,1397 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SPRFST — the tour</title>
+<meta name="description" content="Ten lessons that cover the whole of the SPRFST language, with the real compiler behind every Run button.">
+<link rel="stylesheet" href="tour.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M19 2 7 18h7l-3 12 14-17h-8z' fill='%23ffa136'/></svg>">
+</head>
+<body>
+
+<!-- ======================================================== the rail -->
+<aside id="rail">
+    <div class="brand">
+        <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+            <defs>
+                <linearGradient id="bolt" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#ffc877"/>
+                    <stop offset="1" stop-color="#ff8c12"/>
+                </linearGradient>
+            </defs>
+            <path d="M19.5 1.5 6 18.2h7.2L11 30.5 26 13.1h-8.3z" fill="url(#bolt)"/>
+            <path d="M3 9.5h6M1.5 15h4.2M3 20.5h4" stroke="#c97a1f" stroke-width="1.6"
+                  stroke-linecap="round" opacity=".85"/>
+        </svg>
+        <div>
+            <h1>SPRFST</h1>
+            <p>THE TOUR · TEN LESSONS</p>
+        </div>
+    </div>
+
+    <div class="score">
+        <svg class="ring" viewBox="0 0 46 46" aria-hidden="true">
+            <circle class="track" cx="23" cy="23" r="19"></circle>
+            <circle class="live" id="ring" cx="23" cy="23" r="19"
+                    stroke-dasharray="0 119.4"></circle>
+        </svg>
+        <div>
+            <b id="points">0</b>
+            <span id="rank">Newcomer · 0 of 10</span>
+        </div>
+    </div>
+
+    <div id="live" title="Start new/serve.spf to run code on this page">
+        <span class="dot"></span>
+        <span id="livetext">reading only — runner is off</span>
+    </div>
+
+    <nav id="nav"></nav>
+
+    <div class="railfoot">
+        Everything here runs on your machine.<br>
+        <a href="#finish">What this covers</a>
+    </div>
+</aside>
+
+<main>
+
+<!-- =================================================== 1. the pipeline -->
+<section class="lesson" id="l1" data-n="1" data-title="How a program is made">
+    <div class="eyebrow">Lesson 1 of 10 · The beginning</div>
+    <h2>How a program is made</h2>
+    <p class="sell">SPRFST is a language of its own: your file is read, understood,
+    checked, turned into instructions and run — by one program, in about
+    the time it takes to let go of the return key.</p>
+
+    <div class="visual">
+        <svg viewBox="0 0 760 180" role="img" aria-label="Source text becomes tokens, a tree, checked types, instructions, and output">
+            <rect class="box-amber" x="6" y="52" width="92" height="66" rx="9"/>
+            <text class="lbl-a" x="52" y="78" text-anchor="middle">main.spf</text>
+            <text class="lbl-s" x="52" y="96" text-anchor="middle">what you wrote</text>
+
+            <g class="wire pulse"><path d="M104 85 h40"/></g>
+
+            <rect class="box" x="148" y="52" width="88" height="66" rx="9"/>
+            <text class="lbl" x="192" y="78" text-anchor="middle">lexer</text>
+            <text class="lbl-s" x="192" y="96" text-anchor="middle">words</text>
+
+            <g class="wire pulse"><path d="M242 85 h34"/></g>
+
+            <rect class="box" x="280" y="52" width="88" height="66" rx="9"/>
+            <text class="lbl" x="324" y="78" text-anchor="middle">parser</text>
+            <text class="lbl-s" x="324" y="96" text-anchor="middle">a tree</text>
+
+            <g class="wire pulse"><path d="M374 85 h34"/></g>
+
+            <rect class="box-green" x="412" y="52" width="94" height="66" rx="9"/>
+            <text class="lbl-g" x="459" y="76" text-anchor="middle">types</text>
+            <text class="lbl-s" x="459" y="94" text-anchor="middle">is it sound?</text>
+
+            <g class="wire pulse"><path d="M512 85 h34"/></g>
+
+            <rect class="box" x="550" y="52" width="94" height="66" rx="9"/>
+            <text class="lbl" x="597" y="78" text-anchor="middle">instructions</text>
+            <text class="lbl-s" x="597" y="96" text-anchor="middle">optimised</text>
+
+            <g class="wire-a"><path d="M650 85 h44" marker-end="url(#tip)"/></g>
+            <defs><marker id="tip" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+                <path d="M0 0 L7 3.5 L0 7 z" fill="#c97a1f"/></marker></defs>
+            <text class="lbl-a" x="724" y="82" text-anchor="middle">output</text>
+
+            <path class="wire" d="M459 122 v24 h-407 v-24" stroke-dasharray="3 5"/>
+            <text class="lbl-s" x="255" y="162" text-anchor="middle">
+                an error here names the line, the column and a way out — nothing runs until it is sound
+            </text>
+        </svg>
+        <div class="caption">One binary does all of it. No build file, no toolchain to install.</div>
+    </div>
+
+    <h3 class="step">The smallest whole program</h3>
+    <p>Three things worth noticing: <code class="k">use</code> brings in a part
+    of the library, nothing is in scope by accident. <code class="k">fn main</code>
+    is where every program begins. And a comment is two tildes — this
+    language is not pretending to be C.</p>
+
+    <div class="code" data-example>
+        <div class="bar"><span>hello.spf</span><span class="grow"></span>
+            <button class="run">Run</button></div>
+        <div class="edit"><pre class="paint"><code></code></pre><textarea spellcheck="false">use std.io
+
+fn main() {
+    io.say("hello")
+    io.say(2 + 2)        ~~ not only text
+}</textarea></div>
+        <div class="out" data-recorded="hello
+4"></div>
+    </div>
+
+    <p><code class="k">io.say</code> took a number without being asked to
+    convert it, and printed a line break for you. Change the 2s and press
+    Run again — if the runner is on, that really compiles.</p>
+
+    <div class="note"><b>When it goes wrong.</b> Break something on purpose —
+    type <code class="k">io.sayy</code> — and you get the code, the file, the
+    line, the column, the underline, and the six functions that module
+    actually has. Good errors are not decoration; they are most of what it
+    feels like to use a language.</div>
+
+    <div class="task" data-task="1" data-expect="SPRFST
+10">
+        <span class="worth">100 points</span>
+        <h4>Your turn</h4>
+        <p class="ask">Print two lines: the word <b>SPRFST</b>, then the number
+        ten — worked out as a sum, not typed as text.</p>
+        <div class="wants">SPRFST
+10</div>
+        <div class="code">
+            <div class="edit tall"><pre class="paint"><code></code></pre><textarea spellcheck="false">use std.io
+
+fn main() {
+    ~~ two lines
+}</textarea></div>
+            <div class="out"></div>
+        </div>
+        <div class="row">
+            <button class="go check">Check my answer</button>
+            <button class="runtask">Just run it</button>
+            <button class="hint">Hint</button>
+            <button class="reveal">Show me</button>
+            <span class="grow"></span>
+            <span class="verdict"></span>
+        </div>
+        <div class="hinttext" hidden>io.say takes any value. 5 * 2 is a value.</div>
+        <div class="answertext" hidden>use std.io
+
+fn main() {
+    io.say("SPRFST")
+    io.say(5 * 2)
+}</div>
+    </div>
+    <hr class="end">
+</section>
+
+<!-- =================================================== 2. values -->
+<section class="lesson" id="l2" data-n="2" data-title="Values and names">
+    <div class="eyebrow">Lesson 2 of 10 · The basics</div>
+    <h2>Values and names</h2>
+    <p class="sell">Two ways to name a thing, five kinds of thing to name, and
+    one rule about division that most languages get wrong.</p>
+
+    <div class="visual">
+        <svg viewBox="0 0 760 240" role="img" aria-label="let is sealed, var can change; and seven divided by two is three and a half">
+            <rect class="box-green" x="20" y="24" width="300" height="86" rx="11"/>
+            <text class="mono lbl-g" x="40" y="52">let name = "Ada"</text>
+            <text class="lbl-s" x="40" y="76">sealed. Pointing it somewhere else</text>
+            <text class="lbl-s" x="40" y="94">is a mistake the compiler catches.</text>
+            <path d="M286 44 v-7 a9 9 0 0 1 18 0 v7" class="wire" stroke="#73d08b"/>
+            <rect x="282" y="44" width="26" height="19" rx="4" fill="#73d08b" opacity=".8"/>
+
+            <rect class="box-amber" x="20" y="126" width="300" height="86" rx="11"/>
+            <text class="mono lbl-a" x="40" y="154">var count = 0</text>
+            <text class="lbl-s" x="40" y="178">open. count = count + 1 is fine,</text>
+            <text class="lbl-s" x="40" y="196">and the type still never changes.</text>
+            <path d="M286 146 v-7 a9 9 0 0 1 18 0" class="wire" stroke="#ffa136"/>
+            <rect x="282" y="146" width="26" height="19" rx="4" fill="#ffa136" opacity=".8"/>
+
+            <line x1="360" y1="20" x2="360" y2="220" class="wire" stroke-dasharray="3 6"/>
+
+            <text class="lbl" x="400" y="46">7 / 2</text>
+            <rect class="box" x="400" y="60" width="150" height="48" rx="9"/>
+            <text class="mono lbl-a" x="475" y="90" text-anchor="middle">3.5</text>
+            <text class="lbl-s" x="400" y="128">a Num. The half is not thrown away</text>
+            <text class="lbl-s" x="400" y="146">behind your back.</text>
+
+            <text class="lbl" x="400" y="186">to_int(7 / 2)</text>
+            <rect class="box" x="580" y="60" width="150" height="48" rx="9"/>
+            <text class="mono lbl" x="655" y="90" text-anchor="middle">3</text>
+            <text class="lbl-s" x="580" y="128">an Int, because you asked for</text>
+            <text class="lbl-s" x="580" y="146">one, in writing.</text>
+            <path class="wire-a" d="M520 180 h190 v-60" marker-end="url(#tip)"/>
+        </svg>
+        <div class="caption">Int, Num, Text, Bool, Nil — and the compiler works out which, from the value.</div>
+    </div>
+
+    <p>You never wrote a type above and yet everything has one. That is
+    inference, not absence: give <code class="k">count</code> a piece of text
+    later and the program will not build.</p>
+
+    <div class="code" data-example>
+        <div class="bar"><span>values.spf</span><span class="grow"></span>
+            <button class="run">Run</button></div>
+        <div class="edit"><pre class="paint"><code></code></pre><textarea spellcheck="false">use std.io
+
+fn main() {
+    let name = "Ada"
+    var count = 0
+    count = count + 1
+    io.say("{name} has {count}")
+    io.say("{7 / 2}  {to_int(7 / 2)}  {17 % 5}")
+    io.say("{type_of(name)}  {type_of(count)}  {type_of(7 / 2)}")
+}</textarea></div>
+        <div class="out" data-recorded="Ada has 1
+3.5  3  2
+Text  Int  Num"></div>
+    </div>
+
+    <p>Anything inside braces in a piece of text is filled in — a name, a
+    sum, a whole function call. If you ever need a real brace, double it.</p>
+
+    <table class="ref">
+        <tr><th>type</th><th>holds</th><th>written</th></tr>
+        <tr><td>Int</td><td>whole numbers</td><td>42, 0 - 7</td></tr>
+        <tr><td>Num</td><td>fractions</td><td>3.5, 1.0e9</td></tr>
+        <tr><td>Text</td><td>characters</td><td>"hello {name}"</td></tr>
+        <tr><td>Bool</td><td>yes or no</td><td>true, false</td></tr>
+        <tr><td>Nil</td><td>nothing at all</td><td>nil</td></tr>
+    </table>
+
+    <div class="task" data-task="2" data-expect="3.5
+3">
+        <span class="worth">100 points</span>
+        <h4>Your turn</h4>
+        <p class="ask">Seven pounds, two people. Print the exact share, then
+        the whole-pound share.</p>
+        <div class="wants">3.5
+3</div>
+        <div class="code">
+            <div class="edit tall"><pre class="paint"><code></code></pre><textarea spellcheck="false">use std.io
+
+fn main() {
+    let price = 7
+    let people = 2
+    ~~ two lines
+}</textarea></div>
+            <div class="out"></div>
+        </div>
+        <div class="row">
+            <button class="go check">Check my answer</button>
+            <button class="runtask">Just run it</button>
+            <button class="hint">Hint</button>
+            <button class="reveal">Show me</button>
+            <span class="grow"></span>
+            <span class="verdict"></span>
+        </div>
+        <div class="hinttext" hidden>Dividing two Ints already gives you the exact answer. to_int takes the whole part of it.</div>
+        <div class="answertext" hidden>use std.io
+
+fn main() {
+    let price = 7
+    let people = 2
+    io.say("{price / people}")
+    io.say("{to_int(price / people)}")
+}</div>
+    </div>
+    <hr class="end">
+</section>
+
+<!-- =================================================== 3. control -->
+<section class="lesson" id="l3" data-n="3" data-title="Choosing and repeating">
+    <div class="eyebrow">Lesson 3 of 10 · The basics</div>
+    <h2>Choosing and repeating</h2>
+    <p class="sell">The branch has a value, the operators are words, and a
+    loop has two ways out.</p>
+
+    <div class="visual">
+        <svg viewBox="0 0 760 250" role="img" aria-label="if gives back a value; a loop with skip and break">
+            <text class="mono lbl-a" x="20" y="28">if hour &lt; 12 { "morning" } else { "evening" }</text>
+            <path class="wire" d="M36 40 v22 h120 v16"/>
+            <path class="wire" d="M36 40 v22 h-0"/>
+            <rect class="box" x="86" y="78" width="140" height="42" rx="9"/>
+            <text class="mono lbl" x="156" y="104" text-anchor="middle">"morning"</text>
+            <path class="wire" d="M36 62 h300 v16"/>
+            <rect class="box" x="266" y="78" width="140" height="42" rx="9"/>
+            <text class="mono lbl" x="336" y="104" text-anchor="middle">"evening"</text>
+            <path class="wire-a" d="M156 124 v18 h180 v-18" />
+            <path class="wire-a" d="M246 142 v22" marker-end="url(#tip)"/>
+            <rect class="box-amber" x="176" y="168" width="140" height="42" rx="9"/>
+            <text class="mono lbl-a" x="246" y="194" text-anchor="middle">let part = …</text>
+            <text class="lbl-s" x="246" y="232" text-anchor="middle">
+                it is an expression, so it has a value — that is why there is no ? : operator
+            </text>
+
+            <line x1="440" y1="12" x2="440" y2="238" class="wire" stroke-dasharray="3 6"/>
+
+            <circle cx="590" cy="112" r="62" class="wire" fill="none"/>
+            <path d="M590 50 a62 62 0 0 1 54 31" class="wire-a pulse" stroke-width="2.5"/>
+            <text class="mono lbl-a" x="590" y="108" text-anchor="middle">for n in 1...20</text>
+            <text class="lbl-s" x="590" y="128" text-anchor="middle">1,2,3 … 20</text>
+            <path class="wire" d="M528 112 h-40" marker-end="url(#tip)"/>
+            <text class="lbl-g" x="486" y="108" text-anchor="end">skip</text>
+            <text class="lbl-s" x="486" y="124" text-anchor="end">next turn</text>
+            <path class="wire" d="M652 112 h40" marker-end="url(#tip)"/>
+            <text class="lbl-r" x="700" y="108">break</text>
+            <text class="lbl-s" x="700" y="124">out</text>
+            <text class="lbl-s" x="590" y="206" text-anchor="middle">1..20 stops at 19 · 1...20 includes it</text>
+        </svg>
+        <div class="caption">Also <b>while</b> for a condition, and a bare <b>loop</b> when you will decide the ending yourself.</div>
+    </div>
+
+    <div class="code" data-example>
+        <div class="bar"><span>choosing.spf</span><span class="grow"></span>
+            <button class="run">Run</button></div>
+        <div class="edit"><pre class="paint"><code></code></pre><textarea spellcheck="false">use std.io
+
+fn main() {
+    let hour = 20
+    let part = if hour < 12 { "morning" } else { "evening" }
+    io.say(part)
+
+    var shown = 0
+    for n in 1...20 {
+        if n % 3 != 0 { skip }
+        shown = shown + 1
+        if shown > 3 { break }
+        io.say("{n}")
+    }
+}</textarea></div>
+        <div class="out" data-recorded="evening
+3
+6
+9"></div>
+    </div>
+
+    <p>The operators are <code class="k">and</code>, <code class="k">or</code>
+    and <code class="k">not</code>. You read them aloud and they mean what
+    they say.</p>
+
+    <div class="task" data-task="3" data-expect="4
+8
+12">
+        <span class="worth">100 points</span>
+        <h4>Your turn</h4>
+        <p class="ask">Count from 1 to 12 and print only the numbers that
+        divide exactly by four.</p>
+        <div class="wants">4
+8
+12</div>
+        <div class="code">
+            <div class="edit tall"><pre class="paint"><code></code></pre><textarea spellcheck="false">use std.io
+
+fn main() {
+    for n in 1...12 {
+        ~~ skip the ones you do not want
+    }
+}</textarea></div>
+            <div class="out"></div>
+        </div>
+        <div class="row">
+            <button class="go check">Check my answer</button>
+            <button class="runtask">Just run it</button>
+            <button class="hint">Hint</button>
+            <button class="reveal">Show me</button>
+            <span class="grow"></span>
+            <span class="verdict"></span>
+        </div>
+        <div class="hinttext" hidden>n % 4 is the remainder. If it is not zero, skip.</div>
+        <div class="answertext" hidden>use std.io
+
+fn main() {
+    for n in 1...12 {
+        if n % 4 != 0 { skip }
+        io.say("{n}")
+    }
+}</div>
+    </div>
+    <hr class="end">
+</section>
+
+<!-- =================================================== 4. functions -->
+<section class="lesson" id="l4" data-n="4" data-title="Functions">
+    <div class="eyebrow">Lesson 4 of 10 · Building blocks</div>
+    <h2>Functions</h2>
+    <p class="sell">Named work with its shape written on the outside — and
+    functions are values, so one can be handed to another.</p>
+
+    <div class="visual">
+        <svg viewBox="0 0 760 240" role="img" aria-label="a function as a machine with typed inlets, and a pipeline of two doubles">
+            <text class="mono lbl-a" x="20" y="26">fn double(n: Int) -&gt; Int =&gt; n * 2</text>
+
+            <rect class="box" x="120" y="52" width="190" height="84" rx="12"/>
+            <text class="lbl" x="215" y="88" text-anchor="middle">double</text>
+            <text class="lbl-s" x="215" y="110" text-anchor="middle">n * 2</text>
+            <path class="wire-a" d="M50 94 h62" marker-end="url(#tip)"/>
+            <text class="mono lbl" x="28" y="90">10</text>
+            <text class="lbl-s" x="28" y="108">Int</text>
+            <path class="wire-a" d="M312 94 h62" marker-end="url(#tip)"/>
+            <text class="mono lbl-a" x="382" y="90">20</text>
+            <text class="lbl-s" x="382" y="108">Int</text>
+            <text class="lbl-s" x="215" y="160" text-anchor="middle">
+                the types are the contract; break it three files away and you are told here
+            </text>
+
+            <line x1="20" y1="180" x2="740" y2="180" class="wire" stroke-dasharray="3 6"/>
+
+            <text class="mono lbl-a" x="20" y="212">5 |&gt; double |&gt; double</text>
+            <circle cx="330" cy="206" r="15" class="box-amber"/>
+            <text class="mono lbl-a" x="330" y="211" text-anchor="middle">5</text>
+            <path class="wire pulse" d="M348 206 h54"/>
+            <rect class="box" x="402" y="190" width="78" height="32" rx="8"/>
+            <text class="lbl" x="441" y="211" text-anchor="middle">double</text>
+            <path class="wire pulse" d="M482 206 h40"/>
+            <rect class="box" x="522" y="190" width="78" height="32" rx="8"/>
+            <text class="lbl" x="561" y="211" text-anchor="middle">double</text>
+            <path class="wire-a" d="M602 206 h40" marker-end="url(#tip)"/>
+            <text class="mono lbl-a" x="652" y="211">20</text>
+        </svg>
+        <div class="caption">Left to right, in the order it happens — that is what <b>|&gt;</b> is for.</div>
+    </div>
+
+    <div class="code" data-example>
+        <div class="bar"><span>functions.spf</span><span class="grow"></span>
+            <button class="run">Run</button></div>
+        <div class="edit"><pre class="paint"><code></code></pre><textarea spellcheck="false">use std.io
+
+fn double(n: Int) -> Int => n * 2
+
+fn apply_twice(value: Int, change: fn(Int) -> Int) -> Int {
+    give change(change(value))
+}
+
+fn main() {
+    io.say("{apply_twice(10, double)}")
+    io.say("{5 |> double |> double}")
+    let add = fn(a: Int, b: Int) => a + b
+    io.say("{add(3, 4)}")
+}</textarea></div>
+        <div class="out" data-recorded="40
+20
+7"></div>
+    </div>
+
+    <p><code class="k">give</code> hands the answer back. A function that is
+    one expression drops the braces and uses <code class="k">=&gt;</code>.
+    <code class="k">apply_twice</code> takes another function as an ordinary
+    argument, and <code class="k">add</code> is a function with no name at
+    all.</p>
+
+    <div class="task" data-task="4" data-expect="READY!">
+        <span class="worth">100 points</span>
+        <h4>Your turn</h4>
+        <p class="ask">Write <code class="k">shout</code>, which upper-cases a
+        word and adds an exclamation mark, then send "ready" through it with
+        the pipe.</p>
+        <div class="wants">READY!</div>
+        <div class="code">
+            <div class="edit tall"><pre class="paint"><code></code></pre><textarea spellcheck="false">use std.io
+
+~~ fn shout here
+
+fn main() {
+    io.say("ready" |> shout)
+}</textarea></div>
+            <div class="out"></div>
+        </div>
+        <div class="row">
+            <button class="go check">Check my answer</button>
+            <button class="runtask">Just run it</button>
+            <button class="hint">Hint</button>
+            <button class="reveal">Show me</button>
+            <span class="grow"></span>
+            <span class="verdict"></span>
+        </div>
+        <div class="hinttext" hidden>Text has an upper() method, and + joins two pieces of text.</div>
+        <div class="answertext" hidden>use std.io
+
+fn shout(word: Text) -> Text => word.upper() + "!"
+
+fn main() {
+    io.say("ready" |> shout)
+}</div>
+    </div>
+    <hr class="end">
+</section>
+
+<!-- =================================================== 5. collections -->
+<section class="lesson" id="l5" data-n="5" data-title="Text, lists, maps, sets">
+    <div class="eyebrow">Lesson 5 of 10 · Holding things</div>
+    <h2>Text, lists, maps, sets</h2>
+    <p class="sell">Four shapes, and the handful of methods you will use every
+    day on all of them.</p>
+
+    <div class="visual">
+        <svg viewBox="0 0 760 290" role="img" aria-label="a list of four cells, a map of keys to values, and a set removing a duplicate">
+            <text class="lbl-s" x="20" y="20">LIST — in order, reachable by number</text>
+            <g>
+                <rect class="box" x="20" y="32" width="96" height="44" rx="8"/>
+                <text class="mono lbl" x="68" y="59" text-anchor="middle">"sea"</text>
+                <text class="lbl-s" x="68" y="92" text-anchor="middle">0</text>
+                <rect class="box" x="124" y="32" width="112" height="44" rx="8"/>
+                <text class="mono lbl" x="180" y="59" text-anchor="middle">"shells"</text>
+                <text class="lbl-s" x="180" y="92" text-anchor="middle">1</text>
+                <rect class="box" x="244" y="32" width="96" height="44" rx="8"/>
+                <text class="mono lbl" x="292" y="59" text-anchor="middle">"sea"</text>
+                <text class="lbl-s" x="292" y="92" text-anchor="middle">2</text>
+                <rect class="box" x="348" y="32" width="104" height="44" rx="8"/>
+                <text class="mono lbl" x="400" y="59" text-anchor="middle">"shore"</text>
+                <text class="lbl-s" x="400" y="92" text-anchor="middle">3</text>
+            </g>
+
+            <text class="lbl-s" x="500" y="20">SET — each thing once</text>
+            <path class="wire-a" d="M462 54 h30" marker-end="url(#tip)"/>
+            <rect class="box-green" x="500" y="32" width="92" height="44" rx="8"/>
+            <text class="mono lbl-g" x="546" y="59" text-anchor="middle">"sea"</text>
+            <rect class="box-green" x="600" y="32" width="104" height="44" rx="8"/>
+            <text class="mono lbl-g" x="652" y="59" text-anchor="middle">"shells"</text>
+            <rect class="box-green" x="500" y="84" width="104" height="44" rx="8"/>
+            <text class="mono lbl-g" x="552" y="111" text-anchor="middle">"shore"</text>
+            <text class="lbl-s" x="620" y="111">the second "sea" is gone</text>
+
+            <line x1="20" y1="150" x2="740" y2="150" class="wire" stroke-dasharray="3 6"/>
+
+            <text class="lbl-s" x="20" y="178">MAP — a thing found by its key</text>
+            <rect class="box-amber" x="20" y="192" width="120" height="40" rx="8"/>
+            <text class="mono lbl-a" x="80" y="217" text-anchor="middle">"sea"</text>
+            <path class="wire-a" d="M144 212 h66" marker-end="url(#tip)"/>
+            <rect class="box" x="214" y="192" width="64" height="40" rx="8"/>
+            <text class="mono lbl" x="246" y="217" text-anchor="middle">1</text>
+
+            <rect class="box-amber" x="20" y="240" width="120" height="40" rx="8"/>
+            <text class="mono lbl-a" x="80" y="265" text-anchor="middle">"shore"</text>
+            <path class="wire-a" d="M144 260 h66" marker-end="url(#tip)"/>
+            <rect class="box" x="214" y="240" width="64" height="40" rx="8"/>
+            <text class="mono lbl" x="246" y="265" text-anchor="middle">2</text>
+
+            <text class="mono lbl" x="330" y="206">map(f)</text>
+            <text class="lbl-s" x="330" y="224">every one, changed</text>
+            <text class="mono lbl" x="330" y="252">filter(f)</text>
+            <text class="lbl-s" x="330" y="270">only the ones that pass</text>
+            <text class="mono lbl" x="530" y="206">reduce(start, f)</text>
+            <text class="lbl-s" x="530" y="224">all of them, folded into one</text>
+            <text class="mono lbl" x="530" y="252">sort_by(f)</text>
+            <text class="lbl-s" x="530" y="270">a sorted copy — yours is untouched</text>
+        </svg>
+        <div class="caption">Also len, first, last, contains, join, any, all, count, find, sum, min, max, flatten.</div>
+    </div>
+
+    <div class="code" data-example>
+        <div class="bar"><span>holding.spf</span><span class="grow"></span>
+            <button class="run">Run</button></div>
+        <div class="edit"><pre class="paint"><code></code></pre><textarea spellcheck="false">use std.io
+
+fn main() {
+    let words = ["sea", "shells", "sea", "shore"]
+    io.say("{words.len()}  {words.first() ?? ""}")
+    io.say("{words.map(fn(w) => w.upper())}")
+    io.say("{words.filter(fn(w) => w.len() > 3)}")
+    io.say("{set(words).len()} different")
+
+    var seen = ["sea": 1]
+    seen.set("shore", 2)
+    io.say("{seen.get("sea") ?? 0}  {seen.has("sand")}")
+    io.say("{[5, 3, 9].sort_by(fn(a, b) => a < b)}")
+    io.say("{[5, 3, 9].reduce(0, fn(t, n) => t + n)}")
+}</textarea></div>
+        <div class="out" data-recorded="4  sea
+[&quot;SEA&quot;, &quot;SHELLS&quot;, &quot;SEA&quot;, &quot;SHORE&quot;]
+[&quot;shells&quot;, &quot;shore&quot;]
+3 different
+1  false
+[3, 5, 9]
+17"></div>
+    </div>
+
+    <p>Notice <code class="k">seen.get("sea")</code> followed by
+    <code class="k">?? 0</code>. Asking a map for a key does not hand you a
+    number — it hands you a number <em>or nothing</em>, and you have to say
+    what the nothing means. That is the next lesson, and it is the most
+    important one here.</p>
+
+    <div class="task" data-task="5" data-expect="[2, 4, 7, 9]
+22
+3">
+        <span class="worth">100 points</span>
+        <h4>Your turn</h4>
+        <p class="ask">From <code class="k">[4, 9, 2, 7]</code>: print it
+        sorted smallest first, then the total, then how many are bigger
+        than three.</p>
+        <div class="wants">[2, 4, 7, 9]
+22
+3</div>
+        <div class="code">
+            <div class="edit tall"><pre class="paint"><code></code></pre><textarea spellcheck="false">use std.io
+
+fn main() {
+    let numbers = [4, 9, 2, 7]
+    ~~ three lines
+}</textarea></div>
+            <div class="out"></div>
+        </div>
+        <div class="row">
+            <button class="go check">Check my answer</button>
+            <button class="runtask">Just run it</button>
+            <button class="hint">Hint</button>
+            <button class="reveal">Show me</button>
+            <span class="grow"></span>
+            <span class="verdict"></span>
+        </div>
+        <div class="hinttext" hidden>sort_by takes a test that answers "does a come first?". reduce folds the list into one value. filter then len counts.</div>
+        <div class="answertext" hidden>use std.io
+
+fn main() {
+    let numbers = [4, 9, 2, 7]
+    io.say("{numbers.sort_by(fn(a, b) => a < b)}")
+    io.say("{numbers.reduce(0, fn(total, n) => total + n)}")
+    io.say("{numbers.filter(fn(n) => n > 3).len()}")
+}</div>
+    </div>
+    <hr class="end">
+</section>
+
+<!-- =================================================== 6. nothing -->
+<section class="lesson" id="l6" data-n="6" data-title="Nothing, and failure">
+    <div class="eyebrow">Lesson 6 of 10 · The important one</div>
+    <h2>Nothing, and failure</h2>
+    <p class="sell">Missing and failed are different ideas, so they get
+    different tools — and neither of them can be ignored by accident.</p>
+
+    <div class="visual">
+        <svg viewBox="0 0 760 270" role="img" aria-label="an optional either holds something or does not; a safe call skips; a Result forks into Ok and Err">
+            <text class="mono lbl-a" x="20" y="24">Text?</text>
+            <text class="lbl-s" x="80" y="24">text, or nothing at all</text>
+
+            <rect class="box-green" x="20" y="40" width="130" height="56" rx="10"/>
+            <circle cx="56" cy="68" r="11" fill="#73d08b" opacity=".85"/>
+            <text class="mono lbl-g" x="78" y="73">"ada"</text>
+
+            <rect class="box-red" x="178" y="40" width="130" height="56" rx="10"/>
+            <circle cx="214" cy="68" r="11" fill="none" stroke="#ff6b5e" stroke-dasharray="3 3"/>
+            <text class="mono lbl-r" x="236" y="73">nil</text>
+
+            <path class="wire" d="M85 100 v26 h150" marker-end="url(#tip)"/>
+            <path class="wire" d="M243 100 v26 h-8"/>
+            <rect class="box" x="242" y="110" width="150" height="34" rx="8"/>
+            <text class="mono lbl" x="317" y="132" text-anchor="middle">?.upper()</text>
+            <text class="lbl-s" x="400" y="126">runs only if there is</text>
+            <text class="lbl-s" x="400" y="142">something to run it on</text>
+
+            <path class="wire" d="M317 148 v22 h-80" marker-end="url(#tip)"/>
+            <rect class="box-amber" x="80" y="156" width="156" height="34" rx="8"/>
+            <text class="mono lbl-a" x="158" y="178" text-anchor="middle">?? "nothing"</text>
+            <text class="lbl-s" x="20" y="212">and this is what the nothing becomes</text>
+
+            <line x1="430" y1="18" x2="430" y2="252" class="wire" stroke-dasharray="3 6"/>
+
+            <text class="mono lbl-a" x="470" y="24">Result&lt;Int&gt;</text>
+            <text class="lbl-s" x="470" y="42">a thing that can fail says so in its type</text>
+            <rect class="box" x="470" y="58" width="130" height="38" rx="9"/>
+            <text class="mono lbl" x="535" y="83" text-anchor="middle">age_of("36")</text>
+            <path class="wire" d="M600 77 h26 v-22 h20" marker-end="url(#tip)"/>
+            <path class="wire" d="M600 77 h26 v24 h20" marker-end="url(#tip)"/>
+            <rect class="box-green" x="652" y="38" width="94" height="34" rx="8"/>
+            <text class="mono lbl-g" x="699" y="60" text-anchor="middle">Ok(36)</text>
+            <rect class="box-red" x="652" y="84" width="94" height="34" rx="8"/>
+            <text class="mono lbl-r" x="699" y="106" text-anchor="middle">Err(why)</text>
+            <text class="lbl-s" x="470" y="146">match makes you answer both.</text>
+            <text class="lbl-s" x="470" y="166">No exception arrives from nowhere;</text>
+            <text class="lbl-s" x="470" y="186">you can see what can fail at the call.</text>
+        </svg>
+        <div class="caption">A missing value cannot slip past and turn into a crash an hour later.</div>
+    </div>
+
+    <div class="code" data-example>
+        <div class="bar"><span>nothing.spf</span><span class="grow"></span>
+            <button class="run">Run</button></div>
+        <div class="edit"><pre class="paint"><code></code></pre><textarea spellcheck="false">use std.io
+
+fn first_word(line: Text?) -> Text {
+    give line?.split(" ")?.first() ?? "nothing"
+}
+
+fn age_of(text: Text) -> Result<Int> {
+    let n = text.to_int()
+    if n == nil { give Err("{text} is not a number") }
+    give Ok(n ?? 0)
+}
+
+fn main() {
+    io.say(first_word("hello there"))
+    io.say(first_word(nil))
+    for input in ["36", "ada"] {
+        match age_of(input) {
+            when Ok(age) -> io.say("age {age}")
+            when Err(why) -> io.say("no: {why}")
+        }
+    }
+}</textarea></div>
+        <div class="out" data-recorded="hello
+nothing
+age 36
+no: ada is not a number"></div>
+    </div>
+
+    <p><code class="k">match</code> is not only for Results. Make your own
+    kinds with <code class="k">enum</code> — each one can carry values — and
+    the compiler will tell you when you have forgotten a case.</p>
+
+    <div class="code">
+        <div class="bar"><span>an enum of your own</span></div>
+        <div class="edit"><pre class="paint"><code></code></pre><textarea spellcheck="false" readonly>enum Shape {
+    Circle(Num)
+    Rect(Num, Num)
+}
+
+fn area(it: Shape) -> Num {
+    give match it {
+        when Circle(r) -> 3.14159 * r * r
+        when Rect(w, h) -> w * h
+    }
+}</textarea></div>
+    </div>
+
+    <div class="task" data-task="6" data-expect="A
+?">
+        <span class="worth">100 points</span>
+        <h4>Your turn</h4>
+        <p class="ask">Write <code class="k">initial</code>: it takes a name
+        that might not be there and gives back the first letter in capitals,
+        or a question mark.</p>
+        <div class="wants">A
+?</div>
+        <div class="code">
+            <div class="edit tall"><pre class="paint"><code></code></pre><textarea spellcheck="false">use std.io
+
+fn initial(name: Text?) -> Text {
+    ~~ one line will do it
+}
+
+fn main() {
+    io.say(initial("ada"))
+    io.say(initial(nil))
+}</textarea></div>
+            <div class="out"></div>
+        </div>
+        <div class="row">
+            <button class="go check">Check my answer</button>
+            <button class="runtask">Just run it</button>
+            <button class="hint">Hint</button>
+            <button class="reveal">Show me</button>
+            <span class="grow"></span>
+            <span class="verdict"></span>
+        </div>
+        <div class="hinttext" hidden>slice(0, 1) takes the first letter. Chain it with ?. and finish with ?? "?".</div>
+        <div class="answertext" hidden>use std.io
+
+fn initial(name: Text?) -> Text {
+    give name?.slice(0, 1)?.upper() ?? "?"
+}
+
+fn main() {
+    io.say(initial("ada"))
+    io.say(initial(nil))
+}</div>
+    </div>
+    <hr class="end">
+</section>
+
+<!-- =================================================== 7. your shapes -->
+<section class="lesson" id="l7" data-n="7" data-title="Shapes of your own">
+    <div class="eyebrow">Lesson 7 of 10 · Structure</div>
+    <h2>Shapes of your own</h2>
+    <p class="sell">A thing with an identity, a value that is only its
+    contents, and a promise that any of them can keep. No inheritance
+    anywhere.</p>
+
+    <div class="visual">
+        <svg viewBox="0 0 760 280" role="img" aria-label="two counters with the same count are different things; two points with the same numbers are the same point; a trait is a socket">
+            <text class="lbl-s" x="20" y="20">OBJECT — has an identity of its own</text>
+            <rect class="box" x="20" y="32" width="150" height="70" rx="10"/>
+            <text class="mono lbl" x="95" y="58" text-anchor="middle">Counter</text>
+            <text class="mono lbl-s" x="95" y="78" text-anchor="middle">value: 3</text>
+            <rect class="box" x="190" y="32" width="150" height="70" rx="10"/>
+            <text class="mono lbl" x="265" y="58" text-anchor="middle">Counter</text>
+            <text class="mono lbl-s" x="265" y="78" text-anchor="middle">value: 3</text>
+            <text class="lbl-r" x="180" y="122" text-anchor="middle">still two counters</text>
+
+            <text class="lbl-s" x="420" y="20">DATA — is only its contents</text>
+            <rect class="box-green" x="420" y="32" width="150" height="70" rx="10"/>
+            <text class="mono lbl-g" x="495" y="58" text-anchor="middle">Point</text>
+            <text class="mono lbl-s" x="495" y="78" text-anchor="middle">x: 1.0  y: 2.0</text>
+            <rect class="box-green" x="590" y="32" width="150" height="70" rx="10"/>
+            <text class="mono lbl-g" x="665" y="58" text-anchor="middle">Point</text>
+            <text class="mono lbl-s" x="665" y="78" text-anchor="middle">x: 1.0  y: 2.0</text>
+            <text class="lbl-g" x="580" y="122" text-anchor="middle">the same point — == is true</text>
+
+            <line x1="20" y1="146" x2="740" y2="146" class="wire" stroke-dasharray="3 6"/>
+
+            <text class="lbl-s" x="20" y="174">TRAIT — a promise, and what you get for keeping it</text>
+            <rect class="box-amber" x="286" y="186" width="188" height="74" rx="11"/>
+            <text class="mono lbl-a" x="380" y="212" text-anchor="middle">Greeter</text>
+            <text class="lbl-s" x="380" y="230" text-anchor="middle">you promise: name()</text>
+            <text class="lbl-s" x="380" y="248" text-anchor="middle">you are given: greet()</text>
+
+            <rect class="box" x="40" y="194" width="130" height="58" rx="10"/>
+            <text class="mono lbl" x="105" y="218" text-anchor="middle">Person</text>
+            <text class="lbl-s" x="105" y="236" text-anchor="middle">name → given</text>
+            <path class="wire-a" d="M174 222 h106" marker-end="url(#tip)"/>
+
+            <rect class="box" x="590" y="194" width="130" height="58" rx="10"/>
+            <text class="mono lbl" x="655" y="218" text-anchor="middle">Robot</text>
+            <text class="lbl-s" x="655" y="236" text-anchor="middle">name → serial</text>
+            <path class="wire-a" d="M586 222 h-106" marker-end="url(#tip)"/>
+        </svg>
+        <div class="caption">No base class, no super, no diamond. A small promise kept is worth more than a family tree.</div>
+    </div>
+
+    <div class="code" data-example>
+        <div class="bar"><span>shapes.spf</span><span class="grow"></span>
+            <button class="run">Run</button></div>
+        <div class="edit"><pre class="paint"><code></code></pre><textarea spellcheck="false">use std.io
+
+trait Greeter {
+    fn name(self) -> Text
+    fn greet(self) -> Text => "hello, {self.name()}"
+}
+
+object Person {
+    given: Text = "friend"
+    fn name(self) -> Text => self.given
+}
+
+object Robot {
+    serial: Int = 1
+    fn name(self) -> Text => "unit {self.serial}"
+}
+
+impl Greeter for Person {}
+impl Greeter for Robot {}
+
+data Point {
+    x: Num
+    y: Num
+}
+
+fn main() {
+    for one in [Person { given: "Ada" }, Robot { serial: 7 }] { io.say(one.greet()) }
+    let here = Point { x: 1.0, y: 2.0 }
+    let there = Point { x: 1.0, y: 2.0 }
+    io.say("same place: {here == there}")
+}</textarea></div>
+        <div class="out" data-recorded="hello, Ada
+hello, unit 7
+same place: true"></div>
+    </div>
+
+    <p>Fields carry their defaults, so building one means naming only what
+    is different. Methods take <code class="k">self</code> first. A trait can
+    carry a finished method written in terms of the ones it demands —
+    <code class="k">greet</code> was written once and both shapes got it.</p>
+
+    <div class="task" data-task="7" data-expect="true
+20">
+        <span class="worth">100 points</span>
+        <h4>Your turn</h4>
+        <p class="ask">Make a <code class="k">Coin</code> with a face and a
+        value that <em>is only its contents</em>. Build two identical ones,
+        print whether they are equal, then their values added up.</p>
+        <div class="wants">true
+20</div>
+        <div class="code">
+            <div class="edit tall"><pre class="paint"><code></code></pre><textarea spellcheck="false">use std.io
+
+~~ Coin here
+
+fn main() {
+    let one = Coin { face: "heads", value: 10 }
+    let two = Coin { face: "heads", value: 10 }
+    ~~ two lines
+}</textarea></div>
+            <div class="out"></div>
+        </div>
+        <div class="row">
+            <button class="go check">Check my answer</button>
+            <button class="runtask">Just run it</button>
+            <button class="hint">Hint</button>
+            <button class="reveal">Show me</button>
+            <span class="grow"></span>
+            <span class="verdict"></span>
+        </div>
+        <div class="hinttext" hidden>Only one of the two words gives you == for free. It is not object.</div>
+        <div class="answertext" hidden>use std.io
+
+data Coin {
+    face: Text
+    value: Int
+}
+
+fn main() {
+    let one = Coin { face: "heads", value: 10 }
+    let two = Coin { face: "heads", value: 10 }
+    io.say("{one == two}")
+    io.say("{one.value + two.value}")
+}</div>
+    </div>
+    <hr class="end">
+</section>
+
+<!-- =================================================== 8. generics -->
+<section class="lesson" id="l8" data-n="8" data-title="Every type, and one file at a time">
+    <div class="eyebrow">Lesson 8 of 10 · Scale</div>
+    <h2>Every type, and one file at a time</h2>
+    <p class="sell">Write a function once for all types, and put a wall around
+    a file so the rest of the program only sees what you meant it to.</p>
+
+    <div class="visual">
+        <svg viewBox="0 0 760 260" role="img" aria-label="a generic function accepting three different types, and a module with public doors">
+            <text class="mono lbl-a" x="20" y="22">fn first_of&lt;T&gt;(items: [T]) -&gt; T?</text>
+            <rect class="box-amber" x="130" y="40" width="160" height="60" rx="11"/>
+            <text class="lbl-a" x="210" y="68" text-anchor="middle">first_of</text>
+            <text class="lbl-s" x="210" y="86" text-anchor="middle">whatever T is</text>
+            <rect class="box" x="20" y="36" width="80" height="26" rx="6"/>
+            <text class="mono lbl-s" x="60" y="54" text-anchor="middle">[Int]</text>
+            <rect class="box" x="20" y="68" width="80" height="26" rx="6"/>
+            <text class="mono lbl-s" x="60" y="86" text-anchor="middle">[Text]</text>
+            <rect class="box" x="20" y="100" width="80" height="26" rx="6"/>
+            <text class="mono lbl-s" x="60" y="118" text-anchor="middle">[Point]</text>
+            <path class="wire" d="M104 49 h22 v18"/>
+            <path class="wire" d="M104 81 h22"/>
+            <path class="wire" d="M104 113 h22 v-18"/>
+            <path class="wire-a" d="M292 70 h40" marker-end="url(#tip)"/>
+            <text class="mono lbl-a" x="340" y="66">Int? Text? Point?</text>
+            <text class="lbl-s" x="340" y="84">still fully checked, every time</text>
+            <text class="lbl-s" x="20" y="150">&lt;T: Ord&gt; says what you may assume about T — here, that it can be compared</text>
+
+            <line x1="20" y1="168" x2="740" y2="168" class="wire" stroke-dasharray="3 6"/>
+
+            <rect class="box" x="20" y="186" width="230" height="62" rx="10"/>
+            <text class="mono lbl-s" x="36" y="206">module money</text>
+            <text class="mono lbl-g" x="36" y="226">pub fn vat(…)</text>
+            <text class="mono lbl-r" x="36" y="242">fn secret(…)</text>
+            <rect x="248" y="214" width="6" height="22" fill="#73d08b"/>
+            <path class="wire-a" d="M256 224 h64" marker-end="url(#tip)"/>
+            <text class="lbl-g" x="328" y="220">pub gets out</text>
+            <text class="lbl-r" x="328" y="244">the rest belongs to the file</text>
+            <rect class="box" x="520" y="186" width="220" height="62" rx="10"/>
+            <text class="mono lbl-s" x="536" y="206">use money</text>
+            <text class="mono lbl-a" x="536" y="230">money.vat(100.0)</text>
+        </svg>
+        <div class="caption">No header file, no export list at the bottom, nothing to register in a build file.</div>
+    </div>
+
+    <div class="code" data-example>
+        <div class="bar"><span>generic.spf</span><span class="grow"></span>
+            <button class="run">Run</button></div>
+        <div class="edit"><pre class="paint"><code></code></pre><textarea spellcheck="false">use std.io
+
+fn first_of<T>(items: [T]) -> T? {
+    if items.is_empty() { give nil }
+    give items[0]
+}
+
+fn larger<T: Ord>(a: T, b: T) -> T {
+    if a > b { give a }
+    give b
+}
+
+fn main() {
+    io.say("{first_of([3, 4]) ?? 0}")
+    io.say("{first_of(["x"]) ?? "-"}")
+    io.say("{larger(9, 2)}  {larger("apple", "pear")}")
+}</textarea></div>
+        <div class="out" data-recorded="3
+x
+9  pear"></div>
+    </div>
+
+    <p>A module is just a file that names itself. These two, side by side,
+    print <code class="k">20.0</code>:</p>
+
+    <div class="cards">
+        <div class="card"><b>money.spf</b><span>module money<br><br>pub fn vat(amount: Num) -&gt; Num =&gt; amount * 0.2<br><br>fn secret() -&gt; Text =&gt; "only this file"</span></div>
+        <div class="card"><b>main.spf</b><span>use std.io<br>use money<br><br>fn main() {<br>&nbsp;&nbsp;&nbsp;&nbsp;io.say("{money.vat(100.0)}")<br>}</span></div>
+    </div>
+
+    <p>A project is the same idea one size up: <code class="k">src</code>,
+    <code class="k">tests</code>, <code class="k">assets</code>,
+    <code class="k">packages</code> and a <code class="k">project.sprfst</code>
+    describing it. <code class="k">sprfst new orchard</code> makes one, and
+    <code class="k">sprfst run .</code> runs the whole thing.</p>
+
+    <div class="task" data-task="8" data-expect="3
+b
+true">
+        <span class="worth">100 points</span>
+        <h4>Your turn</h4>
+        <p class="ask">Write <code class="k">last_of</code> — the other end of
+        <code class="k">first_of</code>, for any type at all.</p>
+        <div class="wants">3
+b
+true</div>
+        <div class="code">
+            <div class="edit tall"><pre class="paint"><code></code></pre><textarea spellcheck="false">use std.io
+
+~~ last_of here
+
+fn main() {
+    io.say("{last_of([1, 2, 3]) ?? 0}")
+    io.say(last_of(["a", "b"]) ?? "-")
+    io.say("{last_of([]) == nil}")
+}</textarea></div>
+            <div class="out"></div>
+        </div>
+        <div class="row">
+            <button class="go check">Check my answer</button>
+            <button class="runtask">Just run it</button>
+            <button class="hint">Hint</button>
+            <button class="reveal">Show me</button>
+            <span class="grow"></span>
+            <span class="verdict"></span>
+        </div>
+        <div class="hinttext" hidden>The last position is items.len() - 1. Give nil when the list is empty, so the answer has to be T?.</div>
+        <div class="answertext" hidden>use std.io
+
+fn last_of<T>(items: [T]) -> T? {
+    if items.is_empty() { give nil }
+    give items[items.len() - 1]
+}
+
+fn main() {
+    io.say("{last_of([1, 2, 3]) ?? 0}")
+    io.say(last_of(["a", "b"]) ?? "-")
+    io.say("{last_of([]) == nil}")
+}</div>
+    </div>
+    <hr class="end">
+</section>
+
+<!-- =================================================== 9. memory -->
+<section class="lesson" id="l9" data-n="9" data-title="Memory, and doing several things">
+    <div class="eyebrow">Lesson 9 of 10 · Underneath</div>
+    <h2>Memory, and doing several things</h2>
+    <p class="sell">Who owns this, who is only borrowing it, what happens when
+    the function leaves — and how to do two things at once.</p>
+
+    <div class="visual">
+        <svg viewBox="0 0 760 270" role="img" aria-label="two names pointing at one list, clone making a second, and three tasks running side by side">
+            <text class="lbl-s" x="20" y="20">A LIST IS A REFERENCE</text>
+            <rect class="box" x="20" y="34" width="104" height="34" rx="7"/>
+            <text class="mono lbl" x="72" y="56" text-anchor="middle">numbers</text>
+            <rect class="box" x="20" y="78" width="104" height="34" rx="7"/>
+            <text class="mono lbl" x="72" y="100" text-anchor="middle">items</text>
+            <path class="wire-a" d="M128 51 h46 v18" marker-end="url(#tip)"/>
+            <path class="wire-a" d="M128 95 h46 v-18" marker-end="url(#tip)"/>
+            <rect class="box-amber" x="180" y="56" width="150" height="38" rx="9"/>
+            <text class="mono lbl-a" x="255" y="80" text-anchor="middle">[0, 1, 99]</text>
+            <text class="lbl-s" x="20" y="136">one list, two names — a change through either is seen by both</text>
+
+            <path class="wire" d="M338 75 h40" marker-end="url(#tip)"/>
+            <text class="mono lbl-g" x="384" y="62">clone(numbers)</text>
+            <rect class="box-green" x="384" y="72" width="130" height="38" rx="9"/>
+            <text class="mono lbl-g" x="449" y="96" text-anchor="middle">[0, 1]</text>
+            <text class="lbl-s" x="384" y="130">a copy, said out loud, where the cost can be seen</text>
+
+            <text class="mono lbl-a" x="560" y="40">ref</text>
+            <text class="lbl-s" x="596" y="40">I am only borrowing it</text>
+            <text class="mono lbl-a" x="560" y="64">own</text>
+            <text class="lbl-s" x="596" y="64">I am taking it; you may not use it after</text>
+            <text class="mono lbl-a" x="560" y="88">defer</text>
+            <text class="lbl-s" x="606" y="88">run this when I leave, however I leave</text>
+            <text class="lbl-s" x="560" y="112">no collector pause, no free to forget</text>
+
+            <line x1="20" y1="158" x2="740" y2="158" class="wire" stroke-dasharray="3 6"/>
+
+            <text class="lbl-s" x="20" y="184">DOING SEVERAL THINGS</text>
+            <text class="mono lbl-a" x="20" y="212">spawn</text>
+            <rect class="box" x="90" y="194" width="150" height="26" rx="6"/>
+            <text class="mono lbl-s" x="165" y="212" text-anchor="middle">work(4)</text>
+            <rect class="box" x="90" y="226" width="200" height="26" rx="6"/>
+            <text class="mono lbl-s" x="190" y="244" text-anchor="middle">work(6)</text>
+            <path class="wire pulse" d="M244 207 h120"/>
+            <path class="wire pulse" d="M294 239 h70"/>
+            <path class="wire-a" d="M364 207 h30 v16"/>
+            <path class="wire-a" d="M364 239 h30 v-16"/>
+            <rect class="box-amber" x="396" y="206" width="120" height="34" rx="8"/>
+            <text class="mono lbl-a" x="456" y="228" text-anchor="middle">await</text>
+            <text class="lbl-s" x="530" y="222">and the answers come back in the order you ask</text>
+        </svg>
+        <div class="caption">Also real threads, channels, locks and atomics in <b>std.thread</b>.</div>
+    </div>
+
+    <div class="code" data-example>
+        <div class="bar"><span>memory.spf</span><span class="grow"></span>
+            <button class="run">Run</button></div>
+        <div class="edit"><pre class="paint"><code></code></pre><textarea spellcheck="false">use std.io
+
+task work(n: Int) -> Int {
+    give n * n
+}
+
+fn add_one(items: [Int]) { items.push(1) }
+
+fn main() {
+    defer io.say("finished")
+    var numbers = [0]
+    add_one(numbers)
+    let copy = clone(numbers)
+    numbers.push(99)
+    io.say("{numbers}  {copy}")
+
+    let a = spawn work(4)
+    let b = spawn work(6)
+    io.say("{await a} {await b}")
+}</textarea></div>
+        <div class="out" data-recorded="[0, 1, 99]  [0, 1]
+16 36
+finished"></div>
+    </div>
+
+    <p><code class="k">add_one</code> changed the caller's list, because it
+    was handed the same list — not a copy. <code class="k">finished</code>
+    printed last even though it was written first: that is
+    <code class="k">defer</code>, and it is how you close a file next to
+    where you opened it and stop thinking about it.</p>
+
+    <div class="note"><b>Said plainly.</b> Tasks run on real threads, but the
+    interpreter holds one lock, so this is concurrency for overlapping
+    waiting — not yet for using eight cores at once. It is written down in
+    the project's README under Status, and a native backend is the next big
+    piece of work.</div>
+
+    <div class="task" data-task="9" data-expect="[1, 2]  [1]
+21
+done">
+        <span class="worth">100 points</span>
+        <h4>Your turn</h4>
+        <p class="ask">Use all three: a <code class="k">defer</code> that
+        prints <b>done</b> last, a <code class="k">clone</code> that does not
+        change when the original does, and a spawned task that triples seven.</p>
+        <div class="wants">[1, 2]  [1]
+21
+done</div>
+        <div class="code">
+            <div class="edit tall"><pre class="paint"><code></code></pre><textarea spellcheck="false">use std.io
+
+task triple(n: Int) -> Int {
+    give n * 3
+}
+
+fn main() {
+    ~~ defer, then the two lists, then the task
+}</textarea></div>
+            <div class="out"></div>
+        </div>
+        <div class="row">
+            <button class="go check">Check my answer</button>
+            <button class="runtask">Just run it</button>
+            <button class="hint">Hint</button>
+            <button class="reveal">Show me</button>
+            <span class="grow"></span>
+            <span class="verdict"></span>
+        </div>
+        <div class="hinttext" hidden>Clone before you push. You can write await spawn triple(7) in one breath.</div>
+        <div class="answertext" hidden>use std.io
+
+task triple(n: Int) -> Int {
+    give n * 3
+}
+
+fn main() {
+    defer io.say("done")
+    var first = [1]
+    let second = clone(first)
+    first.push(2)
+    io.say("{first}  {second}")
+    io.say("{await spawn triple(7)}")
+}</div>
+    </div>
+    <hr class="end">
+</section>
+
+<!-- =================================================== 10. the whole -->
+<section class="lesson" id="l10" data-n="10" data-title="A whole program, and the tools">
+    <div class="eyebrow">Lesson 10 of 10 · All of it</div>
+    <h2>A whole program, and the tools</h2>
+    <p class="sell">Everything you have learned, in one program — and the
+    thirteen words that are the entire command line.</p>
+
+    <div class="visual">
+        <svg viewBox="0 0 760 230" role="img" aria-label="the thirteen command line verbs, grouped">
+            <text class="lbl-s" x="20" y="22">EVERY DAY</text>
+            <g>
+                <rect class="box-amber" x="20" y="34" width="86" height="34" rx="8"/>
+                <text class="mono lbl-a" x="63" y="56" text-anchor="middle">run</text>
+                <rect class="box-amber" x="114" y="34" width="86" height="34" rx="8"/>
+                <text class="mono lbl-a" x="157" y="56" text-anchor="middle">check</text>
+                <rect class="box-amber" x="208" y="34" width="86" height="34" rx="8"/>
+                <text class="mono lbl-a" x="251" y="56" text-anchor="middle">test</text>
+                <rect class="box-amber" x="302" y="34" width="86" height="34" rx="8"/>
+                <text class="mono lbl-a" x="345" y="56" text-anchor="middle">fmt</text>
+            </g>
+            <text class="lbl-s" x="420" y="22">WHEN YOU NEED IT</text>
+            <g>
+                <rect class="box" x="420" y="34" width="76" height="34" rx="8"/>
+                <text class="mono lbl" x="458" y="56" text-anchor="middle">lint</text>
+                <rect class="box" x="504" y="34" width="76" height="34" rx="8"/>
+                <text class="mono lbl" x="542" y="56" text-anchor="middle">docs</text>
+                <rect class="box" x="588" y="34" width="76" height="34" rx="8"/>
+                <text class="mono lbl" x="626" y="56" text-anchor="middle">debug</text>
+                <rect class="box" x="672" y="34" width="68" height="34" rx="8"/>
+                <text class="mono lbl" x="706" y="56" text-anchor="middle">build</text>
+            </g>
+            <text class="lbl-s" x="20" y="100">PROJECTS AND PACKAGES — the package manager is called Forge</text>
+            <g>
+                <rect class="box" x="20" y="112" width="76" height="34" rx="8"/>
+                <text class="mono lbl" x="58" y="134" text-anchor="middle">new</text>
+                <rect class="box" x="104" y="112" width="76" height="34" rx="8"/>
+                <text class="mono lbl" x="142" y="134" text-anchor="middle">add</text>
+                <rect class="box" x="188" y="112" width="86" height="34" rx="8"/>
+                <text class="mono lbl" x="231" y="134" text-anchor="middle">remove</text>
+                <rect class="box" x="282" y="112" width="86" height="34" rx="8"/>
+                <text class="mono lbl" x="325" y="134" text-anchor="middle">install</text>
+                <rect class="box" x="376" y="112" width="76" height="34" rx="8"/>
+                <text class="mono lbl" x="414" y="134" text-anchor="middle">clean</text>
+            </g>
+            <text class="lbl-s" x="480" y="126">no central registry — a package is</text>
+            <text class="lbl-s" x="480" y="144">a folder or a git URL, and every</text>
+            <text class="lbl-s" x="480" y="162">one is locked to a SHA-256</text>
+
+            <line x1="20" y1="180" x2="740" y2="180" class="wire" stroke-dasharray="3 6"/>
+            <text class="mono lbl-g" x="20" y="208">test "adding" { testing.same(add(2, 2), 4, "two and two") }</text>
+            <text class="lbl-s" x="20" y="224">a test is a block with a name; bench is one that gets timed. Nothing to install.</text>
+        </svg>
+        <div class="caption">One binary. Thirteen verbs. You can hold the whole command line in your head.</div>
+    </div>
+
+    <h3 class="step">Counting words — everything at once</h3>
+    <p>A map, a loop, a lambda, interpolation, optionals with a default, and
+    a sorted copy. This is ordinary SPRFST.</p>
+
+    <div class="code" data-example>
+        <div class="bar"><span>count.spf</span><span class="grow"></span>
+            <button class="run">Run</button></div>
+        <div class="edit"><pre class="paint"><code></code></pre><textarea spellcheck="false">use std.io
+
+fn main() {
+    let text = "the sea the shells the shore sea"
+    var counts: Map<Text, Int> = [:]
+    for word in text.split(" ") {
+        counts.set(word, (counts.get(word) ?? 0) + 1)
+    }
+    var lines: [Text] = []
+    for key in counts.keys() { lines.push("{key} {counts.get(key) ?? 0}") }
+    for line in lines.sort_by(fn(a, b) => a < b) { io.say(line) }
+}</textarea></div>
+        <div class="out" data-recorded="sea 2
+shells 1
+shore 1
+the 3"></div>
+    </div>
+
+    <div class="cards">
+        <div class="card"><b>std.io · fs · path</b><span>say, print, ask, read, write, lines, folders</span></div>
+        <div class="card"><b>std.text · collections</b><span>split, join, slice, unique, chunks, mean</span></div>
+        <div class="card"><b>std.math · time · hash</b><span>sqrt, min, max, now, format, sha256</span></div>
+        <div class="card"><b>std.net · http · json</b><span>fetch, serve, parse, write, pretty</span></div>
+        <div class="card"><b>std.thread</b><span>threads, channels, locks, atomics</span></div>
+        <div class="card"><b>std.draw · ai · game</b><span>canvas, tensors, layers, trainer</span></div>
+    </div>
+
+    <div class="task" data-task="10" data-expect="4 different words
+a appears 3 times">
+        <span class="worth">100 points</span>
+        <h4>Your turn — the last one</h4>
+        <p class="ask">Count the words in
+        <code class="k">"a storm is a storm is a wind"</code>. Print how many
+        different ones there are, then the commonest and how often it
+        appears.</p>
+        <div class="wants">4 different words
+a appears 3 times</div>
+        <div class="code">
+            <div class="edit tall"><pre class="paint"><code></code></pre><textarea spellcheck="false">use std.io
+
+fn main() {
+    let text = "a storm is a storm is a wind"
+    var counts: Map<Text, Int> = [:]
+    ~~ count them, then find the best one
+}</textarea></div>
+            <div class="out"></div>
+        </div>
+        <div class="row">
+            <button class="go check">Check my answer</button>
+            <button class="runtask">Just run it</button>
+            <button class="hint">Hint</button>
+            <button class="reveal">Show me</button>
+            <span class="grow"></span>
+            <span class="verdict"></span>
+        </div>
+        <div class="hinttext" hidden>Walk counts.keys() keeping the biggest you have seen. counts.len() is how many different words there were.</div>
+        <div class="answertext" hidden>use std.io
+
+fn main() {
+    let text = "a storm is a storm is a wind"
+    var counts: Map<Text, Int> = [:]
+    for word in text.split(" ") {
+        counts.set(word, (counts.get(word) ?? 0) + 1)
+    }
+    var best = ""
+    var most = 0
+    for key in counts.keys() {
+        let n = counts.get(key) ?? 0
+        if n > most { most = n  best = key }
+    }
+    io.say("{counts.len()} different words")
+    io.say("{best} appears {most} times")
+}</div>
+    </div>
+    <hr class="end">
+</section>
+
+<!-- ======================================================== the end -->
+<section id="finish">
+    <div id="done">
+        <h2>That is the language</h2>
+        <p>Ten lessons, and there is no part of SPRFST left that you have not
+        met. Below is every piece of it and where it was taught — if a row
+        looks unfamiliar, that is the lesson to read again.</p>
+    </div>
+
+    <div style="max-width:880px;margin:0 auto;padding:0 40px 80px">
+    <table class="ref">
+        <tr><th>the language</th><th>taught in</th></tr>
+        <tr><td>use · fn main · ~~ comments · io.say</td><td>1 — how a program is made</td></tr>
+        <tr><td>the compiler: lexer, parser, types, IR, optimiser</td><td>1 — how a program is made</td></tr>
+        <tr><td>let · var · inference · "{interpolation}"</td><td>2 — values and names</td></tr>
+        <tr><td>Int · Num · Text · Bool · Nil · type_of · to_int</td><td>2 — values and names</td></tr>
+        <tr><td>+ - * / % · Int / Int gives Num</td><td>2 — values and names</td></tr>
+        <tr><td>if as an expression · and · or · not</td><td>3 — choosing and repeating</td></tr>
+        <tr><td>for · while · loop · skip · break · 1..n · 1...n</td><td>3 — choosing and repeating</td></tr>
+        <tr><td>fn · parameters · give · =&gt; · functions as values</td><td>4 — functions</td></tr>
+        <tr><td>lambdas · the pipe |&gt;</td><td>4 — functions</td></tr>
+        <tr><td>Text methods · [T] · map filter reduce sort_by</td><td>5 — text, lists, maps, sets</td></tr>
+        <tr><td>Map · get set has keys values · set()</td><td>5 — text, lists, maps, sets</td></tr>
+        <tr><td>T? · nil · ?. · ?? </td><td>6 — nothing, and failure</td></tr>
+        <tr><td>Result&lt;T&gt; · Ok · Err · match · when</td><td>6 — nothing, and failure</td></tr>
+        <tr><td>enum with payloads</td><td>6 — nothing, and failure</td></tr>
+        <tr><td>object · fields with defaults · methods · self</td><td>7 — shapes of your own</td></tr>
+        <tr><td>data · value equality</td><td>7 — shapes of your own</td></tr>
+        <tr><td>trait · default methods · impl · composition</td><td>7 — shapes of your own</td></tr>
+        <tr><td>generics &lt;T&gt; · bounds &lt;T: Ord&gt;</td><td>8 — every type, one file at a time</td></tr>
+        <tr><td>module · pub · projects · sprfst new</td><td>8 — every type, one file at a time</td></tr>
+        <tr><td>references · clone · ref · own · defer</td><td>9 — memory and several things</td></tr>
+        <tr><td>task · spawn · await · threads · channels</td><td>9 — memory and several things</td></tr>
+        <tr><td>test · bench · the thirteen verbs · Forge</td><td>10 — a whole program</td></tr>
+        <tr><td>the standard library</td><td>10 — a whole program</td></tr>
+    </table>
+
+    <div class="note" style="margin-top:36px"><b>What it cannot do yet.</b>
+    <code class="k">sprfst build</code> writes optimised instructions rather
+    than a standalone binary; a native ARM backend is the next major piece of
+    work. There is no TLS in the runtime, so HTTPS shells out to curl.
+    Concurrency is threads under one lock. All of it is written down in the
+    project's README, in the same words.</div>
+
+    <p style="color:var(--faint);font-size:13px;max-width:70ch">
+    Want the same thing in a window, with twenty six smaller steps instead of
+    ten? <code class="k">make tour</code> builds SPRFST Tour.app. Want it in a
+    terminal? <code class="k">sprfst run learn/tour.spf</code>. The video
+    script for this page is <code class="k">new/VIDEO-SCRIPT.md</code>.</p>
+    </div>
+</section>
+
+</main>
+
+<div id="toast"></div>
+<script src="tour.js"></script>
+</body>
+</html>

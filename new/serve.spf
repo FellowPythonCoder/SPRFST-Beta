@@ -1,0 +1,143 @@
+~~ =====================================================================
+~~  The runner behind the HTML tour.
+~~
+~~      sprfst run new/serve.spf          then open http://localhost:7070
+~~
+~~  Two jobs, and nothing else. It hands out the three files the tour is
+~~  made of, and it runs the code you type — by writing it to a file and
+~~  giving it to the real interpreter, exactly as if you had typed
+~~  sprfst run yourself. There is no SPRFST interpreter in the browser
+~~  and there is no table of stored answers here: the output the page
+~~  shows you is the output your program produced a moment ago.
+~~
+~~  Nothing leaves this machine and nothing is fetched from the network.
+~~ =====================================================================
+use std.io
+use std.fs
+use std.sys
+use std.path
+use std.http
+use std.json
+use std.time
+
+let PORT = 7070
+let LIMIT = 20000          ~~ longest program we will accept, in bytes
+
+fn here() -> Text {
+    give path.dirname(path.abs(sys.args().first() ?? "new/serve.spf"))
+}
+
+~~ The interpreter that is running this file is the one that should run
+~~ your code, so look where the project keeps it before trusting PATH.
+fn interpreter() -> Text {
+    let given = sys.env("SPRFST_BIN") ?? ""
+    if given != "" and fs.is_file(given) { give path.abs(given) }
+    let root = path.dirname(here())
+    for candidate in [root + "/build/bin/sprfst", "build/bin/sprfst", "/usr/local/bin/sprfst"] {
+        if fs.is_file(candidate) { give path.abs(candidate) }
+    }
+    let found = sys.run("command -v sprfst 2>/dev/null").trim()
+    if found != "" { give found }
+    give "sprfst"
+}
+
+fn scratch() -> Text {
+    let place = (sys.env("TMPDIR") ?? "/tmp") + "/sprfst-tour-web"
+    if not fs.is_dir(place) { fs.mkdir(place) }
+    give place
+}
+
+fn kind_of(name: Text) -> Text {
+    if name.ends_with(".html") { give "text/html; charset=utf-8" }
+    if name.ends_with(".css") { give "text/css; charset=utf-8" }
+    if name.ends_with(".js") { give "text/javascript; charset=utf-8" }
+    if name.ends_with(".svg") { give "image/svg+xml" }
+    if name.ends_with(".png") { give "image/png" }
+    give "text/plain; charset=utf-8"
+}
+
+~~ Only the files that make up the tour, and only from this folder. A
+~~ path with a .. in it never reaches the disk.
+fn serve_file(name: Text) -> Map<Text, Any> {
+    if name.contains("..") {
+        give ["status": 403, "type": "text/plain", "body": "no"]
+    }
+    let full = here() + "/" + name
+    if not fs.is_file(full) {
+        give ["status": 404, "type": "text/plain", "body": "no file called " + name]
+    }
+    give ["status": 200, "type": kind_of(name), "body": fs.read(full) ?? ""]
+}
+
+fn ran(output: Text, broke: Bool, took: Int) -> Map<Text, Any> {
+    var lines: [Text] = []
+    for line in output.split("\n") { lines.push(line) }
+    while lines.len() > 0 and (lines.last() ?? "") == "" { lines.pop() }
+    give ["status": 200, "type": "application/json",
+          "body": json.write(["ok": true, "lines": lines, "broke": broke, "ms": took])]
+}
+
+~~ Write the program, run it, give back whatever it printed. Errors and
+~~ ordinary output come back together, because when something will not
+~~ compile the error is the thing you need to read.
+fn run_code(code: Text) -> Map<Text, Any> {
+    if code.trim() == "" {
+        give ran("(nothing to run — the editor is empty)", false, 0)
+    }
+    if code.len() > LIMIT {
+        give ran("that program is longer than this page will run", true, 0)
+    }
+    let file = scratch() + "/piece.spf"
+    fs.write(file, code)
+    let began = time.ms()
+    let output = sys.run("cd \"" + scratch() + "\" && \"" + interpreter() +
+                         "\" run \"" + file + "\" 2>&1")
+    let took = time.ms() - began
+    give ran(output, output.contains("error["), to_int(took))
+}
+
+fn handle(request: Map<Text, Any>) -> Map<Text, Any> {
+    let way = to_text(request.get("path") ?? "/")
+    let how = to_text(request.get("method") ?? "GET")
+
+    if way == "/api/hello" {
+        give ["status": 200, "type": "application/json",
+              "body": json.write(["ok": true, "service": "sprfst-tour-web",
+                                  "runner": interpreter()])]
+    }
+    if way == "/api/run" {
+        if how != "POST" {
+            give ["status": 405, "type": "text/plain", "body": "send it with POST"]
+        }
+        let sent = json.parse(to_text(request.get("body") ?? ""))
+        if sent == nil {
+            give ["status": 400, "type": "application/json",
+                  "body": json.write(["ok": false, "error": "that was not JSON"])]
+        }
+        let shape: Map<Text, Any> = sent ?? [:]
+        give run_code(to_text(shape.get("code") ?? ""))
+    }
+    if way == "/" or way == "/index.html" { give serve_file("index.html") }
+    if way == "/tour.css" { give serve_file("tour.css") }
+    if way == "/tour.js" { give serve_file("tour.js") }
+    give ["status": 404, "type": "text/plain", "body": "nothing here"]
+}
+
+fn main() {
+    let where_from = here()
+    if not fs.is_file(where_from + "/index.html") {
+        io.say("cannot find index.html next to serve.spf — looked in " + where_from)
+        sys.exit(1)
+    }
+    io.say("")
+    io.say("  SPRFST — the tour, in a browser")
+    io.say("")
+    io.say("  open        http://localhost:{PORT}")
+    io.say("  runner      " + interpreter())
+    io.say("  serving     " + where_from)
+    io.say("")
+    io.say("  Your code is written to " + scratch() + " and run there.")
+    io.say("  Nothing leaves this machine. Stop the server with control-C.")
+    io.say("")
+    http.serve(PORT, handle)
+}

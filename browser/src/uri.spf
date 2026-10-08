@@ -1,0 +1,213 @@
+~~ =====================================================================
+~~  SPRFST Browser — addresses
+~~
+~~  Everything in the engine passes URLs around as Url values rather
+~~  than as text, so a page can resolve its own links without guessing.
+~~ =====================================================================
+module uri
+
+pub object Url {
+    scheme: Text = "http"
+    host: Text = ""
+    port: Int = 80
+    path: Text = "/"
+    query: Text = ""
+    frag: Text = ""
+    ok: Bool = false
+
+    ~~ scheme://host[:port]
+    fn origin(self) -> Text {
+        if self.scheme == "sprfst" { give "sprfst://" + self.host }
+        var out = self.scheme + "://" + self.host
+        if self.port != default_port(self.scheme) {
+            out = out + ":" + self.port.to_text()
+        }
+        give out
+    }
+
+    ~~ The whole address, as it would be typed.
+    fn full(self) -> Text {
+        ~~ sprfst://about is the whole address; it has no path to speak of
+        var out = if self.is_internal() and self.path == "/" {
+            self.origin()
+        } else {
+            self.origin() + self.path
+        }
+        if self.query != "" { out = out + "?" + self.query }
+        if self.frag != "" { out = out + "#" + self.frag }
+        give out
+    }
+
+    ~~ What goes on the first line of the request.
+    fn target(self) -> Text {
+        if self.query == "" { give self.path }
+        give self.path + "?" + self.query
+    }
+
+    ~~ The name a person would recognise: no www, no scheme.
+    fn site(self) -> Text => strip_www(self.host)
+
+    fn is_secure(self) -> Bool => self.scheme == "https"
+
+    fn is_internal(self) -> Bool => self.scheme == "sprfst"
+}
+
+~~ A machine on this desk, or on this network.
+pub fn is_local(host: Text) -> Bool {
+    give host == "localhost" or host == "127.0.0.1" or host == "::1" or
+         host == "0.0.0.0" or host.ends_with(".local") or host.ends_with(".test") or
+         host.starts_with("192.168.") or host.starts_with("10.") or
+         host.starts_with("127.")
+}
+
+pub fn default_port(scheme: Text) -> Int {
+    if scheme == "https" { give 443 }
+    if scheme == "ftp" { give 21 }
+    give 80
+}
+
+pub fn strip_www(host: Text) -> Text {
+    if host.starts_with("www.") { give host.slice(4, host.len()) }
+    give host
+}
+
+~~ The registrable part of a host, near enough for same-site tests:
+~~ the last two labels, or three when the second last is very short.
+pub fn site_of(host: Text) -> Text {
+    let parts = strip_www(host).split(".")
+    let n = parts.len()
+    if n <= 2 { give strip_www(host) }
+    let second = parts[n - 2]
+    if second.len() <= 3 and n >= 3 {
+        give parts[n - 3] + "." + second + "." + parts[n - 1]
+    }
+    give second + "." + parts[n - 1]
+}
+
+~~ Read an address. Anything unparseable comes back with ok = false.
+pub fn parse(raw: Text) -> Url {
+    var out = Url { }
+    var rest = raw.trim()
+    if rest == "" { give out }
+
+    let mark = rest.index_of("://")
+    var told = false
+    if mark > 0 {
+        out.scheme = rest.slice(0, mark).lower()
+        rest = rest.slice(mark + 3, rest.len())
+        told = true
+    } else if rest.starts_with("//") {
+        rest = rest.slice(2, rest.len())
+    }
+    out.port = default_port(out.scheme)
+
+    let hash = rest.index_of("#")
+    if hash >= 0 {
+        out.frag = rest.slice(hash + 1, rest.len())
+        rest = rest.slice(0, hash)
+    }
+    let question = rest.index_of("?")
+    if question >= 0 {
+        out.query = rest.slice(question + 1, rest.len())
+        rest = rest.slice(0, question)
+    }
+
+    var authority = rest
+    var path = ""
+    let slash = rest.index_of("/")
+    if slash >= 0 {
+        authority = rest.slice(0, slash)
+        path = rest.slice(slash, rest.len())
+    }
+
+    let at = authority.index_of("@")
+    if at >= 0 { authority = authority.slice(at + 1, authority.len()) }
+
+    var given_port = -1
+    let colon = authority.index_of(":")
+    if colon >= 0 {
+        out.host = authority.slice(0, colon).lower()
+        let digits = authority.slice(colon + 1, authority.len())
+        given_port = digits.to_int() ?? -1
+    } else {
+        out.host = authority.lower()
+    }
+
+    ~~ Nobody types a scheme any more. Everything is tried over https
+    ~~ unless it is a machine on this desk, which rarely has one.
+    if not told and not is_local(out.host) { out.scheme = "https" }
+    out.port = if given_port >= 0 { given_port } else { default_port(out.scheme) }
+
+    if path == "" { path = "/" }
+    out.path = tidy(path)
+    out.ok = out.host != ""
+    give out
+}
+
+~~ Collapse "." and ".." and double slashes in a path.
+pub fn tidy(path: Text) -> Text {
+    if not path.contains("/.") and not path.contains("//") { give path }
+    var keep: [Text] = []
+    for part in path.split("/") {
+        if part == "" or part == "." { skip }
+        if part == ".." {
+            if keep.len() > 0 { keep.pop() }
+            skip
+        }
+        keep.push(part)
+    }
+    var out = "/" + keep.join("/")
+    if path.ends_with("/") and not out.ends_with("/") { out = out + "/" }
+    give out
+}
+
+~~ Work out where a link on a page points.
+pub fn resolve(base: Url, href: Text) -> Url {
+    let link = href.trim()
+    if link == "" { give base }
+
+    if link.starts_with("#") {
+        give Url { scheme: base.scheme, host: base.host, port: base.port,
+                   path: base.path, query: base.query, ok: base.ok,
+                   frag: link.slice(1, link.len()) }
+    }
+    if link.contains("://") { give parse(link) }
+    if link.starts_with("//") { give parse(base.scheme + ":" + link) }
+    if link.starts_with("mailto:") or link.starts_with("javascript:") or link.starts_with("tel:") {
+        give Url { ok: false, scheme: "unsupported", path: link }
+    }
+    if link.starts_with("/") { give parse(base.origin() + link) }
+
+    var dir = base.path
+    let slash = last_index_of(dir, "/")
+    if slash >= 0 { dir = dir.slice(0, slash + 1) } else { dir = "/" }
+    give parse(base.origin() + dir + link)
+}
+
+pub fn last_index_of(text: Text, part: Text) -> Int {
+    var found = -1
+    var from = 0
+    while from < text.len() {
+        let rest = text.slice(from, text.len())
+        let at = rest.index_of(part)
+        if at < 0 { break }
+        found = from + at
+        from = found + 1
+    }
+    give found
+}
+
+~~ Did someone type an address or a search?
+pub fn looks_like_address(typed: Text) -> Bool {
+    let text = typed.trim()
+    if text == "" { give false }
+    if text.contains(" ") { give false }
+    if text.contains("://") { give true }
+    if text.starts_with("localhost") { give true }
+    if text.starts_with("sprfst:") { give true }
+    if not text.contains(".") { give false }
+    ~~ "4.5" is a number, "a.b" is a host
+    let before = text.slice(0, text.index_of("."))
+    if before.to_num() != nil { give false }
+    give true
+}

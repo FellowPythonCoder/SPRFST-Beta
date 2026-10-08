@@ -1,0 +1,8 @@
+build/
+*.o
+*.spb
+packages/
+.DS_Store
+dist/*
+!dist/*.dmg
+*.forge

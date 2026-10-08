@@ -1,0 +1,647 @@
+~~ =====================================================================
+~~  SPRFST Browser — layout
+~~
+~~  Turns a styled document into a flat list of things to draw at
+~~  absolute positions: block boxes stacked down the page, words
+~~  flowed into lines and broken at the right edge.
+~~
+~~  Text is measured here rather than in the window, so the engine owns
+~~  the layout and the window only paints. The measurements are the
+~~  advance widths of Helvetica, which is what the window draws with.
+~~ =====================================================================
+module layout
+
+use html
+use css
+
+~~ One thing to draw.
+pub object Item {
+    kind: Text = "text"            ~~ text, rect, rule, image or bullet
+    x: Num = 0.0
+    y: Num = 0.0
+    w: Num = 0.0
+    h: Num = 0.0
+    text: Text = ""
+    colour: Int = 0
+    size: Num = 16.0
+    weight: Int = 400
+    italic: Bool = false
+    underline: Bool = false
+    mono: Bool = false
+    link: Text = ""
+    src: Text = ""
+}
+
+pub object Crumb {
+    tag: Text = ""
+    id: Text = ""
+    classes: [Text] = []
+}
+
+pub object Page {
+    items: [Item] = []
+    height: Num = 0.0
+    width: Num = 800.0
+    words: Int = 0
+    links: Int = 0
+    images: Int = 0
+    hidden: Int = 0
+    headings: [Text] = []          ~~ "level|text" for the outline
+}
+
+~~ ----------------------------------------------------------- metrics
+~~ Helvetica advance widths, per thousand, for space to ~.
+fn advances() -> [Int] {
+    give [278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,
+          556,556,556,556,556,556,556,556,556,556,278,278,584,584,584,556,
+          1015,667,667,722,722,667,611,778,722,278,500,667,556,833,722,778,
+          667,778,722,667,611,722,667,944,667,667,611,278,278,278,469,556,
+          333,556,556,500,556,556,278,556,556,222,222,500,222,833,556,556,
+          556,556,333,500,278,556,500,722,500,500,500,334,260,334,584]
+}
+
+pub object Ruler {
+    table: [Int] = []
+
+    fn width_of(self, text: Text, size: Num, weight: Int, mono: Bool) -> Num {
+        if mono { give char_count(text) * size * 0.6 }
+        var total = 0
+        var i = 0
+        let n = text.len()
+        while i < n {
+            let c = text.code_at(i)
+            if c >= 32 and c < 127 {
+                total = total + self.table[c - 32]
+            } else if c >= 192 {
+                total = total + 556
+            } else if c < 128 {
+                total = total + 278
+            }
+            i = i + 1
+        }
+        var out = total / 1000.0 * size
+        if weight >= 600 { out = out * 1.04 }
+        give out
+    }
+}
+
+pub fn ruler() -> Ruler => Ruler { table: advances() }
+
+~~ Characters, not bytes: a UTF-8 lead byte starts one.
+pub fn char_count(text: Text) -> Int {
+    var n = 0
+    var i = 0
+    while i < text.len() {
+        let c = text.code_at(i)
+        if c < 128 or c >= 192 { n = n + 1 }
+        i = i + 1
+    }
+    give n
+}
+
+~~ --------------------------------------------------- the house style
+~~ What each tag looks like before the page says anything.
+pub fn defaults(tag: Text, parent: css.Style) -> css.Style {
+    var out = parent.inherit()
+    out.display = if html.is_block(tag) { "block" } else { "inline" }
+
+    if tag == "h1" { out.size = parent.size * 2.0; out.weight = 700; out.margin_top = 22.0; out.margin_bottom = 12.0; out.level = 1 }
+    if tag == "h2" { out.size = parent.size * 1.6; out.weight = 700; out.margin_top = 20.0; out.margin_bottom = 10.0; out.level = 2 }
+    if tag == "h3" { out.size = parent.size * 1.32; out.weight = 700; out.margin_top = 18.0; out.margin_bottom = 8.0; out.level = 3 }
+    if tag == "h4" { out.size = parent.size * 1.14; out.weight = 700; out.margin_top = 16.0; out.margin_bottom = 7.0; out.level = 4 }
+    if tag == "h5" { out.size = parent.size; out.weight = 700; out.margin_top = 14.0; out.margin_bottom = 6.0; out.level = 5 }
+    if tag == "h6" { out.size = parent.size * 0.9; out.weight = 700; out.margin_top = 14.0; out.margin_bottom = 6.0; out.level = 6 }
+    if tag == "p" { out.margin_top = 10.0; out.margin_bottom = 10.0 }
+    if tag == "ul" or tag == "ol" { out.margin_top = 8.0; out.margin_bottom = 8.0; out.indent = 26.0 }
+    if tag == "li" { out.display = "list-item"; out.margin_top = 2.0; out.margin_bottom = 2.0 }
+    if tag == "dd" { out.indent = 26.0 }
+    if tag == "blockquote" { out.indent = 20.0; out.margin_top = 12.0; out.margin_bottom = 12.0; out.bar = 1 }
+    if tag == "pre" { out.mono = true; out.pre = true; out.margin_top = 12.0; out.margin_bottom = 12.0 }
+    if tag == "code" or tag == "kbd" or tag == "samp" or tag == "tt" { out.mono = true }
+    if tag == "b" or tag == "strong" or tag == "th" { out.weight = 700 }
+    if tag == "i" or tag == "em" or tag == "cite" or tag == "var" { out.italic = true }
+    if tag == "u" or tag == "ins" { out.underline = true }
+    if tag == "small" { out.size = parent.size * 0.85 }
+    if tag == "big" { out.size = parent.size * 1.15 }
+    if tag == "a" { out.underline = true }
+    if tag == "hr" { out.margin_top = 14.0; out.margin_bottom = 14.0 }
+    if tag == "table" { out.margin_top = 10.0; out.margin_bottom = 10.0 }
+    if tag == "td" or tag == "th" { out.display = "inline" }
+    if tag == "tr" { out.display = "block" }
+    if tag == "center" { out.align = "center" }
+    if tag == "script" or tag == "style" or tag == "head" or tag == "noscript" or
+       tag == "template" or tag == "svg" { out.hidden = true }
+    give out
+}
+
+~~ ------------------------------------------------------- rule lookup
+~~ Rules are bucketed by the last thing in the selector, so an element
+~~ only ever considers the handful of rules that could match it.
+pub object Index {
+    by_key: Map<Text, [css.Rule]> = [:]
+    loose: [css.Rule] = []
+
+    fn build(self, sheet: css.Sheet) {
+        for rule in sheet.rules {
+            let last = rule.parts[rule.parts.len() - 1]
+            let key = key_of(last)
+            if key == "" {
+                self.loose.push(rule)
+            } else {
+                var bucket = self.by_key.get(key) ?? []
+                bucket.push(rule)
+                self.by_key.set(key, bucket)
+            }
+        }
+    }
+
+    fn candidates(self, crumb: Crumb) -> [css.Rule] {
+        var out = self.loose.copy()
+        for rule in self.by_key.get("t:" + crumb.tag) ?? [] { out.push(rule) }
+        if crumb.id != "" {
+            for rule in self.by_key.get("i:" + crumb.id) ?? [] { out.push(rule) }
+        }
+        for name in crumb.classes {
+            for rule in self.by_key.get("c:" + name) ?? [] { out.push(rule) }
+        }
+        give out
+    }
+}
+
+fn key_of(part: Text) -> Text {
+    if part.starts_with("#") {
+        give "i:" + strip_marks(part.slice(1, part.len()))
+    }
+    if part.starts_with(".") {
+        give "c:" + strip_marks(part.slice(1, part.len()))
+    }
+    let name = strip_marks(part)
+    if name == "" { give "" }
+    give "t:" + name
+}
+
+fn strip_marks(part: Text) -> Text {
+    var out = part
+    let dot = out.index_of(".")
+    if dot >= 0 { out = out.slice(0, dot) }
+    let hash = out.index_of("#")
+    if hash >= 0 { out = out.slice(0, hash) }
+    give out
+}
+
+fn rule_matches(rule: css.Rule, chain: [Crumb]) -> Bool {
+    var pi = rule.parts.len() - 1
+    var ci = chain.len() - 1
+    if ci < 0 { give false }
+    let here = chain[ci]
+    if not css.part_matches(rule.parts[pi], here.tag, here.id, here.classes) { give false }
+    pi = pi - 1
+    ci = ci - 1
+    while pi >= 0 {
+        var found = false
+        while ci >= 0 {
+            let up = chain[ci]
+            ci = ci - 1
+            if css.part_matches(rule.parts[pi], up.tag, up.id, up.classes) {
+                found = true
+                break
+            }
+        }
+        if not found { give false }
+        pi = pi - 1
+    }
+    give true
+}
+
+~~ --------------------------------------------------------- the frame
+pub object Frame {
+    page: Page = Page { }
+    rule_index: Index = Index { }
+    measure: Ruler = Ruler { }
+    hide: [Text] = []
+    hide_tag: Map<Text, Bool> = [:]      ~~ the simple ones, sorted once
+    hide_id: Map<Text, Bool> = [:]
+    hide_class: Map<Text, Bool> = [:]
+    hide_rest: [Text] = []               ~~ anything compound, matched the long way
+    width: Num = 800.0
+    margin: Num = 28.0
+    left: Num = 0.0
+    y: Num = 0.0
+    pen: Num = 0.0
+    line: [Item] = []
+    line_top: Num = 0.0
+    tallest: Num = 0.0
+    pending_space: Bool = false
+    counters: [Int] = []
+
+    ~~ ------------------------------------------------ inline building
+    fn room(self) -> Num => self.width - self.margin - self.left
+
+    fn add_word(self, word: Text, style: css.Style, link: Text) {
+        if word == "" { give }
+        let gap = if self.pending_space and self.pen > 0.0 {
+            self.measure.width_of(" ", style.size, style.weight, style.mono)
+        } else { 0.0 }
+        let wide = self.measure.width_of(word, style.size, style.weight, style.mono)
+        if self.pen + gap + wide > self.room() and self.pen > 0.0 {
+            self.end_line()
+        }
+        var x = self.left + self.pen
+        if self.pen > 0.0 and self.pending_space { x = x + gap }
+        self.line.push(Item {
+            kind: "text", x: x, y: 0.0, w: wide, h: style.size * 1.45,
+            text: word, colour: style.colour, size: style.size,
+            weight: style.weight, italic: style.italic,
+            underline: style.underline, mono: style.mono, link: link
+        })
+        self.pen = x - self.left + wide
+        if style.size * 1.45 > self.tallest { self.tallest = style.size * 1.45 }
+        self.pending_space = false
+        self.page.words = self.page.words + 1
+    }
+
+    fn add_space(self) {
+        if self.pen > 0.0 { self.pending_space = true }
+    }
+
+    ~~ Settle the pending line onto the page.
+    fn end_line(self) {
+        if self.line.len() == 0 {
+            self.pending_space = false
+            give
+        }
+        let height = if self.tallest > 0.0 { self.tallest } else { 18.0 }
+        ~~ Everything on a line shares one baseline, whatever its size,
+        ~~ and each item's y is the top of its own box above that line.
+        let base = self.y + height * 0.78
+        for item in self.line {
+            item.y = base - item.size * 0.78
+            self.page.items.push(item)
+        }
+        self.y = self.y + height
+        self.line = []
+        self.pen = 0.0
+        self.tallest = 0.0
+        self.pending_space = false
+    }
+
+    fn centre_line(self) {
+        if self.line.len() == 0 { give }
+        let used = self.pen
+        let shift = (self.room() - used) / 2.0
+        if shift > 0.0 {
+            for item in self.line { item.x = item.x + shift }
+        }
+    }
+
+    ~~ --------------------------------------------------- block boxes
+    fn space_down(self, amount: Num) {
+        self.end_line()
+        self.y = self.y + amount
+    }
+
+    fn walk(self, node: html.Node, parent: css.Style, chain: [Crumb]) {
+        if node.kind == "text" {
+            self.text_run(node.text, parent)
+            give
+        }
+        if node.kind != "element" and node.kind != "root" {
+            give
+        }
+        if node.kind == "root" {
+            for kid in node.kids { self.walk(kid, parent, chain) }
+            give
+        }
+
+        let tag = node.name
+        var crumb = Crumb { tag: tag, id: node.id_of(), classes: node.classes() }
+        if self.is_hidden(crumb) {
+            self.page.hidden = self.page.hidden + 1
+            give
+        }
+        ~~ The page can say so itself, and often does.
+        if node.has("hidden") or node.attr("aria-hidden").lower() == "true" {
+            self.page.hidden = self.page.hidden + 1
+            give
+        }
+
+        var style = defaults(tag, parent)
+        chain.push(crumb)
+        self.apply_rules(style, chain, node)
+
+        if style.hidden or style.display == "none" {
+            chain.pop()
+            give
+        }
+
+        let link = if tag == "a" { node.attr("href") } else { "" }
+        if tag == "br" {
+            self.end_line()
+            chain.pop()
+            give
+        }
+        if tag == "hr" {
+            self.space_down(style.margin_top)
+            self.page.items.push(Item {
+                kind: "rule", x: self.left, y: self.y, w: self.room(), h: 1.0,
+                colour: 0x3A3A3E
+            })
+            self.y = self.y + style.margin_bottom
+            chain.pop()
+            give
+        }
+        if tag == "img" {
+            self.place_image(node, style)
+            chain.pop()
+            give
+        }
+
+        let block = style.display == "block" or style.display == "list-item"
+        if block {
+            self.space_down(style.margin_top)
+            self.left = self.left + style.indent
+            if style.display == "list-item" { self.bullet(style) }
+            if style.bar >= 0 {
+                let top = self.y
+                self.children(node, style, chain, link)
+                self.end_line()
+                self.page.items.push(Item {
+                    kind: "rect", x: self.left - 14.0, y: top, w: 3.0,
+                    h: self.y - top, colour: 0x8A6A3A
+                })
+            } else {
+                self.children(node, style, chain, link)
+            }
+            if style.align == "center" { self.centre_line() }
+            self.end_line()
+            self.left = self.left - style.indent
+            self.y = self.y + style.margin_bottom
+            if style.level > 0 {
+                self.page.headings.push("{style.level}|" + html.squash(node.inner_text()).trim())
+            }
+        } else {
+            self.children(node, style, chain, link)
+        }
+        chain.pop()
+    }
+
+    fn children(self, node: html.Node, style: css.Style, chain: [Crumb], link: Text) {
+        if style.pre {
+            self.pre_text(html.raw_text(node), style)
+            give
+        }
+        var number = 1
+        for kid in node.kids {
+            if kid.kind == "text" {
+                if link != "" { self.link_run(kid.text, style, link) }
+                else { self.text_run(kid.text, style) }
+            } else {
+                if node.name == "ol" and kid.name == "li" {
+                    self.counters.push(number)
+                    number = number + 1
+                    self.walk(kid, style, chain)
+                    self.counters.pop()
+                } else {
+                    if link != "" { self.linked_walk(kid, style, chain, link) }
+                    else { self.walk(kid, style, chain) }
+                }
+            }
+        }
+    }
+
+    ~~ Inside an <a> every word carries the address with it.
+    fn linked_walk(self, node: html.Node, style: css.Style, chain: [Crumb], link: Text) {
+        if node.kind == "text" {
+            self.link_run(node.text, style, link)
+            give
+        }
+        var inner = defaults(node.name, style)
+        inner.underline = true
+        for kid in node.kids {
+            if kid.kind == "text" { self.link_run(kid.text, inner, link) }
+            else { self.linked_walk(kid, inner, chain, link) }
+        }
+    }
+
+    fn text_run(self, raw: Text, style: css.Style) {
+        self.emit_words(raw, style, "")
+    }
+
+    fn link_run(self, raw: Text, style: css.Style, link: Text) {
+        var linked = style.inherit()
+        linked.underline = true
+        linked.colour = -2                      ~~ -2 asks the theme for the link colour
+        self.emit_words(raw, linked, link)
+        if link != "" { self.page.links = self.page.links + 1 }
+    }
+
+    fn emit_words(self, raw: Text, style: css.Style, link: Text) {
+        let text = html.squash(raw)
+        if text.trim() == "" {
+            if text != "" { self.add_space() }
+            give
+        }
+        if text.starts_with(" ") { self.add_space() }
+        for word in text.split(" ") {
+            if word == "" { skip }
+            self.add_word(word, style, link)
+            self.add_space()
+        }
+        if not text.ends_with(" ") { self.pending_space = false }
+    }
+
+    fn pre_text(self, raw: Text, style: css.Style) {
+        self.end_line()
+        let top = self.y
+        for row in raw.lines() {
+            let line = row.replace("\t", "    ")
+            if line.trim() != "" {
+                self.page.items.push(Item {
+                    kind: "text", x: self.left + 10.0, y: self.y + style.size * 1.1,
+                    w: self.measure.width_of(line, style.size, style.weight, true),
+                    h: style.size * 1.4, text: line, colour: style.colour,
+                    size: style.size, weight: style.weight, mono: true
+                })
+                self.page.words = self.page.words + 1
+            }
+            self.y = self.y + style.size * 1.4
+        }
+        self.page.items.push(Item {
+            kind: "rect", x: self.left, y: top - 6.0, w: self.room(),
+            h: self.y - top + 12.0, colour: -3
+        })
+        self.y = self.y + 6.0
+    }
+
+    ~~ The mark joins the item's first line rather than being placed
+    ~~ on its own, so it sits on the same baseline as the words.
+    fn bullet(self, style: css.Style) {
+        let mark = if self.counters.len() > 0 {
+            "{self.counters[self.counters.len() - 1]}."
+        } else { "•" }
+        self.line.push(Item {
+            kind: "bullet", x: self.left - 18.0, w: 14.0, h: style.size * 1.45,
+            text: mark, colour: -4, size: style.size * 0.95
+        })
+        if style.size * 1.45 > self.tallest { self.tallest = style.size * 1.45 }
+    }
+
+    fn place_image(self, node: html.Node, style: css.Style) {
+        let alt = node.attr("alt").trim()
+        let src = node.attr("src")
+        if src == "" and alt == "" { give }
+        var wide = (node.attr("width").to_num() ?? 0.0)
+        var high = (node.attr("height").to_num() ?? 0.0)
+        if wide <= 0.0 { wide = math.min(320.0, self.room()) }
+        if high <= 0.0 { high = wide * 0.62 }
+        if wide > self.room() {
+            high = high * (self.room() / wide)
+            wide = self.room()
+        }
+        self.end_line()
+        self.page.items.push(Item {
+            kind: "image", x: self.left, y: self.y, w: wide, h: high,
+            text: alt, src: src, size: style.size, colour: -5
+        })
+        self.y = self.y + high + 8.0
+        self.page.images = self.page.images + 1
+    }
+
+    ~~ ------------------------------------------------------- styling
+    fn apply_rules(self, style: css.Style, chain: [Crumb], node: html.Node) {
+        let here = chain[chain.len() - 1]
+        var winners: [css.Rule] = []
+        for rule in self.rule_index.candidates(here) {
+            if rule_matches(rule, chain) { winners.push(rule) }
+        }
+        let sorted = winners.sort_by(fn(a: css.Rule, b: css.Rule) -> Bool {
+            if a.weight != b.weight { give a.weight < b.weight }
+            give a.order < b.order
+        })
+        for rule in sorted {
+            for name in rule.decls.keys() {
+                set_property(style, name, rule.decls.get(name) ?? "")
+            }
+        }
+        let inline = node.attr("style")
+        if inline != "" {
+            for piece in inline.split(";") {
+                let colon = piece.index_of(":")
+                if colon < 0 { skip }
+                set_property(style, piece.slice(0, colon).trim().lower(),
+                             piece.slice(colon + 1, piece.len()).trim())
+            }
+        }
+    }
+
+    ~~ A hiding rule is read once, not once per element: a page with
+    ~~ seventy rules and two thousand elements would otherwise spend
+    ~~ all its time pulling the same selectors apart.
+    fn sort_hiding(self) {
+        for selector in self.hide {
+            let one = selector.trim()
+            if one == "" { skip }
+            if one.contains(" ") or one.contains(",") or one.contains("[") or
+               one.contains(":") or one.contains(">") {
+                self.hide_rest.push(one)
+                skip
+            }
+            let head = one.char_at(0)
+            let name = one.slice(1, one.len()).lower()
+            if head == "." and not name.contains(".") and not name.contains("#") {
+                self.hide_class.set(name, true)
+            } else if head == "#" and not name.contains(".") and not name.contains("#") {
+                self.hide_id.set(name, true)
+            } else if head != "." and head != "#" and not one.contains(".") and not one.contains("#") {
+                self.hide_tag.set(one.lower(), true)
+            } else {
+                self.hide_rest.push(one)
+            }
+        }
+    }
+
+    fn is_hidden(self, crumb: Crumb) -> Bool {
+        if self.hide_tag.has(crumb.tag) { give true }
+        if crumb.id != "" and self.hide_id.has(crumb.id) { give true }
+        for name in crumb.classes {
+            if self.hide_class.has(name) { give true }
+        }
+        for selector in self.hide_rest {
+            if css.part_matches(selector, crumb.tag, crumb.id, crumb.classes) { give true }
+        }
+        give false
+    }
+}
+
+~~ One declaration, applied to a computed style.
+pub fn set_property(style: css.Style, name: Text, raw: Text) {
+    let value = raw.trim()
+    let lower = value.lower()
+    if name == "display" {
+        if lower == "none" { style.display = "none" }
+        else if lower == "block" or lower == "flex" or lower == "grid" or lower == "table" { style.display = "block" }
+        else if lower == "inline" { style.display = "inline" }
+        else if lower == "list-item" { style.display = "list-item" }
+    }
+    if name == "color" { let c = css.colour_of(value); if c >= 0 { style.colour = c } }
+    if name == "background" or name == "background-color" {
+        let c = css.colour_of(first_word(value))
+        if c >= 0 { style.background = c }
+    }
+    if name == "font-size" { let s = css.length(value, style.size); if s > 1.0 { style.size = s } }
+    if name == "font-weight" {
+        if lower == "bold" or lower == "bolder" { style.weight = 700 }
+        else if lower == "normal" { style.weight = 400 }
+        else { style.weight = value.to_int() ?? style.weight }
+    }
+    if name == "font-style" { style.italic = lower == "italic" or lower == "oblique" }
+    if name == "font-family" {
+        style.mono = lower.contains("mono") or lower.contains("courier") or lower.contains("consol")
+    }
+    if name == "text-decoration" or name == "text-decoration-line" {
+        style.underline = lower.contains("underline")
+    }
+    if name == "text-align" {
+        if lower == "center" or lower == "left" or lower == "right" or lower == "justify" {
+            style.align = if lower == "justify" { "left" } else { lower }
+        }
+    }
+    if name == "margin-top" { style.margin_top = css.length(value, style.size) }
+    if name == "margin-bottom" { style.margin_bottom = css.length(value, style.size) }
+    if name == "margin-left" or name == "padding-left" {
+        style.indent = style.indent + css.length(value, style.size)
+    }
+    if name == "visibility" and lower == "hidden" { style.display = "none" }
+}
+
+fn first_word(value: Text) -> Text {
+    let bits = value.trim().split(" ")
+    if bits.len() == 0 { give value }
+    give bits[0]
+}
+
+~~ ---------------------------------------------------------- the run
+~~ Lay a document out at a given width.
+pub fn run(document: html.Node, sheet: css.Sheet, hide: [Text], width: Num) -> Page {
+    var frame = Frame {
+        width: width,
+        measure: ruler(),
+        hide: hide,
+        page: Page { width: width }
+    }
+    frame.rule_index.build(sheet)
+    frame.sort_hiding()
+    frame.left = frame.margin
+    frame.y = 24.0
+
+    var root = css.Style { size: 16.0, colour: -1, display: "block" }
+    var chain: [Crumb] = []
+    let body = document.first("body")
+    let start = body ?? document
+    frame.walk(start, root, chain)
+    frame.end_line()
+    frame.page.height = frame.y + 40.0
+    give frame.page
+}
+
+use std.math

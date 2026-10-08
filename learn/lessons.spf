@@ -1,0 +1,424 @@
+~~ =====================================================================
+~~  The lessons.
+~~
+~~  Content only: the tour in tour.spf is what shows them, checks them
+~~  and keeps your place. Every expected answer in this file was
+~~  produced by running the solution with the interpreter, not typed
+~~  out by hand, so a lesson that drifts out of date fails the check in
+~~  tour.spf --verify rather than quietly teaching the wrong thing.
+~~ =====================================================================
+module lessons
+
+pub data Lesson {
+    id: Text
+    stage: Text
+    title: Text
+    teach: [Text]
+    example: [Text]
+    brief: [Text]
+    starter: [Text]
+    expect: [Text]
+    hint: Text
+    answer: [Text]
+    side: Text
+    side_code: [Text]
+}
+
+fn stage_the_basics() -> [Lesson] {
+    var out: [Lesson] = []
+    out.push(Lesson {
+            id: "01",
+            stage: "The basics",
+            title: "Saying things",
+            teach: ["Every program begins at a function called main. Nothing runs until something is called from there.", "use std.io brings in the library for reading and writing. io.say prints one value and adds the line break for you.", "Comments start with ~~ and run to the end of the line."],
+            example: ["use std.io", "", "fn main() {{", "    io.say(\"hello\")", "    io.say(2 + 2)        ~~ not only text", "}}"],
+            brief: ["Print two lines: SPRFST on the first, day one on the second."],
+            starter: ["use std.io", "", "fn main() {{", "    ~~ your two lines here", "}}"],
+            expect: ["SPRFST", "day one"],
+            hint: "Two separate calls to io.say, one after the other.",
+            answer: ["use std.io", "", "fn main() {{", "    io.say(\"SPRFST\")", "    io.say(\"day one\")", "}}"],
+            side: "",
+            side_code: []
+    })
+    out.push(Lesson {
+            id: "02",
+            stage: "The basics",
+            title: "Names that hold things",
+            teach: ["let names something that will never change. var names something that will.", "You rarely write the type: it is worked out from the value. Write it when it makes the code clearer.", "Inside text, anything in braces is filled in: \"{{name}}\" becomes the value of name."],
+            example: ["use std.io", "", "fn main() {{", "    let name = \"ada\"", "    var count = 0", "    count = count + 1", "    io.say(\"{{name}} has {{count}}\")", "}}"],
+            brief: ["Keep a let called tool holding SPRFST, and a var called builds starting at 0.", "Add one to builds twice, then print exactly:  SPRFST: 2"],
+            starter: ["use std.io", "", "fn main() {{", "    let tool = \"SPRFST\"", "    var builds = 0", "    ~~ bump builds twice, then print", "}}"],
+            expect: ["SPRFST: 2"],
+            hint: "The whole line is one piece of text with two gaps in it.",
+            answer: ["use std.io", "", "fn main() {{", "    let tool = \"SPRFST\"", "    var builds = 0", "    builds = builds + 1", "    builds = builds + 1", "    io.say(\"{{tool}}: {{builds}}\")", "}}"],
+            side: "",
+            side_code: []
+    })
+    out.push(Lesson {
+            id: "03",
+            stage: "The basics",
+            title: "Numbers",
+            teach: ["Int is a whole number. Num has a fractional part. They are different types and the compiler keeps them apart.", "Dividing two Ints gives a Num: 7 / 2 is 3.5, not 3. to_int() cuts the fraction off.", "% is the remainder. use std.math gives sqrt, min, max, abs, round and the rest."],
+            example: ["use std.io", "use std.math", "", "fn main() {{", "    io.say(\"{{7 / 2}}\")", "    io.say(\"{{to_int(7 / 2)}}\")", "    io.say(\"{{17 % 5}}\")", "    io.say(\"{{math.sqrt(144.0)}}\")", "}}"],
+            brief: ["A class of 7 people splits a bill of 90.", "Print the exact share, then the whole pounds each, then the pennies left over.", "Three lines:  12.85714286  then  12  then  6"],
+            starter: ["use std.io", "", "fn main() {{", "    let bill = 90", "    let people = 7", "    ~~ exact share, whole part, remainder", "}}"],
+            expect: ["12.85714286", "12", "6"],
+            hint: "Three lines: bill / people, then the same wrapped in to_int, then bill % people.",
+            answer: ["use std.io", "", "fn main() {{", "    let bill = 90", "    let people = 7", "    io.say(\"{{bill / people}}\")", "    io.say(\"{{to_int(bill / people)}}\")", "    io.say(\"{{bill % people}}\")", "}}"],
+            side: "",
+            side_code: []
+    })
+    out.push(Lesson {
+            id: "04",
+            stage: "The basics",
+            title: "Choosing",
+            teach: ["if is an expression: it has a value, so you can give it straight to a name.", "The words are and, or, not — not the symbols.", "There is no ternary operator. if ... {{ }} else {{ }} in one line is the short form."],
+            example: ["use std.io", "", "fn main() {{", "    let hour = 20", "    let greeting = if hour < 12 {{ \"morning\" }} else {{ \"evening\" }}", "    io.say(greeting)", "    if hour > 18 and not (hour > 22) {{ io.say(\"supper\") }}", "}}"],
+            brief: ["Write fn grade(mark: Int) -> Text that gives back distinction for 70 and over,", "pass for 40 to 69, and fail below 40. Print the grade for 85, 55 and 12."],
+            starter: ["use std.io", "", "fn grade(mark: Int) -> Text {{", "    ~~ distinction, pass or fail", "}}", "", "fn main() {{", "    for mark in [85, 55, 12] {{", "        io.say(grade(mark))", "    }}", "}}"],
+            expect: ["distinction", "pass", "fail"],
+            hint: "give leaves the function at once, so you can test the highest band first.",
+            answer: ["use std.io", "", "fn grade(mark: Int) -> Text {{", "    if mark >= 70 {{ give \"distinction\" }}", "    if mark >= 40 {{ give \"pass\" }}", "    give \"fail\"", "}}", "", "fn main() {{", "    for mark in [85, 55, 12] {{", "        io.say(grade(mark))", "    }}", "}}"],
+            side: "",
+            side_code: []
+    })
+    out.push(Lesson {
+            id: "05",
+            stage: "The basics",
+            title: "Repeating work",
+            teach: ["for walks a list or a range. 1..5 stops before 5; 1...5 includes it.", "while repeats while something is true. loop repeats until you break.", "break leaves the loop. skip jumps to the next turn."],
+            example: ["use std.io", "", "fn main() {{", "    for n in 1...3 {{ io.say(\"{{n}}\") }}", "", "    var left = 3", "    while left > 0 {{", "        left = left - 1", "    }}", "    io.say(\"done with {{left}} left\")", "}}"],
+            brief: ["Print every number from 1 to 20 that divides by 3, each on its own line,", "and stop early once you have printed four of them."],
+            starter: ["use std.io", "", "fn main() {{", "    var printed = 0", "    for n in 1...20 {{", "        ~~ skip the ones you do not want, break when you have four", "    }}", "}}"],
+            expect: ["3", "6", "9", "12"],
+            hint: "skip the numbers that fail the test, count the ones that pass, break at four.",
+            answer: ["use std.io", "", "fn main() {{", "    var printed = 0", "    for n in 1...20 {{", "        if n % 3 != 0 {{ skip }}", "        io.say(\"{{n}}\")", "        printed = printed + 1", "        if printed == 4 {{ break }}", "    }}", "}}"],
+            side: "",
+            side_code: []
+    })
+    out.push(Lesson {
+            id: "06",
+            stage: "The basics",
+            title: "Functions",
+            teach: ["fn name(parameter: Type) -> Type {{ ... }} and give hands the answer back.", "A function that is one expression can be written with => and no braces.", "Functions are values: you can keep one in a name, pass it to another function, or send a value through one with |>."],
+            example: ["use std.io", "", "fn double(n: Int) -> Int => n * 2", "", "fn apply_twice(value: Int, change: fn(Int) -> Int) -> Int {{", "    give change(change(value))", "}}", "", "fn main() {{", "    io.say(\"{{apply_twice(10, double)}}\")", "    io.say(\"{{5 |> double}}\")", "}}"],
+            brief: ["Write shout, which upper cases text and adds an exclamation mark,", "and excite, which does it twice. Print excite(\"ready\")."],
+            starter: ["use std.io", "", "fn shout(words: Text) -> Text => words.upper() + \"!\"", "", "fn excite(words: Text) -> Text {{", "    ~~ shout it, then shout that", "}}", "", "fn main() {{", "    io.say(excite(\"ready\"))", "}}"],
+            expect: ["READY!!"],
+            hint: "shout(shout(words)) — or words |> shout |> shout.",
+            answer: ["use std.io", "", "fn shout(words: Text) -> Text => words.upper() + \"!\"", "", "fn excite(words: Text) -> Text => shout(shout(words))", "", "fn main() {{", "    io.say(excite(\"ready\"))", "}}"],
+            side: "",
+            side_code: []
+    })
+    give out
+}
+
+fn stage_shaping_data() -> [Lesson] {
+    var out: [Lesson] = []
+    out.push(Lesson {
+            id: "07",
+            stage: "Shaping data",
+            title: "Text",
+            teach: ["Text is a value: methods give you a new one rather than changing the old.", "The ones you will use every day: len, upper, lower, trim, split, contains, replace, slice, starts_with, index_of.", "split gives a list; join puts a list back together."],
+            example: ["use std.io", "", "fn main() {{", "    let line = \"  SPRFST, a language  \"", "    let clean = line.trim()", "    io.say(clean.lower())", "    io.say(\"{{clean.split(\", \")}}\")", "    io.say(\"{{clean.len()}} characters\")", "    io.say(clean.replace(\"language\", \"tool\"))", "}}"],
+            brief: ["Take the line below and print the initials of each word, upper case, with no spaces.", "For \"simple programs run fast\" that is SPRF."],
+            starter: ["use std.io", "", "fn main() {{", "    let line = \"simple programs run fast\"", "    var initials = \"\"", "    ~~ take the first letter of each word", "    io.say(initials)", "}}"],
+            expect: ["SPRF"],
+            hint: "split on the space, then slice(0, 1) takes the first character of each word.",
+            answer: ["use std.io", "", "fn main() {{", "    let line = \"simple programs run fast\"", "    var initials = \"\"", "    for word in line.split(\" \") {{", "        initials = initials + word.slice(0, 1).upper()", "    }}", "    io.say(initials)", "}}"],
+            side: "",
+            side_code: []
+    })
+    out.push(Lesson {
+            id: "08",
+            stage: "Shaping data",
+            title: "Lists",
+            teach: ["A list is written [1, 2, 3] and holds one type of thing.", "push and pop change it. map, filter and reduce give you a new one and leave the old alone.", "sort_by takes a test that answers does a come first."],
+            example: ["use std.io", "", "fn main() {{", "    let numbers = [5, 3, 9, 1]", "    io.say(\"{{numbers.map(fn(n) => n * n)}}\")", "    io.say(\"{{numbers.filter(fn(n) => n > 3)}}\")", "    io.say(\"{{numbers.reduce(0, fn(total, n) => total + n)}}\")", "    io.say(\"{{numbers.sort_by(fn(a, b) => a > b)}}\")", "}}"],
+            brief: ["From the prices below, print the total, then the total of only those over 10,", "then the prices sorted from dearest to cheapest. Three lines."],
+            starter: ["use std.io", "", "fn main() {{", "    let prices = [4, 18, 7, 25, 11]", "    ~~ total, total of the dear ones, sorted downwards", "}}"],
+            expect: ["65", "54", "[25, 18, 11, 7, 4]"],
+            hint: "filter first, then sum the result — the calls chain left to right.",
+            answer: ["use std.io", "", "fn main() {{", "    let prices = [4, 18, 7, 25, 11]", "    io.say(\"{{prices.sum()}}\")", "    io.say(\"{{prices.filter(fn(p) => p > 10).sum()}}\")", "    io.say(\"{{prices.sort_by(fn(a, b) => a > b)}}\")", "}}"],
+            side: "",
+            side_code: []
+    })
+    out.push(Lesson {
+            id: "09",
+            stage: "Shaping data",
+            title: "Maps",
+            teach: ["A map holds pairs: [\"ada\": 36]. An empty one is [:].", "get answers with an optional, because the key might not be there. set puts one in.", "keys, values, has, remove and len do what they say."],
+            example: ["use std.io", "", "fn main() {{", "    var ages = [\"ada\": 36, \"alan\": 41]", "    ages.set(\"grace\", 45)", "    io.say(\"{{ages.get(\"ada\") ?? 0}}\")", "    io.say(\"{{ages.has(\"nobody\")}}\")", "    io.say(\"{{ages.len()}} people\")", "}}"],
+            brief: ["Count how often each word appears in the list below and print the count for the,", "then how many different words there were. Two lines: 3 then 4."],
+            starter: ["use std.io", "", "fn main() {{", "    let words = [\"the\", \"cat\", \"the\", \"mat\", \"on\", \"the\"]", "    var seen: Map<Text, Int> = [:]", "    ~~ count them", "}}"],
+            expect: ["3", "4"],
+            hint: "(seen.get(word) ?? 0) + 1 — the ?? supplies the zero the first time a word turns up.",
+            answer: ["use std.io", "", "fn main() {{", "    let words = [\"the\", \"cat\", \"the\", \"mat\", \"on\", \"the\"]", "    var seen: Map<Text, Int> = [:]", "    for word in words {{", "        seen.set(word, (seen.get(word) ?? 0) + 1)", "    }}", "    io.say(\"{{seen.get(\"the\") ?? 0}}\")", "    io.say(\"{{seen.len()}}\")", "}}"],
+            side: "",
+            side_code: []
+    })
+    out.push(Lesson {
+            id: "10",
+            stage: "Shaping data",
+            title: "When there is nothing there",
+            teach: ["A question mark on a type means or nothing: Int? is a whole number or nothing at all.", "?? supplies a value for the nothing case. ?. only calls the method when there is something there.", "The compiler will not let an Int? be used where an Int is wanted, so a missing value cannot slip past you."],
+            example: ["use std.io", "", "fn first_word(line: Text?) -> Text {{", "    give line?.split(\" \")?.first() ?? \"nothing\"", "}}", "", "fn main() {{", "    io.say(first_word(\"hello there\"))", "    io.say(first_word(nil))", "}}"],
+            brief: ["Write fn initial(name: Text?) -> Text that gives the first letter upper cased,", "or a question mark when there is no name. Print it for \"ada\" and for nil."],
+            starter: ["use std.io", "", "fn initial(name: Text?) -> Text {{", "    ~~ first letter, or ? when there is nothing", "}}", "", "fn main() {{", "    io.say(initial(\"ada\"))", "    io.say(initial(nil))", "}}"],
+            expect: ["A", "?"],
+            hint: "Chain with ?. and finish the whole chain with ?? to supply the fallback.",
+            answer: ["use std.io", "", "fn initial(name: Text?) -> Text {{", "    give name?.slice(0, 1)?.upper() ?? \"?\"", "}}", "", "fn main() {{", "    io.say(initial(\"ada\"))", "    io.say(initial(nil))", "}}"],
+            side: "",
+            side_code: []
+    })
+    out.push(Lesson {
+            id: "11",
+            stage: "Shaping data",
+            title: "When it can fail",
+            teach: ["Missing and failed are different ideas. A thing that can fail gives back Result<T>: either Ok(value) or Err(reason).", "match pulls the answer apart and makes you deal with both sides.", "This is why there are no exceptions appearing out of nowhere: a failure is in the type."],
+            example: ["use std.io", "", "fn parse_age(text: Text) -> Result<Int> {{", "    let n = text.to_int()", "    if n == nil {{ give Err(\"'{{text}}' is not a number\") }}", "    give Ok(n ?? 0)", "}}", "", "fn main() {{", "    for input in [\"36\", \"ada\"] {{", "        match parse_age(input) {{", "            when Ok(age) -> io.say(\"age {{age}}\")", "            when Err(why) -> io.say(\"no: {{why}}\")", "        }}", "    }}", "}}"],
+            brief: ["Write fn half(n: Int) -> Result<Int> that refuses odd numbers with the reason", "\"8 is odd\" style, and gives Ok of the half otherwise. Try it on 8 and on 7."],
+            starter: ["use std.io", "", "fn half(n: Int) -> Result<Int> {{", "    ~~ Err for odd, Ok for even", "}}", "", "fn main() {{", "    for n in [8, 7] {{", "        match half(n) {{", "            when Ok(value) -> io.say(\"half is {{value}}\")", "            when Err(why) -> io.say(why)", "        }}", "    }}", "}}"],
+            expect: ["half is 4", "7 is odd"],
+            hint: "Remember that Int / Int gives a Num, so wrap the division in to_int.",
+            answer: ["use std.io", "", "fn half(n: Int) -> Result<Int> {{", "    if n % 2 != 0 {{ give Err(\"{{n}} is odd\") }}", "    give Ok(to_int(n / 2))", "}}", "", "fn main() {{", "    for n in [8, 7] {{", "        match half(n) {{", "            when Ok(value) -> io.say(\"half is {{value}}\")", "            when Err(why) -> io.say(why)", "        }}", "    }}", "}}"],
+            side: "",
+            side_code: []
+    })
+    out.push(Lesson {
+            id: "12",
+            stage: "Shaping data",
+            title: "Enums and matching",
+            teach: ["An enum lists the shapes a value is allowed to take, and each shape can carry data.", "match chooses an arm and pulls the data out in the same step. The compiler checks you covered every shape.", "match works on ordinary values too, and an arm can carry a condition with if."],
+            example: ["use std.io", "", "enum Shape {{", "    Circle(Num)", "    Rect(Num, Num)", "}}", "", "fn area(s: Shape) -> Num {{", "    give match s {{", "        when Circle(r) -> 3.14159 * r * r", "        when Rect(w, h) -> w * h", "    }}", "}}", "", "fn main() {{", "    io.say(\"{{area(Rect(3.0, 4.0))}}\")", "}}"],
+            brief: ["Add an enum Coin with Heads and Tails, and fn call(c: Coin) -> Text", "that answers you win for Heads and try again for Tails. Print both."],
+            starter: ["use std.io", "", "enum Coin {{", "    Heads", "    Tails", "}}", "", "fn call(c: Coin) -> Text {{", "    ~~ match the two shapes", "}}", "", "fn main() {{", "    io.say(call(Heads))", "    io.say(call(Tails))", "}}"],
+            expect: ["you win", "try again"],
+            hint: "give match c {{ ... }} — the match is the value the function hands back.",
+            answer: ["use std.io", "", "enum Coin {{", "    Heads", "    Tails", "}}", "", "fn call(c: Coin) -> Text {{", "    give match c {{", "        when Heads -> \"you win\"", "        when Tails -> \"try again\"", "    }}", "}}", "", "fn main() {{", "    io.say(call(Heads))", "    io.say(call(Tails))", "}}"],
+            side: "",
+            side_code: []
+    })
+    give out
+}
+
+fn stage_structure() -> [Lesson] {
+    var out: [Lesson] = []
+    out.push(Lesson {
+            id: "13",
+            stage: "Structure",
+            title: "Objects",
+            teach: ["An object has fields with defaults and functions that take self.", "You build one by naming the fields you want to change: Counter {{ name: \"hits\" }}.", "Objects are references: hand one to a function and the function sees the same object you do."],
+            example: ["use std.io", "", "object Counter {{", "    name: Text = \"counter\"", "    value: Int = 0", "", "    fn bump(self) {{ self.value = self.value + 1 }}", "    fn report(self) -> Text => \"{{self.name}} is at {{self.value}}\"", "}}", "", "fn main() {{", "    var hits = Counter {{ name: \"page views\" }}", "    hits.bump()", "    hits.bump()", "    io.say(hits.report())", "}}"],
+            brief: ["Write an object Basket with a list of prices and two methods: add(price)", "and total(). Add 3, 7 and 10, then print  basket: 20"],
+            starter: ["use std.io", "", "object Basket {{", "    prices: [Int] = []", "", "    ~~ add and total — sum() answers with a Num, so wrap it in to_int", "}}", "", "fn main() {{", "    var basket = Basket {{ }}", "    basket.add(3)", "    basket.add(7)", "    basket.add(10)", "    io.say(\"basket: {{basket.total()}}\")", "}}"],
+            expect: ["basket: 20"],
+            hint: "Every method's first parameter is self, and then its own arguments after it.",
+            answer: ["use std.io", "", "object Basket {{", "    prices: [Int] = []", "", "    fn add(self, price: Int) {{ self.prices.push(price) }}", "    fn total(self) -> Int => to_int(self.prices.sum())", "}}", "", "fn main() {{", "    var basket = Basket {{ }}", "    basket.add(3)", "    basket.add(7)", "    basket.add(10)", "    io.say(\"basket: {{basket.total()}}\")", "}}"],
+            side: "",
+            side_code: []
+    })
+    out.push(Lesson {
+            id: "14",
+            stage: "Structure",
+            title: "Values that are only their contents",
+            teach: ["data is for things with no identity of their own: a point, a date, a colour.", "Two data values with the same contents are equal. Two objects are only equal if they are the same object.", "Reach for data when the thing is a measurement, and object when it is a thing that does something."],
+            example: ["use std.io", "", "data Point {{", "    x: Num", "    y: Num", "}}", "", "fn main() {{", "    let a = Point {{ x: 1.0, y: 2.0 }}", "    let b = Point {{ x: 1.0, y: 2.0 }}", "    io.say(\"same: {{a == b}}\")", "}}"],
+            brief: ["Make a data Size with width and height, write fn area(s: Size) -> Int,", "and print the area of 4 by 5, then whether two separate 4 by 5 sizes are equal."],
+            starter: ["use std.io", "", "data Size {{", "    width: Int", "    height: Int", "}}", "", "fn area(s: Size) -> Int {{", "    ~~ width times height", "}}", "", "fn main() {{", "    let a = Size {{ width: 4, height: 5 }}", "    let b = Size {{ width: 4, height: 5 }}", "    io.say(\"{{area(a)}}\")", "    io.say(\"{{a == b}}\")", "}}"],
+            expect: ["20", "true"],
+            hint: "A one line function can use => instead of braces and give.",
+            answer: ["use std.io", "", "data Size {{", "    width: Int", "    height: Int", "}}", "", "fn area(s: Size) -> Int => s.width * s.height", "", "fn main() {{", "    let a = Size {{ width: 4, height: 5 }}", "    let b = Size {{ width: 4, height: 5 }}", "    io.say(\"{{area(a)}}\")", "    io.say(\"{{a == b}}\")", "}}"],
+            side: "",
+            side_code: []
+    })
+    out.push(Lesson {
+            id: "15",
+            stage: "Structure",
+            title: "Traits",
+            teach: ["A trait is a promise: these functions exist. An object that keeps the promise can be used wherever the trait is wanted.", "A trait can carry a finished method of its own, written in terms of the ones it demands.", "impl Trait for Object {{}} is how you say the promise is kept. Composition first: small traits beat deep family trees."],
+            example: ["use std.io", "", "trait Greeter {{", "    fn name(self) -> Text", "    fn greet(self) -> Text => \"hello, {{self.name()}}\"", "}}", "", "object Person {{", "    given: Text = \"friend\"", "    fn name(self) -> Text => self.given", "}}", "", "impl Greeter for Person {{}}", "", "fn main() {{", "    io.say(Person {{ given: \"Ada\" }}.greet())", "}}"],
+            brief: ["Write a trait Loud with fn word(self) -> Text and a finished fn shout(self)", "that upper cases it with an exclamation mark. Give it to a Dog saying woof", "and a Cat saying meow, then shout both from one list."],
+            starter: ["use std.io", "", "trait Loud {{", "    fn word(self) -> Text", "    ~~ a finished shout, built on word", "}}", "", "object Dog {{ fn word(self) -> Text => \"woof\" }}", "object Cat {{ fn word(self) -> Text => \"meow\" }}", "", "impl Loud for Dog {{}}", "impl Loud for Cat {{}}", "", "fn main() {{", "    let animals: [Loud] = [Dog {{ }}, Cat {{ }}]", "    for one in animals {{", "        io.say(one.shout())", "    }}", "}}"],
+            expect: ["WOOF!", "MEOW!"],
+            hint: "The default method calls self.word(), which each object fills in differently.",
+            answer: ["use std.io", "", "trait Loud {{", "    fn word(self) -> Text", "    fn shout(self) -> Text => self.word().upper() + \"!\"", "}}", "", "object Dog {{ fn word(self) -> Text => \"woof\" }}", "object Cat {{ fn word(self) -> Text => \"meow\" }}", "", "impl Loud for Dog {{}}", "impl Loud for Cat {{}}", "", "fn main() {{", "    let animals: [Loud] = [Dog {{ }}, Cat {{ }}]", "    for one in animals {{", "        io.say(one.shout())", "    }}", "}}"],
+            side: "",
+            side_code: []
+    })
+    out.push(Lesson {
+            id: "16",
+            stage: "Structure",
+            title: "Generics",
+            teach: ["A generic function works for any type, and the compiler still checks every use.", "<T> introduces the name of the type. <T: Ord> says it must be one you can compare.", "There is no boxing and no casting: the same code is used, and the types are erased once they are checked."],
+            example: ["use std.io", "", "fn first_of<T>(items: [T]) -> T? {{", "    if items.is_empty() {{ give nil }}", "    give items[0]", "}}", "", "fn larger<T: Ord>(a: T, b: T) -> T {{", "    if a > b {{ give a }}", "    give b", "}}", "", "fn main() {{", "    io.say(\"{{first_of([3, 4, 5]) ?? 0}}\")", "    io.say(larger(\"apple\", \"pear\"))", "}}"],
+            brief: ["Write fn last_of<T>(items: [T]) -> T? and use it on a list of numbers", "and a list of words. Print 9 then zebra."],
+            starter: ["use std.io", "", "fn last_of<T>(items: [T]) -> T? {{", "    ~~ nothing when empty, otherwise the final one", "}}", "", "fn main() {{", "    io.say(\"{{last_of([3, 6, 9]) ?? 0}}\")", "    io.say(last_of([\"ant\", \"zebra\"]) ?? \"none\")", "}}"],
+            expect: ["9", "zebra"],
+            hint: "items.len() - 1 is the last position, and an empty list has to give nil.",
+            answer: ["use std.io", "", "fn last_of<T>(items: [T]) -> T? {{", "    if items.is_empty() {{ give nil }}", "    give items[items.len() - 1]", "}}", "", "fn main() {{", "    io.say(\"{{last_of([3, 6, 9]) ?? 0}}\")", "    io.say(last_of([\"ant\", \"zebra\"]) ?? \"none\")", "}}"],
+            side: "",
+            side_code: []
+    })
+    out.push(Lesson {
+            id: "17",
+            stage: "Structure",
+            title: "Modules",
+            teach: ["A file that begins with module <name> can be used by its neighbours with use <name>.", "Only what you mark pub is visible outside. Everything else belongs to the file.", "A project has src, tests, assets and packages, described by project.sprfst. sprfst new makes one for you."],
+            example: ["~~ money.spf", "module money", "", "pub fn vat(amount: Num) -> Num => amount * 0.2", "fn secret() -> Text => \"not visible outside\""],
+            brief: ["A file called shapes.spf has been written next to yours. Open it, add a pub fn", "perimeter(side: Num) -> Num, then use it from your file to print the area and", "the perimeter of a square of side 4. Two lines: 16.0 then 16.0"],
+            starter: ["use std.io", "use shapes", "", "fn main() {{", "    io.say(\"{{shapes.area(4.0)}}\")", "    ~~ now the perimeter", "}}"],
+            expect: ["16.0", "16.0"],
+            hint: "In shapes.spf: pub fn perimeter(side: Num) -> Num => side * 4.0",
+            answer: ["use std.io", "use shapes", "", "fn main() {{", "    io.say(\"{{shapes.area(4.0)}}\")", "    io.say(\"{{shapes.perimeter(4.0)}}\")", "}}"],
+            side: "shapes.spf",
+            side_code: ["module shapes", "", "pub fn area(side: Num) -> Num => side * side", "", "~~ add a pub fn perimeter here"]
+    })
+    give out
+}
+
+fn stage_power() -> [Lesson] {
+    var out: [Lesson] = []
+    out.push(Lesson {
+            id: "18",
+            stage: "Power",
+            title: "Files and JSON",
+            teach: ["fs.read gives Text? because the file might not be there. fs.write answers whether it worked.", "json.parse gives you an Any you can look into; json.write turns a value back into text.", "use std.path for joining and splitting paths rather than gluing text together."],
+            example: ["use std.io", "use std.fs", "use std.json", "", "fn main() {{", "    fs.write(\"/tmp/note.json\", json.write([\"tool\": \"SPRFST\", \"year\": 2026]))", "    let back = fs.read(\"/tmp/note.json\") ?? \"\"", "    io.say(back)", "    io.say(\"{{fs.exists(\"/tmp/note.json\")}}\")", "}}"],
+            brief: ["Write the list of names below to /tmp/names.json as JSON, read the file back,", "and print the text you read, then how many bytes it was."],
+            starter: ["use std.io", "use std.fs", "use std.json", "", "fn main() {{", "    let names = [\"ada\", \"alan\", \"grace\"]", "    ~~ write it, read it back, print both lines", "}}"],
+            expect: ["[\"ada\",\"alan\",\"grace\"]", "22 bytes"],
+            hint: "fs.read gives Text?, so finish it with ?? \"\" before using it.",
+            answer: ["use std.io", "use std.fs", "use std.json", "", "fn main() {{", "    let names = [\"ada\", \"alan\", \"grace\"]", "    fs.write(\"/tmp/names.json\", json.write(names))", "    let back = fs.read(\"/tmp/names.json\") ?? \"\"", "    io.say(back)", "    io.say(\"{{back.len()}} bytes\")", "}}"],
+            side: "",
+            side_code: []
+    })
+    out.push(Lesson {
+            id: "19",
+            stage: "Power",
+            title: "Testing",
+            teach: ["A function whose name begins with test is a test. sprfst test finds every one under tests/ and runs it.", "use std.testing gives same, different, yes, no, close and holds. Each one says what it was checking.", "Tests are ordinary code: no framework to learn, and they run at the speed of the interpreter."],
+            example: ["use std.io", "use std.testing", "", "fn add(a: Int, b: Int) -> Int => a + b", "", "fn main() {{", "    testing.same(add(2, 2), 4, \"two and two\")", "    testing.yes(add(2, 2) > 3, \"bigger than three\")", "    io.say(\"checked\")", "}}"],
+            brief: ["Write fn reverse_words(line: Text) -> Text that reverses the order of the words,", "then check it with testing.same on two different sentences and print done."],
+            starter: ["use std.io", "use std.testing", "", "fn reverse_words(line: Text) -> Text {{", "    ~~ split, reverse, join", "}}", "", "fn main() {{", "    testing.same(reverse_words(\"one two three\"), \"three two one\", \"three words\")", "    ~~ one more check of your own", "    io.say(\"done\")", "}}"],
+            expect: ["done"],
+            hint: "split(\" \") then reverse() then join(\" \") — three calls in a row.",
+            answer: ["use std.io", "use std.testing", "", "fn reverse_words(line: Text) -> Text => line.split(\" \").reverse().join(\" \")", "", "fn main() {{", "    testing.same(reverse_words(\"one two three\"), \"three two one\", \"three words\")", "    testing.same(reverse_words(\"hello\"), \"hello\", \"one word\")", "    io.say(\"done\")", "}}"],
+            side: "",
+            side_code: []
+    })
+    out.push(Lesson {
+            id: "20",
+            stage: "Power",
+            title: "Doing several things",
+            teach: ["task is a function that can be run alongside others. spawn starts one, await waits for its answer.", "Awaiting in order gives you an order you can rely on, which is what tests and examples want.", "thread.channel is the other way: a queue you send into and take out of."],
+            example: ["use std.io", "", "task work(id: Int) -> Int {{", "    give id * 100", "}}", "", "fn main() {{", "    let a = spawn work(1)", "    let b = spawn work(2)", "    io.say(\"{{await a}} {{await b}}\")", "}}"],
+            brief: ["Start three tasks that square 2, 4 and 6, await them in order, and print the", "three answers on one line, then their total on the next."],
+            starter: ["use std.io", "", "task square(n: Int) -> Int {{", "    ~~ n times n", "}}", "", "fn main() {{", "    ~~ spawn three, await in order, print", "}}"],
+            expect: ["4 16 36", "56"],
+            hint: "Keep each awaited answer in a name so you can print it and add it up.",
+            answer: ["use std.io", "", "task square(n: Int) -> Int {{", "    give n * n", "}}", "", "fn main() {{", "    let a = spawn square(2)", "    let b = spawn square(4)", "    let c = spawn square(6)", "    let x = await a", "    let y = await b", "    let z = await c", "    io.say(\"{{x}} {{y}} {{z}}\")", "    io.say(\"{{x + y + z}}\")", "}}"],
+            side: "",
+            side_code: []
+    })
+    out.push(Lesson {
+            id: "21",
+            stage: "Power",
+            title: "Memory",
+            teach: ["There is no collector pause you can feel and no free() to forget. Values live as long as something is holding them.", "Lists, maps and objects are references: pass one along and both sides see the same thing. clone() gives you your own copy.", "ref on a parameter says I am only borrowing this. own says I am taking it, and the caller may not use it afterwards.", "defer runs a line when the function leaves, however it leaves."],
+            example: ["use std.io", "", "fn add_one(items: [Int]) {{ items.push(1) }}", "fn peek(items: ref [Int]) -> Int => items.len()", "", "fn main() {{", "    var numbers = [0]", "    add_one(numbers)", "    io.say(\"{{numbers}}\")", "", "    let copy = clone(numbers)", "    numbers.push(99)", "    io.say(\"copy is still {{copy}}\")", "    io.say(\"borrowed length {{peek(numbers)}}\")", "}}"],
+            brief: ["Make a list, hand it to a function that pushes to it, and print it: the change shows.", "Then clone it, push to the clone, and print both to show the original is untouched.", "Add a defer that prints finished as the last thing main does."],
+            starter: ["use std.io", "", "fn grow(items: [Int]) {{", "    items.push(2)", "}}", "", "fn main() {{", "    defer io.say(\"finished\")", "    var original = [1]", "    ~~ grow it, clone it, change the clone, print both", "}}"],
+            expect: ["original [1, 2]", "copy [1, 2, 3]", "finished"],
+            hint: "defer is written where it is set up, but runs at the very end.",
+            answer: ["use std.io", "", "fn grow(items: [Int]) {{", "    items.push(2)", "}}", "", "fn main() {{", "    defer io.say(\"finished\")", "    var original = [1]", "    grow(original)", "    var copy = clone(original)", "    copy.push(3)", "    io.say(\"original {{original}}\")", "    io.say(\"copy {{copy}}\")", "}}"],
+            side: "",
+            side_code: []
+    })
+    give out
+}
+
+fn stage_pro() -> [Lesson] {
+    var out: [Lesson] = []
+    out.push(Lesson {
+            id: "22",
+            stage: "Pro",
+            title: "The web",
+            teach: ["http.serve takes a port and a function. Whatever the function gives back is what the caller receives.", "Keeping the handler as an ordinary function means you can call it yourself, in a test, with no socket in sight.", "There is an http client too, and net for raw sockets — the browser in this repository is built on them."],
+            example: ["use std.io", "use std.http", "", "fn reply(path: Text) -> Text {{", "    if path == \"/\" {{ give \"welcome\" }}", "    give \"no such page: {{path}}\"", "}}", "", "fn main() {{", "    io.say(reply(\"/\"))", "    ~~ and when you are ready for real callers:", "    ~~ http.serve(8080, fn(method, path, body) => reply(path))", "}}"],
+            brief: ["Write fn reply(path: Text) -> Text answering welcome at /, the current count", "at /count after two visits, and not found for anything else. Print three lines:", "welcome, then visits: 2, then not found"],
+            starter: ["use std.io", "", "var visits = 0", "", "fn reply(path: Text) -> Text {{", "    ~~ three answers", "}}", "", "fn main() {{", "    io.say(reply(\"/\"))", "    visits = visits + 1", "    visits = visits + 1", "    io.say(reply(\"/count\"))", "    io.say(reply(\"/nowhere\"))", "}}"],
+            expect: ["welcome", "visits: 2", "not found"],
+            hint: "A var at the top of the file lives for as long as the program does.",
+            answer: ["use std.io", "", "var visits = 0", "", "fn reply(path: Text) -> Text {{", "    if path == \"/\" {{ give \"welcome\" }}", "    if path == \"/count\" {{ give \"visits: {{visits}}\" }}", "    give \"not found\"", "}}", "", "fn main() {{", "    io.say(reply(\"/\"))", "    visits = visits + 1", "    visits = visits + 1", "    io.say(reply(\"/count\"))", "    io.say(reply(\"/nowhere\"))", "}}"],
+            side: "",
+            side_code: []
+    })
+    out.push(Lesson {
+            id: "23",
+            stage: "Pro",
+            title: "Drawing",
+            teach: ["draw.canvas makes an image, draw.rect, line, circle and text put marks on it, and save_png writes a real PNG.", "Colours are packed with draw.rgb. The PNG writer does its own compression — no library underneath.", "The same canvas is what the logo in this repository is drawn with."],
+            example: ["use std.io", "use std.draw", "", "fn main() {{", "    let image = draw.canvas(64, 64)", "    draw.clear(image, draw.rgb(11, 11, 13))", "    draw.circle(image, 32, 32, 20, draw.rgb(255, 161, 54))", "    draw.save_png(image, \"/tmp/dot.png\")", "    io.say(\"{{draw.size(image)}}\")", "}}"],
+            brief: ["Draw a 120 by 40 banner: near black background, an amber bar across the bottom", "eight pixels high, and the word SPRFST in soft white. Save it to /tmp/banner.png", "and print its size in pixels, then true if the file is on disk."],
+            starter: ["use std.io", "use std.draw", "use std.fs", "", "fn main() {{", "    let image = draw.canvas(120, 40)", "    ~~ background, bar, word, save", "}}"],
+            expect: ["[120, 40]", "true"],
+            hint: "draw.rect takes the canvas, x, y, width, height and the colour.",
+            answer: ["use std.io", "use std.draw", "use std.fs", "", "fn main() {{", "    let image = draw.canvas(120, 40)", "    draw.clear(image, draw.rgb(11, 11, 13))", "    draw.rect(image, 0, 32, 120, 8, draw.rgb(255, 161, 54))", "    draw.text(image, 10, 14, \"SPRFST\", draw.rgb(232, 232, 230))", "    draw.save_png(image, \"/tmp/banner.png\")", "    io.say(\"{{draw.size(image)}}\")", "    io.say(\"{{fs.exists(\"/tmp/banner.png\")}}\")", "}}"],
+            side: "",
+            side_code: []
+    })
+    out.push(Lesson {
+            id: "24",
+            stage: "Pro",
+            title: "Speed",
+            teach: ["Measure before you change anything: time.clock() gives you a high resolution reading in seconds.", "The usual win is not a cleverer loop but doing the work once: keep the answer in a map and look it up.", "sprfst run --time prints where the time went, and -O2 turns the optimiser up."],
+            example: ["use std.io", "use std.time", "", "fn main() {{", "    let started = time.clock()", "    var total = 0", "    for n in 1...200000 {{ total = total + n }}", "    let took = time.clock() - started", "    io.say(\"{{total}}\")", "    io.say(\"{{took < 1.0}}\")", "}}"],
+            brief: ["fib(25) written the plain way calls itself about a quarter of a million times.", "Write it with a map that remembers answers, print fib(25), then how many", "answers the map ended up holding. Two lines: 75025 then 26.", "The map is seeded with 0 and 1 because an empty literal has no type to go on."],
+            starter: ["use std.io", "", "var memo: Map<Int, Int> = [0: 0, 1: 1]", "", "fn fib(n: Int) -> Int {{", "    ~~ look it up first, work it out only once", "}}", "", "fn main() {{", "    io.say(\"{{fib(25)}}\")", "    io.say(\"{{memo.len()}}\")", "}}"],
+            expect: ["75025", "26"],
+            hint: "Check the map before doing the work, and put the answer in before giving it back.",
+            answer: ["use std.io", "", "var memo: Map<Int, Int> = [0: 0, 1: 1]", "", "fn fib(n: Int) -> Int {{", "    if n < 2 {{ give n }}", "    let kept = memo.get(n)", "    if kept != nil {{ give kept ?? 0 }}", "    let answer = fib(n - 1) + fib(n - 2)", "    memo.set(n, answer)", "    give answer", "}}", "", "fn main() {{", "    io.say(\"{{fib(25)}}\")", "    io.say(\"{{memo.len()}}\")", "}}"],
+            side: "",
+            side_code: []
+    })
+    out.push(Lesson {
+            id: "25",
+            stage: "Pro",
+            title: "Packages and trust",
+            teach: ["Forge is the package manager: sprfst add <path or git url>, remove, install. There is no registry to depend on.", "Every package in the lockfile carries a SHA-256 of its contents, so the thing you install is the thing you reviewed.", "hash.sha256 is the same function Forge uses. You can check anything with it in three lines."],
+            example: ["use std.io", "use std.hash", "", "fn main() {{", "    let digest = hash.sha256(\"SPRFST\")", "    io.say(digest.slice(0, 16))", "    io.say(\"{{digest.len()}} hex characters\")", "    io.say(hash.base64(\"SPRFST\"))", "}}"],
+            brief: ["Pretend two downloads arrived. Print the first sixteen characters of the digest", "of the good one, then whether the second matches it. Two lines, the second false."],
+            starter: ["use std.io", "use std.hash", "", "fn main() {{", "    let good = \"package contents\"", "    let other = \"package contents, tampered\"", "    ~~ digest the first, compare the second against it", "}}"],
+            expect: ["b9e2b98ba957e07c", "false"],
+            hint: "Digest both and compare the two pieces of text with ==.",
+            answer: ["use std.io", "use std.hash", "", "fn main() {{", "    let good = \"package contents\"", "    let other = \"package contents, tampered\"", "    let wanted = hash.sha256(good)", "    io.say(wanted.slice(0, 16))", "    io.say(\"{{hash.sha256(other) == wanted}}\")", "}}"],
+            side: "",
+            side_code: []
+    })
+    out.push(Lesson {
+            id: "26",
+            stage: "Pro",
+            title: "A whole program",
+            teach: ["Everything so far in one go: text in, a map to count, a list to sort, a function for each job.", "This is the shape of most real programs — read, reshape, report.", "When it works, sprfst fmt tidies it, sprfst lint looks it over, and sprfst test keeps it working."],
+            example: ["use std.io", "", "fn words_of(text: Text) -> [Text] {{", "    give text.lower().replace(\".\", \"\").replace(\",\", \"\").split(\" \")", "}}", "", "fn main() {{", "    io.say(\"{{words_of(\"One, two. Two\").len()}}\")", "}}"],
+            brief: ["Count the words in the passage, then print the three commonest as word count,", "most common first. Expected: the 4, then sea 3, then shore 2."],
+            starter: ["use std.io", "", "fn words_of(text: Text) -> [Text] {{", "    give text.lower().replace(\".\", \"\").replace(\",\", \"\").split(\" \")", "}}", "", "fn main() {{", "    let passage = \"She sells sea shells on the sea shore. The shells she sells by the sea shore are the sea shells.\"", "    ~~ count them, sort them, print the top three", "}}"],
+            expect: ["sea 4", "the 4", "shells 3"],
+            hint: "Count into a map, sort the keys by their count, then take the first three.",
+            answer: ["use std.io", "", "fn words_of(text: Text) -> [Text] {{", "    give text.lower().replace(\".\", \"\").replace(\",\", \"\").split(\" \")", "}}", "", "fn main() {{", "    let passage = \"She sells sea shells on the sea shore. The shells she sells by the sea shore are the sea shells.\"", "    var counts: Map<Text, Int> = [:]", "    for word in words_of(passage) {{", "        if word == \"\" {{ skip }}", "        counts.set(word, (counts.get(word) ?? 0) + 1)", "    }}", "    let ordered = counts.keys().sort_by(fn(a, b) => (counts.get(a) ?? 0) > (counts.get(b) ?? 0))", "    for word in ordered.take(3) {{", "        io.say(\"{{word}} {{counts.get(word) ?? 0}}\")", "    }}", "}}"],
+            side: "",
+            side_code: []
+    })
+    give out
+}
+
+pub fn all() -> [Lesson] {
+    var every: [Lesson] = []
+    for one in stage_the_basics() { every.push(one) }
+    for one in stage_shaping_data() { every.push(one) }
+    for one in stage_structure() { every.push(one) }
+    for one in stage_power() { every.push(one) }
+    for one in stage_pro() { every.push(one) }
+    give every
+}

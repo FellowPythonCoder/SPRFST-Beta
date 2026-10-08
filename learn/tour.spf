@@ -1,0 +1,643 @@
+~~ =====================================================================
+~~  The tour — SPRFST taught by writing it.
+~~
+~~      sprfst run learn/tour.spf
+~~
+~~  Twenty six lessons, basics to pro. Each one explains an idea, shows
+~~  it working, and then gives you a file of your own to finish. When
+~~  you type check, your file is handed to the real interpreter and the
+~~  output compared against what the lesson wants. Nothing is simulated
+~~  and no answer is hard coded: the expected output in lessons.spf was
+~~  produced by running the solutions, and tour.spf --verify runs them
+~~  all again to prove it.
+~~
+~~  Your work lives in ~/sprfst-tour, outside this repository, so it
+~~  survives a git pull and never turns up in a commit.
+~~ =====================================================================
+use std.io
+use std.fs
+use std.sys
+use std.path
+use std.json
+use lessons
+
+~~ --------------------------------------------------------------- paint
+let AMBER = "\e[38;5;214m"
+let GREEN = "\e[38;5;114m"
+let RED = "\e[38;5;203m"
+let GREY = "\e[38;5;245m"
+let BOLD = "\e[1m"
+let OFF = "\e[0m"
+let WIDTH = 74
+
+fn wrap(text: Text, width: Int) -> [Text] {
+    var out: [Text] = []
+    var line = ""
+    for word in text.split(" ") {
+        if line == "" {
+            line = word
+            skip
+        }
+        if line.len() + 1 + word.len() > width {
+            out.push(line)
+            line = word
+            skip
+        }
+        line = line + " " + word
+    }
+    if line != "" { out.push(line) }
+    give out
+}
+
+fn paragraph(text: Text, indent: Text, colour: Text) {
+    for line in wrap(text, WIDTH - indent.len()) {
+        io.say(colour + indent + line + OFF)
+    }
+}
+
+fn rule() {
+    io.say(GREY + "  " + "─".repeat(WIDTH) + OFF)
+}
+
+fn code_block(lines: [Text], colour: Text) {
+    for line in lines {
+        io.say(colour + "      " + line + OFF)
+    }
+}
+
+~~ ---------------------------------------------------------- where things go
+fn home_dir() -> Text {
+    give sys.env("HOME") ?? "."
+}
+
+fn work_dir() -> Text {
+    let place = home_dir() + "/sprfst-tour"
+    if not fs.is_dir(place) { fs.mkdir(place) }
+    give place
+}
+
+~~ The interpreter running this file is the one that should run your
+~~ work, so look for it where this project puts it before falling back
+~~ to whatever is on the path.
+~~ Always absolute: your work is run from ~/sprfst-tour, where a
+~~ relative path to the interpreter would mean nothing.
+fn interpreter() -> Text {
+    let given = sys.env("SPRFST_BIN") ?? ""
+    if given != "" and fs.is_file(given) { give path.abs(given) }
+    for candidate in ["build/bin/sprfst", "../build/bin/sprfst",
+        home_dir() + "/SPRFST-Beta/build/bin/sprfst",
+        home_dir() + "/Downloads/SPRFST-Beta/build/bin/sprfst",
+    "/usr/local/bin/sprfst"] {
+        if fs.is_file(candidate) { give path.abs(candidate) }
+    }
+    let found = sys.run("command -v sprfst 2>/dev/null").trim()
+    if found != "" { give found }
+    give "sprfst"
+}
+
+fn slug(title: Text) -> Text {
+    var out = ""
+    for letter in title.lower().chars() {
+        if letter == " " { out = out + "-"; skip }
+        if letter >= "a" and letter <= "z" { out = out + letter }
+    }
+    give out
+}
+
+fn work_path(one: lessons.Lesson) -> Text {
+    give work_dir() + "/" + one.id + "-" + slug(one.title) + ".spf"
+}
+
+~~ The starter is written once. After that the file is yours, and the
+~~ tour will not overwrite what you have typed.
+fn ensure_files(one: lessons.Lesson) {
+    let path = work_path(one)
+    if not fs.is_file(path) { fs.write(path, one.starter.join("\n") + "\n") }
+    if one.side != "" {
+        let beside = work_dir() + "/" + one.side
+        if not fs.is_file(beside) { fs.write(beside, one.side_code.join("\n") + "\n") }
+    }
+}
+
+~~ ------------------------------------------------------------- progress
+fn progress_path() -> Text {
+    give work_dir() + "/progress.json"
+}
+
+~~ Everything we remember about you lives in one small file: which
+~~ lessons are finished, which ones you took a hint or an answer on,
+~~ and the points that came of it. Text to text, so it stays readable
+~~ and a half written file can never crash the tour.
+fn state_load() -> Map<Text, Text> {
+    var state: Map<Text, Text> = ["done": "", "hinted": "", "shown": ""]
+    let raw = fs.read(progress_path()) ?? ""
+    if raw == "" { give state }
+    let parsed = json.parse(raw)
+    if parsed == nil { give state }
+    let shape: Map<Text, Any> = parsed ?? [:]
+    for key in ["done", "hinted", "shown"] {
+        state.set(key, to_text(shape.get(key) ?? ""))
+    }
+    give state
+}
+
+fn state_save(state: Map<Text, Text>) {
+    fs.write(progress_path(), json.pretty(state))
+}
+
+fn marks(state: Map<Text, Text>, key: Text) -> [Text] {
+    var out: [Text] = []
+    for item in (state.get(key) ?? "").split(",") {
+        if item.trim() != "" { out.push(item.trim()) }
+    }
+    give out
+}
+
+fn mark(state: Map<Text, Text>, key: Text, id: Text) -> Map<Text, Text> {
+    var have = marks(state, key)
+    if have.contains(id) { give state }
+    have.push(id)
+    var next = state
+    next.set(key, have.join(","))
+    give next
+}
+
+~~ A hundred for a lesson you worked out. Taking a hint costs forty,
+~~ reading the answer costs seventy — still worth something, because
+~~ typing it in and seeing it run is how a lot of people learn.
+fn worth(state: Map<Text, Text>, id: Text) -> Int {
+    if marks(state, "shown").contains(id) { give 30 }
+    if marks(state, "hinted").contains(id) { give 60 }
+    give 100
+}
+
+fn score(state: Map<Text, Text>) -> Int {
+    var total = 0
+    for id in marks(state, "done") { total = total + worth(state, id) }
+    give total
+}
+
+fn rank_of(points: Int) -> Text {
+    if points >= 2300 { give "Pro" }
+    if points >= 1600 { give "Craftsman" }
+    if points >= 900 { give "Builder" }
+    if points >= 300 { give "Apprentice" }
+    give "Newcomer"
+}
+
+fn load_done() -> [Text] {
+    give marks(state_load(), "done")
+}
+
+fn save_done(done: [Text]) {
+    var state = state_load()
+    state.set("done", done.join(","))
+    state_save(state)
+}
+
+~~ ---------------------------------------------------------- running work
+fn run_in(folder: Text, file: Text, with_errors: Bool) -> Text {
+    let tail = if with_errors { " 2>&1" } else { " 2>/dev/null" }
+    give sys.run("cd \"" + folder + "\" && \"" + interpreter() +
+    "\" run \"" + file + "\"" + tail)
+}
+
+fn run_file(path: Text, with_errors: Bool) -> Text {
+    give run_in(work_dir(), path, with_errors)
+}
+
+fn as_lines(blob: Text) -> [Text] {
+    var out: [Text] = []
+    for line in blob.split("\n") { out.push(line) }
+    while out.len() > 0 and (out.last() ?? "") == "" { out.pop() }
+    give out
+}
+
+fn same_output(got: [Text], want: [Text]) -> Bool {
+    if got.len() != want.len() { give false }
+    var i = 0
+    while i < got.len() {
+        if got[i].trim() != want[i].trim() { give false }
+        i = i + 1
+    }
+    give true
+}
+
+fn show_difference(got: [Text], want: [Text]) {
+    io.say("")
+    io.say(RED + "  not yet" + OFF)
+    io.say("")
+    io.say(GREY + "  you printed" + OFF)
+    if got.len() == 0 { io.say(GREY + "      (nothing)" + OFF) }
+    code_block(got, "")
+    io.say(GREY + "  the lesson wants" + OFF)
+    code_block(want, GREEN)
+    io.say("")
+    var i = 0
+    while i < want.len() {
+        let mine = if i < got.len() { got[i].trim() } else { "(nothing)" }
+        if mine != want[i].trim() {
+            io.say(GREY + "  line {i + 1} is where it first differs: you have " +
+                OFF + mine + GREY + ", it wants " + OFF + want[i].trim())
+            break
+        }
+        i = i + 1
+    }
+    io.say("")
+}
+
+~~ ---------------------------------------------------------------- views
+fn show_lesson(one: lessons.Lesson, number: Int, total: Int, finished: Bool) {
+    io.say("")
+    rule()
+    let tick = if finished { GREEN + "  done" + OFF } else { "" }
+    io.say(AMBER + BOLD + "  {number} of {total}  ·  " + one.stage + "  ·  " +
+    one.title + OFF + tick)
+    rule()
+    io.say("")
+    for part in one.teach {
+        paragraph(part, "  ", "")
+        io.say("")
+    }
+    if one.example.len() > 0 {
+        io.say(GREY + "  for instance" + OFF)
+        code_block(one.example, GREY)
+        io.say("")
+    }
+    io.say(AMBER + "  your turn" + OFF)
+    for part in one.brief { paragraph(part, "  ", "") }
+    io.say("")
+    io.say(GREY + "  file  " + OFF + work_path(one))
+    if one.side != "" {
+        io.say(GREY + "  also  " + OFF + work_dir() + "/" + one.side)
+    }
+    io.say("")
+    io.say(GREY + "  run · check · hint · answer · next · back · list · quit" + OFF)
+    io.say("")
+}
+
+fn show_list(all: [lessons.Lesson], done: [Text]) {
+    io.say("")
+    var stage = ""
+    var n = 0
+    for one in all {
+        n = n + 1
+        if one.stage != stage {
+            stage = one.stage
+            io.say("")
+            io.say(AMBER + "  " + stage + OFF)
+        }
+        let mark = if done.contains(one.id) { GREEN + "✓" + OFF } else { GREY + "·" + OFF }
+        io.say("  " + mark + " " + GREY + "{n}".pad_left(3) + OFF + "  " + one.title)
+    }
+    io.say("")
+    io.say(GREY + "  {done.len()} of {all.len()} finished · type a number to go there" + OFF)
+    io.say("")
+}
+
+~~ --------------------------------------------------------------- verify
+~~ Proof that every lesson still teaches the truth: write each answer
+~~ out, run it, and compare with the output the lesson promises.
+fn verify(all: [lessons.Lesson]) -> Int {
+    var bad = 0
+    io.say("")
+    io.say(AMBER + "  checking every lesson against the interpreter" + OFF)
+    io.say("")
+    ~~ in a scratch folder of its own, so checking the lessons can
+    ~~ never overwrite the file somebody is working in
+    let scratch = work_dir() + "/.verify"
+    if not fs.is_dir(scratch) { fs.mkdir(scratch) }
+    for one in all {
+        let path = scratch + "/work.spf"
+        fs.write(path, one.answer.join("\n") + "\n")
+        if one.side != "" {
+            let beside = scratch + "/" + one.side
+            var filled: [Text] = []
+            for line in one.side_code {
+                if line.starts_with("~~ add a pub fn") {
+                    filled.push("pub fn perimeter(side: Num) -> Num => side * 4.0")
+                    skip
+                }
+                filled.push(line)
+            }
+            fs.write(beside, filled.join("\n") + "\n")
+        }
+        let got = as_lines(run_in(scratch, path, false))
+        if same_output(got, one.expect) {
+            io.say(GREEN + "  pass" + OFF + "  " + one.id + " " + one.title)
+        } else {
+            bad = bad + 1
+            io.say(RED + "  FAIL" + OFF + "  " + one.id + " " + one.title)
+            io.say(GREY + "        got    " + OFF + got.join(" | "))
+            io.say(GREY + "        wanted " + OFF + one.expect.join(" | "))
+        }
+        fs.remove(path)
+    }
+    io.say("")
+    io.say("  {all.len() - bad} passed, {bad} failed")
+    io.say("")
+    give bad
+}
+
+~~ ---------------------------------------------------------- the service
+~~ One JSON object per line in, one per line out — the same shape the
+~~ browser uses. The window in learn/macos drives this and draws the
+~~ answers; every lesson, every check and every point is decided here,
+~~ so the two front ends can never disagree about your progress.
+fn lesson_card(one: lessons.Lesson, number: Int, state: Map<Text, Text>) -> Map<Text, Any> {
+    let done = marks(state, "done").contains(one.id)
+    give [
+        "n": number,
+        "id": one.id,
+        "stage": one.stage,
+        "title": one.title,
+        "done": done,
+        "hinted": marks(state, "hinted").contains(one.id),
+        "shown": marks(state, "shown").contains(one.id),
+        "worth": if done { worth(state, one.id) } else { 0 }
+    ]
+}
+
+fn standing(state: Map<Text, Text>, all: [lessons.Lesson]) -> Map<Text, Any> {
+    let points = score(state)
+    give [
+        "points": points,
+        "rank": rank_of(points),
+        "finished": marks(state, "done").len(),
+        "lessons": all.len(),
+        "most": all.len() * 100
+    ]
+}
+
+fn current_code(one: lessons.Lesson) -> Text {
+    ensure_files(one)
+    give fs.read(work_path(one)) ?? one.starter.join("\n")
+}
+
+fn serve(all: [lessons.Lesson]) {
+    io.say(json.write(["ok": true, "service": "sprfst-tour",
+                       "version": "0.1.0-beta", "lessons": all.len(),
+                       "home": work_dir()]))
+    io.flush()
+    loop {
+        let line = io.read_line()
+        if line == nil { break }
+        let text = (line ?? "").trim()
+        if text == "" { skip }
+        let parsed = json.parse(text)
+        if parsed == nil {
+            io.say(json.write(["ok": false, "error": "that was not JSON"]))
+            io.flush()
+            skip
+        }
+        let request: Map<Text, Any> = parsed ?? [:]
+        let verb = to_text(request.get("do") ?? "")
+        if verb == "bye" { break }
+
+        var state = state_load()
+        let asked = to_int(to_text(request.get("n") ?? "1").to_int() ?? 1)
+        let index = if asked >= 1 and asked <= all.len() { asked - 1 } else { 0 }
+        let one = all[index]
+        var answer: Map<Text, Any> = ["ok": true]
+
+        if verb == "list" {
+            var cards: [Any] = []
+            var n = 0
+            for item in all {
+                n = n + 1
+                cards.push(lesson_card(item, n, state))
+            }
+            answer.set("items", cards)
+        }
+        else if verb == "open" {
+            answer.set("n", asked)
+            answer.set("id", one.id)
+            answer.set("stage", one.stage)
+            answer.set("title", one.title)
+            answer.set("teach", one.teach)
+            answer.set("example", one.example)
+            answer.set("brief", one.brief)
+            answer.set("code", current_code(one))
+            answer.set("expect", one.expect)
+            answer.set("file", work_path(one))
+            answer.set("side", one.side)
+            answer.set("done", marks(state, "done").contains(one.id))
+            answer.set("hinted", marks(state, "hinted").contains(one.id))
+            answer.set("shown", marks(state, "shown").contains(one.id))
+            if one.side != "" {
+                answer.set("side_file", work_dir() + "/" + one.side)
+                answer.set("side_code", fs.read(work_dir() + "/" + one.side) ?? "")
+            }
+        }
+        else if verb == "hint" {
+            state = mark(state, "hinted", one.id)
+            state_save(state)
+            answer.set("hint", one.hint)
+        }
+        else if verb == "answer" {
+            state = mark(state, "shown", one.id)
+            state_save(state)
+            answer.set("answer", one.answer)
+        }
+        else if verb == "save" or verb == "run" or verb == "check" {
+            let code = to_text(request.get("code") ?? "")
+            if code != "" { fs.write(work_path(one), code) }
+            if to_text(request.get("side_code") ?? "") != "" and one.side != "" {
+                fs.write(work_dir() + "/" + one.side, to_text(request.get("side_code") ?? ""))
+            }
+            if verb != "save" {
+                let got = as_lines(run_in(work_dir(), work_path(one), verb == "run"))
+                answer.set("output", got)
+                if verb == "check" {
+                    let passed = same_output(got, one.expect)
+                    answer.set("passed", passed)
+                    answer.set("expected", one.expect)
+                    var first = 0
+                    while first < one.expect.len() {
+                        let mine = if first < got.len() { got[first].trim() } else { "" }
+                        if mine != one.expect[first].trim() { break }
+                        first = first + 1
+                    }
+                    answer.set("differs", first + 1)
+                    if passed {
+                        let already = marks(state, "done").contains(one.id)
+                        if not already {
+                            state = mark(state, "done", one.id)
+                            state_save(state)
+                        }
+                        answer.set("awarded", if already { 0 } else { worth(state, one.id) })
+                        answer.set("first_time", not already)
+                    } else {
+                        let trouble = run_in(work_dir(), work_path(one), true)
+                        answer.set("broken", trouble.contains("error["))
+                        if trouble.contains("error[") { answer.set("output", as_lines(trouble)) }
+                    }
+                }
+            }
+        }
+        else if verb == "forget" {
+            state = ["done": "", "hinted": "", "shown": ""]
+            state_save(state)
+        }
+        else if verb != "state" {
+            answer = ["ok": false, "error": "no such request: " + verb]
+        }
+
+        answer.set("standing", standing(state_load(), all))
+        io.say(json.write(answer))
+        io.flush()
+    }
+}
+
+~~ ----------------------------------------------------------------- main
+fn main() {
+    let all = lessons.all()
+    var done = load_done()
+
+    for arg in sys.args() {
+        if arg == "--serve" {
+            serve(all)
+            give
+        }
+        if arg == "--verify" {
+            if verify(all) > 0 { sys.exit(1) }
+            give
+        }
+        if arg == "--list" {
+            show_list(all, done)
+            give
+        }
+    }
+
+    io.say("")
+    io.say(AMBER + BOLD + "  SPRFST — the tour" + OFF)
+    io.say("")
+    paragraph("Twenty six lessons. Each one gives you a file to finish; " +
+        "type check and the real interpreter decides whether it is " +
+        "right. Your work is in " + work_dir() + ".", "  ", GREY)
+    io.say("")
+    io.say(GREY + "  interpreter  " + OFF + interpreter())
+    io.say("")
+
+    ~~ start where you left off
+    var at = 0
+    while at < all.len() and done.contains(all[at].id) { at = at + 1 }
+    if at >= all.len() { at = 0 }
+
+    var showing = true
+    loop {
+        let one = all[at]
+        ensure_files(one)
+        if showing { show_lesson(one, at + 1, all.len(), done.contains(one.id)) }
+        showing = true
+
+        io.print(AMBER + "  ▸ " + OFF)
+        io.flush()
+        let typed = io.read_line()
+        if typed == nil { break }
+        let said = (typed ?? "").trim().lower()
+
+        if said == "quit" or said == "q" or said == "exit" { break }
+
+        if said == "" { showing = false; skip }
+
+        if said == "list" or said == "l" {
+            show_list(all, done)
+            showing = false
+            skip
+        }
+
+        if said == "next" or said == "n" {
+            if at + 1 < all.len() { at = at + 1 }
+            else { io.say(GREY + "  that was the last one." + OFF); showing = false }
+            skip
+        }
+
+        if said == "back" or said == "b" {
+            if at > 0 { at = at - 1 }
+            else { io.say(GREY + "  this is the first one." + OFF); showing = false }
+            skip
+        }
+
+        if said == "hint" or said == "h" {
+            io.say("")
+            paragraph(one.hint, "  ", AMBER)
+            io.say("")
+            showing = false
+            skip
+        }
+
+        if said == "answer" {
+            io.say("")
+            io.say(GREY + "  one way to do it" + OFF)
+            code_block(one.answer, GREEN)
+            io.say("")
+            io.say(GREY + "  copy it into your file if you like, then check." + OFF)
+            io.say("")
+            showing = false
+            skip
+        }
+
+        if said == "run" or said == "r" {
+            let output = run_file(work_path(one), true)
+            io.say("")
+            if output.trim() == "" { io.say(GREY + "  (your file printed nothing)" + OFF) }
+            else { code_block(as_lines(output), "") }
+            io.say("")
+            showing = false
+            skip
+        }
+
+        if said == "check" or said == "c" {
+            let got = as_lines(run_file(work_path(one), false))
+            if same_output(got, one.expect) {
+                io.say("")
+                io.say(GREEN + "  that is it." + OFF)
+                io.say("")
+                if not done.contains(one.id) {
+                    done.push(one.id)
+                    save_done(done)
+                }
+                if at + 1 < all.len() {
+                    io.say(GREY + "  next: " + OFF + all[at + 1].title +
+                    GREY + "   (press return)" + OFF)
+                    io.say("")
+                    at = at + 1
+                    showing = false
+                } else {
+                    io.say(AMBER + "  that was the last lesson. All twenty six." + OFF)
+                    io.say("")
+                    showing = false
+                }
+            } else {
+                let errors = run_file(work_path(one), true)
+                if errors.contains("error[") {
+                    io.say("")
+                    io.say(RED + "  it did not compile" + OFF)
+                    code_block(as_lines(errors), "")
+                    io.say("")
+                } else {
+                    show_difference(got, one.expect)
+                }
+                showing = false
+            }
+            skip
+        }
+
+        let asked = said.to_int()
+        if asked != nil {
+            let want = (asked ?? 1) - 1
+            if want >= 0 and want < all.len() { at = want }
+            else { io.say(GREY + "  there are {all.len()} lessons." + OFF); showing = false }
+            skip
+        }
+
+        io.say(GREY + "  run, check, hint, answer, next, back, list, a number, or quit." + OFF)
+        showing = false
+    }
+
+    io.say("")
+    io.say(GREY + "  {done.len()} of {all.len()} finished. Come back with: " + OFF +
+    "sprfst run learn/tour.spf")
+    io.say("")
+}

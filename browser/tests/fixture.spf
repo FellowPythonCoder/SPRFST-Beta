@@ -1,0 +1,97 @@
+~~ =====================================================================
+~~  A page of the modern web, served locally, so the browser can be
+~~  tested against the thing it was built for: an article buried in
+~~  adverts, trackers, a consent wall and a chat widget.
+~~
+~~      sprfst run tests/fixture.spf -- 8099
+~~
+~~  tools/browser_live.sh starts it, reads it with the browser, and
+~~  checks that what came out is the article and nothing else.
+~~ =====================================================================
+use std.io
+use std.http
+use std.sys
+
+fn article() -> Text {
+    var out: [Text] = []
+    out.push("<!doctype html><html><head><meta charset='utf-8'>")
+    out.push("<title>Nine ways to read the news · The Daily Fixture</title>")
+    out.push("<link rel='stylesheet' href='/style.css'>")
+    out.push("<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Inter'>")
+    out.push("<script src='https://www.googletagmanager.com/gtag/js?id=UA-1'></script>")
+    out.push("<script src='https://cdn.taboola.com/libtrc/loader.js'></script>")
+    out.push("<script src='/local.js'></script>")
+    out.push("</head><body>")
+    out.push("<div class='cookie-banner'><p>We and our 1,431 partners store cookies.</p>" +
+             "<button>Accept everything</button></div>")
+    out.push("<nav><a href='/'>Home</a> <a href='/world'>World</a> <a href='/sport'>Sport</a> " +
+             "<a href='/money'>Money</a> <a href='/weather'>Weather</a></nav>")
+    out.push("<div class='ad-banner'><img src='https://doubleclick.net/pixel.gif' alt='advert'>" +
+             "<p>Sponsored: buy a boat today</p></div>")
+    out.push("<article>")
+    out.push("<h1>Nine ways to read the news</h1>")
+    out.push("<p class='byline'>By A Fixture, " + "4 October 2026</p>")
+    out.push("<img src='/photo.jpg' alt='A photograph of a newspaper'>")
+    var i = 1
+    while i <= 14 {
+        out.push("<p>Paragraph {i}. The habit of reading, which once meant paper and ink, " +
+                 "now means a screen that watches back, counts the seconds, and sells them. " +
+                 "Here is a <a href='/link{i}'>link</a> to something else entirely.</p>")
+        i = i + 1
+    }
+    out.push("<blockquote>A page should be a page, not a trap.</blockquote>")
+    out.push("<ul><li>First point</li><li>Second point</li><li>Third point</li></ul>")
+    out.push("<pre><code>sprfst run browser.spf</code></pre>")
+    out.push("</article>")
+    out.push("<aside class='sidebar'><h3>Most read</h3><ol>" +
+             "<li><a href='/a'>A thing happened</a></li>" +
+             "<li><a href='/b'>Another thing</a></li>" +
+             "<li><a href='/c'>A third thing</a></li></ol></aside>")
+    out.push("<div id='taboola-below-article'><p>Promoted stories from around the web</p></div>")
+    out.push("<iframe src='https://adnxs.com/frame'></iframe>")
+    out.push("<div class='chat-widget'><p>Chat with us!</p></div>")
+    out.push("<footer><p>Copyright 2026 The Daily Fixture. All rights reserved.</p></footer>")
+    out.push("<script src='https://connect.facebook.net/en_US/fbevents.js'></script>")
+    out.push("</body></html>")
+    give out.join("")
+}
+
+fn style() -> Text {
+    give ["body {{ background: #ffffff; color: #222222; font-size: 16px }}",
+          "h1 {{ color: #101010; font-size: 34px }}",
+          ".byline {{ color: #888888; font-size: 13px }}",
+          "nav a {{ color: #0055cc }}",
+          ".sidebar {{ color: #555555 }}",
+          "blockquote {{ color: #444444 }}"].join("\n")
+}
+
+fn handle(request: Map<Text, Any>) -> Map<Text, Any> {
+    let path = to_text(request.get("path") ?? "/")
+    if path == "/style.css" {
+        give ["status": 200, "type": "text/css", "body": style()]
+    }
+    if path == "/local.js" {
+        give ["status": 200, "type": "application/javascript", "body": "var x = 1"]
+    }
+    if path == "/slow" {
+        give ["status": 200, "body": "<p>took its time</p>"]
+    }
+    if path == "/moved" {
+        give ["status": 302, "headers": ["Location": "/"], "body": ""]
+    }
+    if path == "/" or path.starts_with("/link") {
+        give ["status": 200, "body": article()]
+    }
+    give ["status": 404, "body": "<html><title>Not here</title><body><h1>404</h1>" +
+                                 "<p>No page at {path}</p></body></html>"]
+}
+
+fn main() {
+    var port = 8099
+    for arg in sys.args() {
+        let given = arg.to_int()
+        if given != nil { port = given ?? 8099 }
+    }
+    io.say("fixture on {port}")
+    http.serve(port, handle)
+}

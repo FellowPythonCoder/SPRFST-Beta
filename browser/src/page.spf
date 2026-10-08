@@ -1,0 +1,437 @@
+~~ =====================================================================
+~~  SPRFST Browser — opening a page
+~~
+~~  One call does the lot: work out what was typed, ask the Shield,
+~~  fetch, parse, gather the stylesheets, lay it out and keep a note of
+~~  what it cost. The window never does any of this itself.
+~~ =====================================================================
+module page
+
+use std.time
+use uri
+use html
+use css
+use shield
+use layout
+use fetch
+use reader
+
+pub object Settings {
+    search: Text = "https://duckduckgo.com/html/?q="
+    engine_name: Text = "DuckDuckGo"
+    ember: Bool = true                 ~~ paint every page in our colours
+    shield_on: Bool = true
+    reading: Bool = false
+    width: Num = 860.0
+    text_size: Num = 16.0
+    home: Text = "sprfst://start"
+    images: Bool = true
+}
+
+pub object Visit {
+    address: Text = ""
+    title: Text = ""
+    ms: Num = 0.0
+    bytes: Int = 0
+    blocked: Int = 0
+    at: Num = 0.0
+}
+
+pub object Result {
+    address: Text = ""
+    title: Text = ""
+    status: Int = 0
+    ms: Num = 0.0
+    fetch_ms: Num = 0.0
+    parse_ms: Num = 0.0
+    style_ms: Num = 0.0
+    layout_ms: Num = 0.0
+    bytes: Int = 0
+    blocked: Int = 0
+    hidden: Int = 0
+    words: Int = 0
+    images: Int = 0
+    requests: Int = 0
+    secure: Bool = false
+    cached: Bool = false
+    reading: Bool = false
+    error: Text = ""
+    page: layout.Page = layout.Page { }
+    headings: [Text] = []
+}
+
+pub object Session {
+    guard: shield.Shield = shield.Shield { }
+    store: fetch.Store = fetch.Store { }
+    settings: Settings = Settings { }
+    trail: [Visit] = []
+    history: [Text] = []
+    cursor: Int = -1
+    last: Result = Result { }
+
+    ~~ ------------------------------------------------------ history
+    fn remember(self, address: Text) {
+        while self.history.len() > self.cursor + 1 { self.history.pop() }
+        self.history.push(address)
+        self.cursor = self.history.len() - 1
+    }
+
+    fn can_back(self) -> Bool => self.cursor > 0
+
+    fn can_forward(self) -> Bool => self.cursor >= 0 and self.cursor < self.history.len() - 1
+
+    fn back(self) -> Text {
+        if not self.can_back() { give "" }
+        self.cursor = self.cursor - 1
+        give self.history[self.cursor]
+    }
+
+    fn forward(self) -> Text {
+        if not self.can_forward() { give "" }
+        self.cursor = self.cursor + 1
+        give self.history[self.cursor]
+    }
+}
+
+~~ What a typed line means: an address, or a search.
+pub fn address_for(typed: Text, settings: Settings) -> Text {
+    let text = typed.trim()
+    if text == "" { give settings.home }
+    if uri.looks_like_address(text) {
+        ~~ uri.parse settles the scheme: https for the web, plain http
+        ~~ for a machine on this desk, which rarely has a certificate.
+        give uri.parse(text).full()
+    }
+    give settings.search + encode(text)
+}
+
+pub fn encode(text: Text) -> Text {
+    var out: [Text] = []
+    var i = 0
+    while i < text.len() {
+        let c = text.code_at(i)
+        let safe = (c >= 48 and c <= 57) or (c >= 65 and c <= 90) or
+                   (c >= 97 and c <= 122) or c == 45 or c == 46 or c == 95 or c == 126
+        if safe { out.push(text.char_at(i)) }
+        else if c == 32 { out.push("+") }
+        else { out.push("%" + hex(c)) }
+        i = i + 1
+    }
+    give out.join("")
+}
+
+fn hex(value: Int) -> Text {
+    let digits = "0123456789ABCDEF"
+    give digits.char_at(to_int(value / 16)) + digits.char_at(value % 16)
+}
+
+~~ ------------------------------------------------------------- open
+pub fn open(session: Session, typed: Text, width: Num, record: Bool) -> Result {
+    let started = time.clock()
+    let address = address_for(typed, session.settings)
+    let target = uri.parse(address)
+    session.guard.enabled = session.settings.shield_on
+    session.guard.reset_counts()
+
+    var out = Result { address: address, reading: session.settings.reading }
+    var source = ""
+    var mime = "text/html"
+
+    if target.is_internal() or address.starts_with("sprfst:") {
+        source = internal(address, session)
+        out.status = 200
+        out.secure = true
+    } else if not target.ok {
+        source = problem("That address cannot be read", address, "")
+        out.status = 0
+        out.error = "bad address"
+    } else if session.guard.blocks(target, target.host) {
+        source = problem("The Shield stopped this page", address,
+                         "It matched one of your block rules.")
+        out.status = 0
+        out.error = "blocked"
+        out.blocked = 1
+    } else {
+        var answer = fetch.Response { }
+        let cached = session.store.look(address)
+        if cached != nil and not record {
+            answer = cached ?? fetch.Response { }
+            answer.cached = true
+        } else {
+            answer = fetch.get(target)
+            if answer.ok { session.store.keep(address, answer) }
+        }
+        out.status = answer.status
+        out.bytes = answer.bytes
+        out.fetch_ms = answer.ms
+        out.secure = answer.secure
+        out.cached = answer.cached
+        mime = answer.mime
+        if not answer.ok and answer.body == "" {
+            source = problem("This page did not load", address, answer.error)
+            out.error = answer.error
+        } else {
+            source = answer.body
+            if answer.address != "" { out.address = answer.address }
+        }
+    }
+
+    ~~ ------------------------------------------------- make a document
+    var mark = time.clock()
+    var document = html.Node { }
+    if mime != "text/html" and mime != "application/xhtml+xml" and mime != "" {
+        if mime.starts_with("text/") or mime.contains("json") or mime.contains("xml") {
+            document = html.parse("<pre>" + escape(source) + "</pre>")
+        } else {
+            document = html.parse(problem("This is not a page",
+                out.address, "The server sent " + mime + "."))
+        }
+    } else {
+        document = html.parse(source)
+    }
+
+    out.parse_ms = (time.clock() - mark) * 1000.0
+    mark = time.clock()
+
+    let here = uri.parse(out.address)
+    out.title = html.title_of(document)
+    if out.title == "" { out.title = here.site() }
+    absolutise(document, here)
+
+    ~~ --------------------------------------------------- stylesheets
+    var style_text: [Text] = []
+    for node in document.all("style") { style_text.push(html.raw_text(node)) }
+    for node in document.all("link") {
+        let rel = node.attr("rel").lower()
+        if not rel.contains("stylesheet") { skip }
+        let href = node.attr("href")
+        if href == "" { skip }
+        let sheet_url = uri.parse(href)
+        out.requests = out.requests + 1
+        if session.guard.check(sheet_url, here.host) { skip }
+        ~~ Pages are painted in one typeface, so a web font sheet is a
+        ~~ round trip that can change nothing. It is not fetched.
+        if is_font_host(sheet_url.host) { skip }
+        if style_text.len() >= 4 { skip }
+        let answer = fetch.get(sheet_url)
+        if answer.ok { style_text.push(answer.body) }
+    }
+    let sheet = css.parse(style_text.join("\n"))
+    out.style_ms = (time.clock() - mark) * 1000.0
+
+    ~~ ------------------------------------- everything else the page wants
+    for tag in ["img", "script", "iframe", "embed", "video", "audio", "source"] {
+        for node in document.all(tag) {
+            let src = node.attr("src")
+            if src == "" { skip }
+            out.requests = out.requests + 1
+            if session.guard.check(uri.parse(src), here.host) {
+                node.attrs.set("src", "")
+                node.attrs.set("alt", "")
+                node.name = "span"
+            }
+        }
+    }
+    if not session.settings.images {
+        for node in document.all("img") { node.name = "span" }
+    }
+
+    ~~ ------------------------------------------------------ lay it out
+    var shown = document
+    if session.settings.reading {
+        shown = reader.distil(document, out.title)
+    }
+    let hide = session.guard.hiding(here.host)
+    mark = time.clock()
+    let laid = layout.run(shown, sheet, hide, width)
+    out.layout_ms = (time.clock() - mark) * 1000.0
+
+    out.page = laid
+    out.words = laid.words
+    out.images = laid.images
+    out.headings = laid.headings
+    out.blocked = session.guard.blocked
+    out.hidden = laid.hidden + session.guard.hidden
+    out.ms = (time.clock() - started) * 1000.0
+
+    if record {
+        session.remember(out.address)
+        session.trail.push(Visit {
+            address: out.address, title: out.title, ms: out.ms,
+            bytes: out.bytes, blocked: out.blocked, at: time.now()
+        })
+    }
+    session.last = out
+    give out
+}
+
+~~ Rewrite every link and image to an address that stands on its own.
+fn absolutise(document: html.Node, here: uri.Url) {
+    var base = here
+    for node in document.all("base") {
+        let href = node.attr("href")
+        if href != "" { base = uri.resolve(here, href) }
+    }
+    for node in document.all("a") {
+        let href = node.attr("href")
+        if href == "" { skip }
+        let full = uri.resolve(base, href)
+        if full.ok { node.attrs.set("href", full.full()) }
+        else { node.attrs.set("href", "") }
+    }
+    for tag in ["img", "script", "iframe", "source"] {
+        for node in document.all(tag) {
+            let src = node.attr("src")
+            if src == "" { skip }
+            let full = uri.resolve(base, src)
+            if full.ok { node.attrs.set("src", full.full()) }
+        }
+    }
+    for node in document.all("link") {
+        let href = node.attr("href")
+        if href == "" { skip }
+        let full = uri.resolve(base, href)
+        if full.ok { node.attrs.set("href", full.full()) }
+    }
+}
+
+~~ Hosts that serve nothing but typefaces.
+pub fn is_font_host(host: Text) -> Bool {
+    let name = uri.strip_www(host)
+    give name == "fonts.googleapis.com" or name == "fonts.gstatic.com" or
+         name == "use.typekit.net" or name == "p.typekit.net" or
+         name == "fast.fonts.net" or name == "cloud.typography.com" or
+         name == "use.fontawesome.com" or name == "maxcdn.bootstrapcdn.com"
+}
+
+pub fn escape(text: Text) -> Text {
+    give text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+}
+
+~~ ---------------------------------------------------- pages of ours
+pub fn problem(headline: Text, address: Text, detail: Text) -> Text {
+    var out = "<html><head><title>" + escape(headline) + "</title></head><body>"
+    out = out + "<h1>" + escape(headline) + "</h1>"
+    out = out + "<p style=\"color:#9a9aa0\">" + escape(address) + "</p>"
+    if detail != "" { out = out + "<p>" + escape(detail) + "</p>" }
+    out = out + "<hr><p>Try the address again, or go back to <a href=\"sprfst://start\">the start page</a>.</p>"
+    out = out + "</body></html>"
+    give out
+}
+
+pub fn internal(address: Text, session: Session) -> Text {
+    let which = address.replace("sprfst://", "").replace("sprfst:", "")
+    if which.starts_with("start") { give start_page(session) }
+    if which.starts_with("about") { give about_page(session) }
+    if which.starts_with("settings") { give settings_page(session) }
+    if which.starts_with("trail") { give trail_page(session) }
+    if which.starts_with("shield") { give shield_page(session) }
+    give problem("No such page", address, "SPRFST Browser has no page called that.")
+}
+
+fn start_page(session: Session) -> Text {
+    var out = "<html><head><title>SPRFST</title></head><body>"
+    out = out + "<h1 style=\"color:#ffa136\">SPRFST</h1>"
+    out = out + "<p style=\"color:#9a9aa0\">A browser written in SPRFST. " +
+                "Type an address, or words to look up with " + session.settings.engine_name + ".</p>"
+    out = out + "<hr>"
+    out = out + "<h3>Pages of this browser</h3><ul>"
+    out = out + "<li><a href=\"sprfst://shield\">The Shield</a> — what has been blocked</li>"
+    out = out + "<li><a href=\"sprfst://trail\">The Trail</a> — where you have been</li>"
+    out = out + "<li><a href=\"sprfst://settings\">Settings</a></li>"
+    out = out + "<li><a href=\"sprfst://about\">About</a></li>"
+    out = out + "</ul>"
+    out = out + "<h3>Somewhere to start</h3><ul>"
+    out = out + "<li><a href=\"http://example.com\">example.com</a> — the smallest page on the web</li>"
+    out = out + "<li><a href=\"https://en.wikipedia.org/wiki/Web_browser\">Wikipedia: web browser</a></li>"
+    out = out + "<li><a href=\"https://news.ycombinator.com\">Hacker News</a></li>"
+    out = out + "<li><a href=\"https://developer.mozilla.org/en-US/docs/Web/HTML\">MDN: HTML</a></li>"
+    out = out + "</ul>"
+    out = out + "<p style=\"color:#6a6a70\">" + session.guard.loaded.to_text() +
+                " block rules are loaded. No page here reports anything to anyone.</p>"
+    out = out + "</body></html>"
+    give out
+}
+
+fn about_page(session: Session) -> Text {
+    var out = "<html><head><title>About SPRFST Browser</title></head><body>"
+    out = out + "<h1>SPRFST Browser</h1>"
+    out = out + "<p>Version 0.1.0-beta. The engine — addresses, blocking, HTML, CSS, " +
+                "layout and the reading lens — is written in SPRFST and runs on the " +
+                "SPRFST runtime. The window is a native Mac application that paints " +
+                "what the engine works out.</p>"
+    out = out + "<h3>What it does not do</h3><ul>"
+    out = out + "<li>It does not run JavaScript. There is no script engine, and none is pretended.</li>"
+    out = out + "<li>It speaks HTTP itself; https is fetched through curl, because SPRFST has no TLS yet.</li>"
+    out = out + "<li>CSS goes as far as colour, type, spacing, alignment and display.</li>"
+    out = out + "</ul>"
+    out = out + "<h3>This session</h3><ul>"
+    out = out + "<li>" + session.trail.len().to_text() + " pages opened</li>"
+    out = out + "<li>" + session.guard.loaded.to_text() + " block rules</li>"
+    out = out + "</ul>"
+    out = out + "<p><a href=\"sprfst://start\">Back to the start page</a></p>"
+    out = out + "</body></html>"
+    give out
+}
+
+fn settings_page(session: Session) -> Text {
+    let s = session.settings
+    var out = "<html><head><title>Settings</title></head><body>"
+    out = out + "<h1>Settings</h1>"
+    out = out + "<p style=\"color:#9a9aa0\">These are changed from the browser's own menu; " +
+                "this page shows where they stand.</p><ul>"
+    out = out + "<li>Search: " + s.engine_name + "</li>"
+    out = out + "<li>Shield: " + yes_no(s.shield_on) + "</li>"
+    out = out + "<li>Ember colours: " + yes_no(s.ember) + "</li>"
+    out = out + "<li>Reading lens: " + yes_no(s.reading) + "</li>"
+    out = out + "<li>Images: " + yes_no(s.images) + "</li>"
+    out = out + "<li>Text size: " + to_int(s.text_size).to_text() + "</li>"
+    out = out + "</ul><p><a href=\"sprfst://start\">Back to the start page</a></p></body></html>"
+    give out
+}
+
+fn trail_page(session: Session) -> Text {
+    var out = "<html><head><title>The Trail</title></head><body><h1>The Trail</h1>"
+    if session.trail.len() == 0 {
+        out = out + "<p>Nothing yet. Open a page and it will be listed here with what it cost.</p>"
+    } else {
+        out = out + "<p style=\"color:#9a9aa0\">Every page this session, newest last.</p><ul>"
+        for visit in session.trail {
+            out = out + "<li><a href=\"" + escape(visit.address) + "\">" +
+                  escape(if visit.title == "" { visit.address } else { visit.title }) +
+                  "</a> <span style=\"color:#6a6a70\">" + to_int(visit.ms).to_text() + " ms, " +
+                  human(visit.bytes) + ", " + visit.blocked.to_text() + " blocked</span></li>"
+        }
+        out = out + "</ul>"
+    }
+    out = out + "<p><a href=\"sprfst://start\">Back to the start page</a></p></body></html>"
+    give out
+}
+
+fn shield_page(session: Session) -> Text {
+    let g = session.guard
+    var out = "<html><head><title>The Shield</title></head><body><h1>The Shield</h1>"
+    out = out + "<p>" + g.loaded.to_text() + " rules are loaded. The Shield is " +
+          (if g.enabled { "on" } else { "off" }) + ".</p>"
+    out = out + "<h3>On the last page</h3><ul>"
+    out = out + "<li>" + g.blocked.to_text() + " requests stopped before they were made</li>"
+    out = out + "<li>" + g.passed.to_text() + " requests allowed</li>"
+    out = out + "<li>" + g.hidden.to_text() + " elements removed from the page</li>"
+    out = out + "</ul>"
+    out = out + "<p>Rules are plain text, one per line, in <code>shield.rules</code> beside the " +
+          "browser. A line like <code>||ads.example.com^</code> covers a host and everything " +
+          "under it; <code>@@</code> in front of a rule makes it an exception.</p>"
+    out = out + "<p><a href=\"sprfst://start\">Back to the start page</a></p></body></html>"
+    give out
+}
+
+fn yes_no(value: Bool) -> Text {
+    if value { give "on" }
+    give "off"
+}
+
+pub fn human(bytes: Int) -> Text {
+    if bytes < 1024 { give bytes.to_text() + " B" }
+    if bytes < 1048576 { give to_int(to_num(bytes) / 1024.0).to_text() + " kB" }
+    give to_int(to_num(bytes) / 104857.6).to_text() + "00 kB"
+}

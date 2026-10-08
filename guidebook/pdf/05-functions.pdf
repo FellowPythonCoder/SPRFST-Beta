@@ -1,0 +1,255 @@
+%PDF-1.4
+%\342\343\317\323
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 2 /Kids [8 0 R 10 0 R] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
+endobj
+6 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >>
+endobj
+7 0 obj
+<< /Type /Outlines /Count 0 >>
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612.0 792.0] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> >> /Contents 9 0 R >>
+endobj
+9 0 obj
+<< /Length 8189 >>
+stream
+BT /F2 21.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 714.0 Tm (Functions) Tj ET
+0.961 0.541 0.149 rg 72.0 703.0 46.0 2.4 re f
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 681.0 Tm (A) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 81.45 681.0 Tm (function) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 119.25 681.0 Tm (takes) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 145.93 681.0 Tm (values) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 177.61 681.0 Tm (in) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 188.17 681.0 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 207.63 681.0 Tm (gives) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 233.75 681.0 Tm (one) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 253.21 681.0 Tm (back.) Tj ET
+0.961 0.961 0.969 rg 281.67 678.5 24.8 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 282.67 681.0 Tm (give) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 311.03 681.0 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 321.03 681.0 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 337.71 681.0 Tm (word) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 362.16 681.0 Tm (for) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 376.61 681.0 Tm (handing) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 414.97 681.0 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 423.31 681.0 Tm (value) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 449.99 681.0 Tm (back.) Tj ET
+0.961 0.961 0.969 rg 72.0 547.8 468.0 116.6 re f
+0.961 0.541 0.149 rg 72.0 547.8 2.2 116.6 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 655.4 Tm (use std.io) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 632.6 Tm (fn area\(width: Num, height: Num\) -> Num {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 621.2 Tm (    give width * height) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 609.8 Tm (}) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 587.0 Tm (fn main\(\) {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 575.6 Tm (    io.say\("{area\(3.0, 4.0\)}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 564.2 Tm (}) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 538.8 Tm (Parameter) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 121.46 538.8 Tm (types) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 148.14 538.8 Tm (are) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 165.37 538.8 Tm (always) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 198.71 538.8 Tm (written) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 230.94 538.8 Tm (down.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 260.4 538.8 Tm (The) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 280.41 538.8 Tm (result) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 307.64 538.8 Tm (type) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 329.32 538.8 Tm (goes) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 353.78 538.8 Tm (after) Tj ET
+0.961 0.961 0.969 rg 378.35 536.3 13.4 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 379.35 538.8 Tm (->) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 393.53 538.8 Tm (;) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 399.09 538.8 Tm (leave) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 425.77 538.8 Tm (it) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 433.55 538.8 Tm (off) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 447.45 538.8 Tm (when) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 474.13 538.8 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 490.81 538.8 Tm (function) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 524.2 Tm (gives) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 98.12 524.2 Tm (nothing) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 133.7 524.2 Tm (back.) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 490.6 Tm (Short functions) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 473.6 Tm (When) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 100.9 473.6 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 117.58 473.6 Tm (whole) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 146.48 473.6 Tm (body) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 170.94 473.6 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 180.94 473.6 Tm (one) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 200.4 473.6 Tm (expression,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 254.31 473.6 Tm (use) Tj ET
+0.961 0.961 0.969 rg 274.99 471.1 13.4 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 275.99 473.6 Tm (=>) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 290.17 473.6 Tm (:) Tj ET
+0.961 0.961 0.969 rg 72.0 340.4 468.0 116.6 re f
+0.961 0.541 0.149 rg 72.0 340.4 2.2 116.6 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 448 Tm (use std.io) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 425.2 Tm (fn double\(n: Int\) -> Int => n * 2) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 413.8 Tm (fn shout\(words: Text\) -> Text => words.upper\(\) + "!") Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 391 Tm (fn main\(\) {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 379.6 Tm (    io.say\("{double\(21\)}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 368.2 Tm (    io.say\(shout\("quietly"\)\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 356.8 Tm (}) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 317.4 Tm (Functions as values) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 300.4 Tm (A) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 81.45 300.4 Tm (function) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 119.25 300.4 Tm (can) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 138.15 300.4 Tm (be) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 152.05 300.4 Tm (stored,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 185.4 300.4 Tm (passed) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 220.42 300.4 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 239.88 300.4 Tm (returned.) Tj ET
+0.961 0.961 0.969 rg 72.0 155.8 468.0 128.0 re f
+0.961 0.541 0.149 rg 72.0 155.8 2.2 128.0 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 274.8 Tm (use std.io) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 252 Tm (fn apply_twice\(value: Int, change: fn\(Int\) -> Int\) -> Int {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 240.6 Tm (    give change\(change\(value\)\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 229.2 Tm (}) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 206.4 Tm (fn main\(\) {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 195 Tm (    let add_three = fn\(n: Int\) => n + 3) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 183.6 Tm (    io.say\("{apply_twice\(10, add_three\)}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 172.2 Tm (}) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 146.8 Tm (A) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 81.45 146.8 Tm (function) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 119.25 146.8 Tm (written) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 151.48 146.8 Tm (inline) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 177.6 146.8 Tm (like) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 195.38 146.8 Tm (that) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 214.84 146.8 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 224.84 146.8 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 233.18 146.8 Tm (lambda.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 271.53 146.8 Tm (It) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 279.87 146.8 Tm (can) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 298.77 146.8 Tm (see) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 317.67 146.8 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 334.35 146.8 Tm (values) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 366.03 146.8 Tm (around) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 399.94 146.8 Tm (it:) Tj ET
+0.87 0.87 0.89 rg 72.0 62.0 468.0 0.6 re f
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 72.0 48.0 Tm (SPRFST Guidebook) Tj ET
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 535.552 48.0 Tm (1) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612.0 792.0] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> >> /Contents 11 0 R >>
+endobj
+11 0 obj
+<< /Length 6105 >>
+stream
+0.961 0.961 0.969 rg 72.0 639.2 468.0 93.8 re f
+0.961 0.541 0.149 rg 72.0 639.2 2.2 93.8 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 724.0 Tm (use std.io) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 701.2 Tm (fn main\(\) {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 689.8 Tm (    let tax = 0.2) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 678.4 Tm (    let with_tax = fn\(price: Num\) => price * \(1.0 + tax\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 667.0 Tm (    io.say\("{with_tax\(100.0\)}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 655.6 Tm (}) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 630.2 Tm (Lambdas) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 115.91 630.2 Tm (capture) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 152.04 630.2 Tm (by) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 165.38 630.2 Tm (value,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 194.84 630.2 Tm (so) Tj ET
+0.961 0.961 0.969 rg 209.96 627.7 19.1 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 210.96 630.2 Tm (tax) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 233.62 630.2 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 243.62 630.2 Tm (fixed) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 267.52 630.2 Tm (at) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 278.64 630.2 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 295.32 630.2 Tm (moment) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 334.22 630.2 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 350.9 630.2 Tm (lambda) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 386.47 630.2 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 396.47 630.2 Tm (made.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 427.04 630.2 Tm (Nothing) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 464.28 630.2 Tm (changes) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 504.86 630.2 Tm (under) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 615.6 Tm (you) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 90.9 615.6 Tm (later.) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 582.0 Tm (Pipelines) Tj ET
+0.961 0.961 0.969 rg 71.0 562.5 13.4 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 72.0 565.0 Tm (|>) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 88.96 565.0 Tm (sends) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 118.42 565.0 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 135.1 565.0 Tm (value) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 161.78 565.0 Tm (on) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 175.68 565.0 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 192.36 565.0 Tm (left) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 208.48 565.0 Tm (into) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 227.38 565.0 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 244.06 565.0 Tm (function) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 281.86 565.0 Tm (on) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 295.76 565.0 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 312.44 565.0 Tm (right.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 337.45 565.0 Tm (It) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 345.79 565.0 Tm (turns) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 370.8 565.0 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 379.14 565.0 Tm (nest) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 400.82 565.0 Tm (of) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 411.94 565.0 Tm (calls) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 434.72 565.0 Tm (inside) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 463.62 565.0 Tm (out.) Tj ET
+0.961 0.961 0.969 rg 72.0 454.6 468.0 93.8 re f
+0.961 0.541 0.149 rg 72.0 454.6 2.2 93.8 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 539.4 Tm (use std.io) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 516.6 Tm (fn main\(\) {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 505.2 Tm (    let total = [1, 2, 3, 4, 5] |> sum) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 493.8 Tm (    io.say\("{total}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 482.4 Tm (    io.say\("{"  hello  " |> trim |> upper}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 471.0 Tm (}) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 431.6 Tm (Exercise) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 414.6 Tm (Write) Tj ET
+0.961 0.961 0.969 rg 99.89 412.1 121.7 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 100.89 414.6 Tm (celsius_to_fahrenheit) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 226.15 414.6 Tm (and) Tj ET
+0.961 0.961 0.969 rg 247.39 412.1 121.7 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 248.39 414.6 Tm (fahrenheit_to_celsius) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 370.87 414.6 Tm (,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 376.43 414.6 Tm (then) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 398.67 414.6 Tm (print) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 420.9 414.6 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 429.24 414.6 Tm (small) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 455.35 414.6 Tm (conversion) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 506.48 414.6 Tm (table) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 400 Tm (from) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 94.78 400 Tm (-10) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 112.01 400 Tm (to) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 123.13 400 Tm (40) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 137.03 400 Tm (in) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 147.59 400 Tm (steps) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 174.27 400 Tm (of) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 185.39 400 Tm (10.) Tj ET
+0.87 0.87 0.89 rg 72.0 62.0 468.0 0.6 re f
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 72.0 48.0 Tm (SPRFST Guidebook) Tj ET
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 535.552 48.0 Tm (2) Tj ET
+endstream
+endobj
+xref
+0 12
+0000000000 65535 f 
+0000000027 00000 n 
+0000000076 00000 n 
+0000000140 00000 n 
+0000000237 00000 n 
+0000000339 00000 n 
+0000000434 00000 n 
+0000000539 00000 n 
+0000000585 00000 n 
+0000000745 00000 n 
+0000008986 00000 n 
+0000009148 00000 n 
+trailer
+<< /Size 12 /Root 1 0 R /Info << /Title (Functions) /Producer (SPRFST 0.1.0-beta) /CreationDate (D:20261005005520Z) >> >>
+startxref
+15306
+%%EOF

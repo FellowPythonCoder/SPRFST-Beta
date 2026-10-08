@@ -1,0 +1,512 @@
+%PDF-1.4
+%\342\343\317\323
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 3 /Kids [8 0 R 10 0 R 12 0 R] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
+endobj
+6 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >>
+endobj
+7 0 obj
+<< /Type /Outlines /Count 0 >>
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612.0 792.0] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> >> /Contents 9 0 R >>
+endobj
+9 0 obj
+<< /Length 11482 >>
+stream
+BT /F2 21.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 714.0 Tm (Learning machines) Tj ET
+0.961 0.541 0.149 rg 72.0 703.0 46.0 2.4 re f
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 681.0 Tm (SPRFST) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 114.23 681.0 Tm (ships) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 140.35 681.0 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 157.03 681.0 Tm (pieces) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 188.71 681.0 Tm (you) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 207.61 681.0 Tm (need) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 232.63 681.0 Tm (to) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 243.75 681.0 Tm (train) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 265.98 681.0 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 274.32 681.0 Tm (small) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 300.43 681.0 Tm (model) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 330.44 681.0 Tm (without) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 364.9 681.0 Tm (reaching) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 406.03 681.0 Tm (for) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 420.48 681.0 Tm (anything) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 461.06 681.0 Tm (else:) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 484.96 681.0 Tm (an) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 498.86 681.0 Tm (array) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 666.4 Tm (type) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 93.68 666.4 Tm (with) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 114.24 666.4 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 130.92 666.4 Tm (usual) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 157.6 666.4 Tm (operations) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 207.07 666.4 Tm (in) Tj ET
+0.961 0.961 0.969 rg 219.41 663.9 59.0 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 220.41 666.4 Tm (std.tensor) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 280.19 666.4 Tm (,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 285.75 666.4 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 305.21 666.4 Tm (layers,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 337.44 666.4 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 345.78 666.4 Tm (network) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 383.57 666.4 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 403.03 666.4 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 411.37 666.4 Tm (trainer) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 442.49 666.4 Tm (in) Tj ET
+0.961 0.961 0.969 rg 454.83 663.9 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 455.83 666.4 Tm (std.ai) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 492.81 666.4 Tm (.) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 632.8 Tm (Tensors) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 615.8 Tm (A) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 81.45 615.8 Tm (tensor) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 112.02 615.8 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 122.02 615.8 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 130.36 615.8 Tm (shape) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 160.38 615.8 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 179.84 615.8 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 188.18 615.8 Tm (flat) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 204.3 615.8 Tm (list) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 219.3 615.8 Tm (of) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 230.42 615.8 Tm (numbers.) Tj ET
+0.961 0.961 0.969 rg 72.0 391.4 468.0 207.8 re f
+0.961 0.541 0.149 rg 72.0 391.4 2.2 207.8 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 590.2 Tm (use std.io) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 578.8 Tm (use std.tensor) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 556 Tm (fn main\(\) {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 544.6 Tm (    let a = tensor.make\([2, 3], [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 533.2 Tm (    let b = tensor.make\([3, 2], [7.0, 8.0, 9.0, 10.0, 11.0, 12.0]\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 510.4 Tm (    io.say\("shape    {tensor.shape\(a\)}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 499 Tm (    io.say\("a + a    {tensor.to_list\(tensor.add\(a, a\)\)}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 487.6 Tm (    io.say\("a * 2    {tensor.to_list\(tensor.scale\(a, 2.0\)\)}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 476.2 Tm (    io.say\("a @ b    {tensor.to_list\(tensor.matmul\(a, b\)\)}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 464.8 Tm (    io.say\("a^T      {tensor.to_list\(tensor.transpose\(a\)\)}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 453.4 Tm (    io.say\("mean     {tensor.mean\(a\)}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 442 Tm (    io.say\("softmax  {tensor.to_list\(tensor.softmax\(tensor.make\([3], [1.0, 2.0, 3.0]\)\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 430.6 Tm (  \)}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 419.2 Tm (    io.say\("argmax   {tensor.argmax\(tensor.make\([4], [0.1, 0.9, 0.3, 0.2]\)\)}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 407.8 Tm (}) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 382.4 Tm (The) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 92.01 382.4 Tm (full) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 107.57 382.4 Tm (set:) Tj ET
+0.961 0.961 0.969 rg 128.25 379.9 24.8 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 129.25 382.4 Tm (make) Tj ET
+0.961 0.961 0.969 rg 153.83 379.9 30.5 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 154.83 382.4 Tm (zeros) Tj ET
+0.961 0.961 0.969 rg 185.11 379.9 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 186.11 382.4 Tm (random) Tj ET
+0.961 0.961 0.969 rg 222.09 379.9 30.5 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 223.09 382.4 Tm (shape) Tj ET
+0.961 0.961 0.969 rg 253.37 379.9 13.4 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 254.37 382.4 Tm (at) Tj ET
+0.961 0.961 0.969 rg 267.55 379.9 19.1 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 268.55 382.4 Tm (put) Tj ET
+0.961 0.961 0.969 rg 287.43 379.9 19.1 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 288.43 382.4 Tm (add) Tj ET
+0.961 0.961 0.969 rg 307.31 379.9 19.1 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 308.31 382.4 Tm (sub) Tj ET
+0.961 0.961 0.969 rg 327.19 379.9 19.1 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 328.19 382.4 Tm (mul) Tj ET
+0.961 0.961 0.969 rg 347.07 379.9 30.5 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 348.07 382.4 Tm (scale) Tj ET
+0.961 0.961 0.969 rg 378.35 379.9 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 379.35 382.4 Tm (matmul) Tj ET
+0.961 0.961 0.969 rg 415.33 379.9 53.3 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 416.33 382.4 Tm (transpose) Tj ET
+0.961 0.961 0.969 rg 469.41 379.9 24.8 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 470.41 382.4 Tm (relu) Tj ET
+0.961 0.961 0.969 rg 494.99 379.9 41.9 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 495.99 382.4 Tm (sigmoid) Tj ET
+0.961 0.961 0.969 rg 71.0 365.3 24.8 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 72.0 367.8 Tm (tanh) Tj ET
+0.961 0.961 0.969 rg 96.58 365.3 41.9 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 97.58 367.8 Tm (softmax) Tj ET
+0.961 0.961 0.969 rg 139.26 365.3 19.1 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 140.26 367.8 Tm (sum) Tj ET
+0.961 0.961 0.969 rg 159.14 365.3 24.8 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 160.14 367.8 Tm (mean) Tj ET
+0.961 0.961 0.969 rg 184.72 365.3 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 185.72 367.8 Tm (argmax) Tj ET
+0.961 0.961 0.969 rg 221.7 365.3 41.9 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 222.7 367.8 Tm (to_list) Tj ET
+0.961 0.961 0.969 rg 264.38 365.3 19.1 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 265.38 367.8 Tm (dot) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 285.26 367.8 Tm (.) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 334.2 Tm (A network) Tj ET
+0.961 0.961 0.969 rg 71.0 314.7 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 72.0 317.2 Tm (std.ai) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 111.76 317.2 Tm (builds) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 140.66 317.2 Tm (on) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 154.56 317.2 Tm (those.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 184.58 317.2 Tm (A) Tj ET
+0.961 0.961 0.969 rg 195.81 314.7 30.5 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 196.81 317.2 Tm (Dense) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 230.87 317.2 Tm (layer) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 255.32 317.2 Tm (holds) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 282.0 317.2 Tm (its) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 294.78 317.2 Tm (own) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 315.9 317.2 Tm (weights;) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 355.36 317.2 Tm (a) Tj ET
+0.961 0.961 0.969 rg 365.48 314.7 41.9 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 366.48 317.2 Tm (Network) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 411.94 317.2 Tm (chains) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 443.62 317.2 Tm (two) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 461.96 317.2 Tm (of) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 473.08 317.2 Tm (them) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 498.09 317.2 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 302.6 Tm (trains) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 99.23 302.6 Tm (by) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 112.57 302.6 Tm (gradient) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 151.48 302.6 Tm (descent.) Tj ET
+0.961 0.961 0.969 rg 72.0 89.6 468.0 196.4 re f
+0.961 0.541 0.149 rg 72.0 89.6 2.2 196.4 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 277 Tm (use std.io) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 265.6 Tm (use std.ai) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 254.2 Tm (use std.rand) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 242.8 Tm (use std.math) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 220 Tm (fn main\(\) {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 208.6 Tm (    rand.seed\(11\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 185.8 Tm (    var net = ai.Network { rate: 0.6 }) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 174.4 Tm (    net.build\(2, 6, 1\)            ~~ 2 inputs, 6 hidden, 1 output) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 151.6 Tm (    let inputs = [[0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]]) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 140.2 Tm (    let wanted = [[0.0], [1.0], [1.0], [0.0]]) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 117.4 Tm (    let final_loss = net.train\(inputs, wanted, 2000, false\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 106 Tm (    io.say\("loss after training: {final_loss}"\)) Tj ET
+0.87 0.87 0.89 rg 72.0 62.0 468.0 0.6 re f
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 72.0 48.0 Tm (SPRFST Guidebook) Tj ET
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 535.552 48.0 Tm (1) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612.0 792.0] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> >> /Contents 11 0 R >>
+endobj
+11 0 obj
+<< /Length 13766 >>
+stream
+0.961 0.961 0.969 rg 72.0 627.8 468.0 105.2 re f
+0.961 0.541 0.149 rg 72.0 627.8 2.2 105.2 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 712.6 Tm (    var correct = 0) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 701.2 Tm (    for i in 0..4 {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 689.8 Tm (        let got = net.predict\(inputs[i]\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 678.4 Tm (        if math.round\(got[0]\) == wanted[i][0] { correct = correct + 1 }) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 667.0 Tm (    }) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 655.6 Tm (    io.say\("{correct} of 4 correct"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 644.2 Tm (}) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 618.8 Tm (XOR) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 96.45 618.8 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 106.45 618.8 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 123.13 618.8 Tm (classic) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 155.91 618.8 Tm (test) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 174.81 618.8 Tm (because) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 215.39 618.8 Tm (no) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 229.29 618.8 Tm (single) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 258.19 618.8 Tm (layer) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 282.64 618.8 Tm (can) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 301.54 618.8 Tm (learn) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 326.55 618.8 Tm (it.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 337.11 618.8 Tm (If) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 345.45 618.8 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 362.13 618.8 Tm (loss) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 382.69 618.8 Tm (stops) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 409.37 618.8 Tm (falling,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 441.05 618.8 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 457.73 618.8 Tm (usual) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 484.41 618.8 Tm (causes) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 518.87 618.8 Tm (are) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 604.2 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 80.34 604.2 Tm (learning) Tj ET
+0.961 0.961 0.969 rg 120.47 601.7 24.8 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 121.47 604.2 Tm (rate) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 149.83 604.2 Tm (that) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 169.29 604.2 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 179.29 604.2 Tm (too) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 195.97 604.2 Tm (large,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 223.76 604.2 Tm (too) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 240.44 604.2 Tm (few) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 258.78 604.2 Tm (hidden) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 291.58 604.2 Tm (units,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 318.26 604.2 Tm (or) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 329.93 604.2 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 338.27 604.2 Tm (seed) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 362.73 604.2 Tm (that) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 382.19 604.2 Tm (started) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 415.54 604.2 Tm (somewhere) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 470 604.2 Tm (awkward) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 512.23 604.2 Tm (\227) Tj ET
+0.961 0.961 0.969 rg 71.0 587.1 53.3 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 72.0 589.6 Tm (rand.seed) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 128.86 589.6 Tm (makes) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 161.09 589.6 Tm (every) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 188.32 589.6 Tm (run) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 205.55 589.6 Tm (repeatable) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 255.58 589.6 Tm (so) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 268.92 589.6 Tm (you) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 287.82 589.6 Tm (can) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 306.72 589.6 Tm (tell) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 322.28 589.6 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 338.96 589.6 Tm (difference.) Tj ET
+BT /F2 10.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 560 Tm (The parts) Tj ET
+0.93 0.93 0.95 rg 72.0 533 295.16 18.0 re f
+BT /F2 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 80.0 538 Tm (Piece) Tj ET
+BT /F2 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 198.6 538 Tm (What it does) Tj ET
+0.88 0.88 0.90 rg 72.0 515 295.16 0.4 re f
+BT /F3 9.0 Tf 0.20 0.20 0.24 rg 1 0 0 1 80.0 520 Tm (ai.Dense) Tj ET
+BT /F1 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 198.6 520 Tm (one fully connected layer: start, forward) Tj ET
+0.88 0.88 0.90 rg 72.0 497 295.16 0.4 re f
+BT /F3 9.0 Tf 0.20 0.20 0.24 rg 1 0 0 1 80.0 502 Tm (ai.Network) Tj ET
+BT /F1 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 198.6 502 Tm (two layers plus build, predict, learn, train) Tj ET
+0.88 0.88 0.90 rg 72.0 479 295.16 0.4 re f
+BT /F3 9.0 Tf 0.20 0.20 0.24 rg 1 0 0 1 80.0 484 Tm (ai.apply / ai.slope) Tj ET
+BT /F1 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 198.6 484 Tm (activations and their derivatives) Tj ET
+0.88 0.88 0.90 rg 72.0 461 295.16 0.4 re f
+BT /F3 9.0 Tf 0.20 0.20 0.24 rg 1 0 0 1 80.0 466 Tm (ai.loss) Tj ET
+BT /F1 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 198.6 466 Tm (mean squared error) Tj ET
+0.88 0.88 0.90 rg 72.0 443 295.16 0.4 re f
+BT /F3 9.0 Tf 0.20 0.20 0.24 rg 1 0 0 1 80.0 448 Tm (ai.tokenize) Tj ET
+BT /F1 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 198.6 448 Tm (text to word tokens) Tj ET
+0.88 0.88 0.90 rg 72.0 425 295.16 0.4 re f
+BT /F3 9.0 Tf 0.20 0.20 0.24 rg 1 0 0 1 80.0 430 Tm (ai.vocabulary) Tj ET
+BT /F1 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 198.6 430 Tm (tokens to numbers) Tj ET
+0.88 0.88 0.90 rg 72.0 413 295.16 0.4 re f
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 402 Tm (Activations) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 123.13 402 Tm (available) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 165.37 402 Tm (to) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 176.49 402 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 184.83 402 Tm (layer:) Tj ET
+0.961 0.961 0.969 rg 213.84 399.5 24.8 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 214.84 402 Tm (relu) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 240.42 402 Tm (,) Tj ET
+0.961 0.961 0.969 rg 247.76 399.5 41.9 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 248.76 402 Tm (sigmoid) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 291.44 402 Tm (,) Tj ET
+0.961 0.961 0.969 rg 298.78 399.5 24.8 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 299.78 402 Tm (tanh) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 325.36 402 Tm (,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 330.92 402 Tm (and) Tj ET
+0.961 0.961 0.969 rg 352.16 399.5 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 353.16 402 Tm (linear) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 392.92 402 Tm (for) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 407.37 402 Tm (anything) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 447.95 402 Tm (else.) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 368.4 Tm (Text in, numbers out) Tj ET
+0.961 0.961 0.969 rg 72.0 180.8 468.0 173.6 re f
+0.961 0.541 0.149 rg 72.0 180.8 2.2 173.6 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 345.4 Tm (use std.io) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 334 Tm (use std.ai) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 311.2 Tm (fn main\(\) {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 299.8 Tm (    let words = ai.tokenize\("SPRFST is fast. SPRFST is small. Fast is good!"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 288.4 Tm (    io.say\("tokens     {words}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 265.6 Tm (    let vocab = ai.vocabulary\(words\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 254.2 Tm (    io.say\("vocabulary {vocab}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 231.4 Tm (    var encoded: [Int] = []) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 220 Tm (    for w in words { encoded.push\(vocab.get\(w\) ?? 0\) }) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 208.6 Tm (    io.say\("encoded    {encoded}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 197.2 Tm (}) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 171.8 Tm (That) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 94.79 171.8 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 104.79 171.8 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 121.47 171.8 Tm (front) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 144.26 171.8 Tm (of) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 155.38 171.8 Tm (every) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 182.61 171.8 Tm (language) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 226.53 171.8 Tm (model:) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 259.32 171.8 Tm (split,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 282.66 171.8 Tm (number,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 322.12 171.8 Tm (feed.) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 138.2 Tm (Where the edges are) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 121.2 Tm (Be) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 87.01 121.2 Tm (clear) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 111.46 121.2 Tm (eyed) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 135.92 121.2 Tm (about) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 163.72 121.2 Tm (what) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 187.62 121.2 Tm (this) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 205.96 121.2 Tm (is.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 218.74 121.2 Tm (The) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 238.75 121.2 Tm (gradients) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 282.66 121.2 Tm (in) Tj ET
+0.961 0.961 0.969 rg 295 118.7 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 296 121.2 Tm (std.ai) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 335.76 121.2 Tm (are) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 352.99 121.2 Tm (written) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 385.22 121.2 Tm (out) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 401.9 121.2 Tm (by) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 415.24 121.2 Tm (hand) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 440.26 121.2 Tm (for) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 454.71 121.2 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 471.39 121.2 Tm (two) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 489.73 121.2 Tm (layer) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 514.18 121.2 Tm (case;) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 106.6 Tm (there) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 97.57 106.6 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 107.57 106.6 Tm (no) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 121.47 106.6 Tm (automatic) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 167.6 106.6 Tm (differentiation,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 233.19 106.6 Tm (no) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 247.09 106.6 Tm (GPU,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 274.32 106.6 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 293.78 106.6 Tm (no) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 307.68 106.6 Tm (pretrained) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 355.48 106.6 Tm (weights.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 394.94 106.6 Tm (It) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 403.28 106.6 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 413.28 106.6 Tm (enough) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 449.42 106.6 Tm (to) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 460.54 106.6 Tm (learn) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 485.55 106.6 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 493.89 106.6 Tm (function) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 92 Tm (from) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 94.78 92 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 103.12 92 Tm (few) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 121.46 92 Tm (thousand) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 165.38 92 Tm (examples,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 213.73 92 Tm (to) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 224.85 92 Tm (run) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 242.08 92 Tm (inference) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 285.99 92 Tm (from) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 308.77 92 Tm (weights) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 345.45 92 Tm (you) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 364.35 92 Tm (load) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 386.03 92 Tm (yourself,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 426.6 92 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 446.06 92 Tm (to) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 457.18 92 Tm (understand) Tj ET
+0.87 0.87 0.89 rg 72.0 62.0 468.0 0.6 re f
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 72.0 48.0 Tm (SPRFST Guidebook) Tj ET
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 535.552 48.0 Tm (2) Tj ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612.0 792.0] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> >> /Contents 13 0 R >>
+endobj
+13 0 obj
+<< /Length 6880 >>
+stream
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 724.0 Tm (exactly) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 105.9 724.0 Tm (what) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 129.8 724.0 Tm (every) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 157.03 724.0 Tm (number) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 193.71 724.0 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 203.71 724.0 Tm (doing) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 230.95 724.0 Tm (\227) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 237.06 724.0 Tm (and) Tj ET
+0.961 0.961 0.969 rg 258.3 721.5 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 259.3 724.0 Tm (std.ai) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 299.06 724.0 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 309.06 724.0 Tm (ordinary) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 347.96 724.0 Tm (SPRFST) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 390.19 724.0 Tm (source) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 422.98 724.0 Tm (in) Tj ET
+0.961 0.961 0.969 rg 435.32 721.5 59.0 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 436.32 724.0 Tm (std/ai.spf) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 496.1 724.0 Tm (,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 501.66 724.0 Tm (so) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 515 724.0 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 709.4 Tm (third) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 94.23 709.4 Tm (layer) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 118.68 709.4 Tm (or) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 130.35 709.4 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 138.69 709.4 Tm (new) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 159.81 709.4 Tm (optimiser) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 203.15 709.4 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 213.15 709.4 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 221.49 709.4 Tm (file) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 237.05 709.4 Tm (you) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 255.95 709.4 Tm (can) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 274.85 709.4 Tm (edit.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 689.8 Tm (Anything) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 113.69 689.8 Tm (larger) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 142.03 689.8 Tm (belongs) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 179.83 689.8 Tm (in) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 190.39 689.8 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 198.73 689.8 Tm (program) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 238.74 689.8 Tm (that) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 258.2 689.8 Tm (calls) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 280.98 689.8 Tm (out) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 297.66 689.8 Tm (to) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 308.78 689.8 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 317.12 689.8 Tm (dedicated) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 363.26 689.8 Tm (runtime,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 402.16 689.8 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 421.62 689.8 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 438.3 689.8 Tm (extension) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 483.88 689.8 Tm (points) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 513.34 689.8 Tm (in) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 675.2 Tm (chapter) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 108.13 675.2 Tm (27) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 122.03 675.2 Tm (are) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 139.26 675.2 Tm (how) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 160.38 675.2 Tm (you) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 179.28 675.2 Tm (would) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 208.18 675.2 Tm (attach) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 238.2 675.2 Tm (one.) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 641.6 Tm (Exercise) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 624.6 Tm (Train) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 97.56 624.6 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 114.24 624.6 Tm (network) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 152.03 624.6 Tm (to) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 163.15 624.6 Tm (tell) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 178.71 624.6 Tm (even) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 203.17 624.6 Tm (numbers) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 244.85 624.6 Tm (from) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 267.63 624.6 Tm (odd) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 287.09 624.6 Tm (ones:) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 314.33 624.6 Tm (feed) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 336.57 624.6 Tm (it) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 344.35 624.6 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 361.03 624.6 Tm (four) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 381.04 624.6 Tm (bits) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 399.38 624.6 Tm (of) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 410.5 624.6 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 418.84 624.6 Tm (number) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 455.52 624.6 Tm (from) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 478.3 624.6 Tm (0) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 486.64 624.6 Tm (to) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 497.76 624.6 Tm (15) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 511.66 624.6 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 610 Tm (expect) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 104.24 610 Tm (1) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 112.58 610 Tm (for) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 127.03 610 Tm (even.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 154.27 610 Tm (Then) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 179.84 610 Tm (print) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 202.07 610 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 218.75 610 Tm (cases) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 247.65 610 Tm (it) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 255.43 610 Tm (gets) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 277.11 610 Tm (wrong.) Tj ET
+0.87 0.87 0.89 rg 72.0 62.0 468.0 0.6 re f
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 72.0 48.0 Tm (SPRFST Guidebook) Tj ET
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 535.552 48.0 Tm (3) Tj ET
+endstream
+endobj
+xref
+0 14
+0000000000 65535 f 
+0000000027 00000 n 
+0000000076 00000 n 
+0000000147 00000 n 
+0000000244 00000 n 
+0000000346 00000 n 
+0000000441 00000 n 
+0000000546 00000 n 
+0000000592 00000 n 
+0000000752 00000 n 
+0000012287 00000 n 
+0000012449 00000 n 
+0000026269 00000 n 
+0000026431 00000 n 
+trailer
+<< /Size 14 /Root 1 0 R /Info << /Title (Learning machines) /Producer (SPRFST 0.1.0-beta) /CreationDate (D:20261005005520Z) >> >>
+startxref
+33364
+%%EOF

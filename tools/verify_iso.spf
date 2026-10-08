@@ -1,0 +1,283 @@
+~~ =====================================================================
+~~  verify_iso.spf — read a disk image back and prove it is really one
+~~
+~~      sprfst run tools/verify_iso.spf -- <image> [folder it was made from]
+~~
+~~  Nothing here shares code with the writer. It parses the image the way
+~~  a mounting operating system does: the two volume descriptors, the
+~~  both endian fields, the path tables, then both directory trees, and
+~~  finally every file's bytes against the originals on disk.
+~~ =====================================================================
+
+use std.io
+use std.fs
+use std.sys
+use std.math
+
+let SECTOR = 2048
+let GLYPHS = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{{|}}~"
+
+~~ ---------------------------------------------------------------- bytes
+
+fn le16(img: [Int], at: Int) -> Int { give img[at] + img[at + 1] * 256 }
+fn be16(img: [Int], at: Int) -> Int { give img[at] * 256 + img[at + 1] }
+
+fn le32(img: [Int], at: Int) -> Int {
+    give img[at] + img[at + 1] * 256 + img[at + 2] * 65536 + img[at + 3] * 16777216
+}
+
+fn be32(img: [Int], at: Int) -> Int {
+    give img[at] * 16777216 + img[at + 1] * 65536 + img[at + 2] * 256 + img[at + 3]
+}
+
+~~ a both endian field holds the same number twice, little then big
+fn both32(img: [Int], at: Int, what: Text, bad: [Text]) -> Int {
+    let a = le32(img, at)
+    let b = be32(img, at + 4)
+    if a != b { bad.push("{what}: the two halves disagree, {a} and {b}") }
+    give a
+}
+
+fn both16(img: [Int], at: Int, what: Text, bad: [Text]) -> Int {
+    let a = le16(img, at)
+    let b = be16(img, at + 2)
+    if a != b { bad.push("{what}: the two halves disagree, {a} and {b}") }
+    give a
+}
+
+fn glyph(b: Int) -> Text {
+    if b >= 32 and b < 127 { give GLYPHS.chars()[b - 32] }
+    give "."
+}
+
+fn ascii(img: [Int], at: Int, n: Int) -> Text {
+    var s = ""
+    var i = 0
+    while i < n {
+        s = s + glyph(img[at + i])
+        i = i + 1
+    }
+    give s.trim()
+}
+
+~~ UCS-2, big end first, which is what Joliet stores
+fn wide(img: [Int], at: Int, n: Int) -> Text {
+    var s = ""
+    var i = 0
+    while i + 1 < n {
+        let hi = img[at + i]
+        let lo = img[at + i + 1]
+        if hi == 0 { s = s + glyph(lo) } else { s = s + "?" }
+        i = i + 2
+    }
+    give s.trim()
+}
+
+fn matches(img: [Int], at: Int, want: Text) -> Bool {
+    var i = 0
+    for b in want.bytes() {
+        if img[at + i] != b { give false }
+        i = i + 1
+    }
+    give true
+}
+
+~~ ------------------------------------------------------------ the trees
+
+object Entry {
+    path: Text
+    lba: Int
+    size: Int
+    folder: Bool
+}
+
+fn read_tree(img: [Int], lba: Int, length: Int, joliet: Bool, here: Text,
+             out: [Entry], bad: [Text], depth: Int) {
+    if depth > 12 {
+        bad.push("the tree is deeper than twelve levels at {here}")
+        give
+    }
+    let base = lba * SECTOR
+    var off = 0
+    while off < length {
+        let rec_len = img[base + off]
+        if rec_len == 0 {
+            ~~ the rest of this sector is padding, step to the next one
+            off = (math.floor(off / SECTOR) + 1) * SECTOR
+            skip
+        }
+        if rec_len < 33 {
+            bad.push("a record of {rec_len} bytes at {here}, which is too short")
+            give
+        }
+        let at = base + off
+        let child_lba = both32(img, at + 2, "extent of a record in {here}", bad)
+        let child_size = both32(img, at + 10, "size of a record in {here}", bad)
+        let flags = img[at + 25]
+        let id_len = img[at + 32]
+        let folder = flags % 4 >= 2
+
+        if (off % SECTOR) + rec_len > SECTOR {
+            bad.push("a record straddles a sector boundary in {here}")
+        }
+
+        var name = ""
+        if id_len == 1 and img[at + 33] < 2 {
+            name = if img[at + 33] == 0 { "." } else { ".." }
+        } else {
+            name = if joliet { wide(img, at + 33, id_len) } else { ascii(img, at + 33, id_len) }
+        }
+
+        if name != "." and name != ".." {
+            let full = here + "/" + name
+            out.push(Entry { path: full, lba: child_lba, size: child_size, folder: folder })
+            if folder {
+                read_tree(img, child_lba, child_size, joliet, full, out, bad, depth + 1)
+            }
+        }
+        off = off + rec_len
+    }
+}
+
+fn describe(img: [Int], sector: Int, joliet: Bool, total: Int, bad: [Text]) -> [Entry] {
+    let at = sector * SECTOR
+    if not matches(img, at + 1, "CD001") {
+        bad.push("sector {sector} does not start with CD001")
+        give []
+    }
+    if img[at + 6] != 1 { bad.push("sector {sector} is not descriptor version 1") }
+
+    let name = if joliet { wide(img, at + 40, 32) } else { ascii(img, at + 40, 32) }
+    let space = both32(img, at + 80, "volume space size", bad)
+    let block = both16(img, at + 128, "logical block size", bad)
+    let pt_size = both32(img, at + 132, "path table size", bad)
+    let pt_l = le32(img, at + 140)
+    let pt_m = be32(img, at + 148)
+    let root_lba = both32(img, at + 158, "root extent", bad)
+    let root_size = both32(img, at + 166, "root size", bad)
+
+    if block != SECTOR { bad.push("the logical block size is {block}, not {SECTOR}") }
+    if space != total { bad.push("the volume claims {space} sectors but the file holds {total}") }
+    if img[at + 881] != 1 { bad.push("the file structure version is not 1") }
+    if joliet and not matches(img, at + 88, "%/E") {
+        bad.push("the Joliet escape sequence is missing")
+    }
+    if pt_l == 0 or pt_m == 0 { bad.push("a path table address is zero") }
+    if pt_size == 0 { bad.push("the path table is empty") }
+    if root_lba + math.floor((root_size + SECTOR - 1) / SECTOR) > total {
+        bad.push("the root folder runs past the end of the image")
+    }
+
+    let kind_name = if joliet { "joliet  " } else { "primary " }
+    io.say("  {kind_name} volume \"{name}\"   {space} sectors   root at {root_lba}, {root_size} bytes")
+    io.say("           path tables at {pt_l} and {pt_m}, {pt_size} bytes each")
+
+    var found: [Entry] = []
+    read_tree(img, root_lba, root_size, joliet, "", found, bad, 0)
+
+    var folders = 0
+    var files = 0
+    for e in found {
+        if e.folder { folders = folders + 1 } else { files = files + 1 }
+        if not e.folder and e.size > 0 {
+            let last = e.lba + math.floor((e.size + SECTOR - 1) / SECTOR)
+            if last > total { bad.push("{e.path} runs past the end of the image") }
+        }
+    }
+    io.say("           {folders} folders, {files} files")
+    give found
+}
+
+~~ ---------------------------------------------------------------- main
+
+fn main() {
+    let args = sys.args()
+    if args.len() < 1 {
+        io.warn("usage: sprfst run tools/verify_iso.spf -- <image> [source folder]")
+        sys.exit(1)
+    }
+    let path = args[0]
+    let source = if args.len() > 1 { args[1] } else { "" }
+
+    let maybe = fs.read_bytes(path)
+    if maybe == nil {
+        io.warn("cannot read {path}")
+        sys.exit(1)
+    }
+    let img = maybe ?? []
+    var bad: [Text] = []
+
+    io.say("")
+    io.say("  {path}   {img.len()} bytes")
+
+    if img.len() % SECTOR != 0 {
+        bad.push("the file is not a whole number of {SECTOR} byte sectors")
+    }
+    let total = math.floor(img.len() / SECTOR)
+    if total < 20 { bad.push("an image this small cannot hold the descriptors") }
+
+    ~~ the first sixteen sectors belong to the boot area and stay blank
+    var i = 0
+    var dirty = 0
+    while i < 16 * SECTOR and i < img.len() {
+        if img[i] != 0 { dirty = dirty + 1 }
+        i = i + 1
+    }
+    if dirty > 0 { bad.push("the system area is not blank, {dirty} bytes are set") }
+
+    if img[16 * SECTOR] != 1 { bad.push("sector 16 is not a primary descriptor") }
+    if img[17 * SECTOR] != 2 { bad.push("sector 17 is not a supplementary descriptor") }
+    if img[18 * SECTOR] != 255 { bad.push("sector 18 is not the terminator") }
+
+    let primary = describe(img, 16, false, total, bad)
+    let joliet = describe(img, 17, true, total, bad)
+
+    if primary.len() != joliet.len() {
+        bad.push("the two trees hold different numbers of entries, {primary.len()} and {joliet.len()}")
+    }
+
+    ~~ every file, byte for byte, against the folder it came from
+    if source != "" {
+        var checked = 0
+        var bytes = 0
+        for e in joliet {
+            if e.folder { skip }
+            let on_disk = source + e.path
+            let want_maybe = fs.read_bytes(on_disk)
+            if want_maybe == nil {
+                bad.push("{e.path} is in the image but not in {source}")
+                skip
+            }
+            let want = want_maybe ?? []
+            if want.len() != e.size {
+                bad.push("{e.path} is {e.size} bytes in the image, {want.len()} on disk")
+                skip
+            }
+            var k = 0
+            var wrong = -1
+            let at = e.lba * SECTOR
+            while k < want.len() {
+                if img[at + k] != want[k] {
+                    wrong = k
+                    k = want.len()
+                }
+                k = k + 1
+            }
+            if wrong >= 0 { bad.push("{e.path} differs from the original at byte {wrong}") }
+            checked = checked + 1
+            bytes = bytes + want.len()
+        }
+        io.say("  compared {checked} files, {bytes} bytes, against {source}")
+    }
+
+    io.say("")
+    if bad.len() == 0 {
+        io.say("  the image is sound")
+        io.say("")
+        give
+    }
+    for b in bad { io.warn("  {b}") }
+    io.warn("  {bad.len()} problems")
+    io.say("")
+    sys.exit(1)
+}

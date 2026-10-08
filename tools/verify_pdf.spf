@@ -1,0 +1,161 @@
+~~ =====================================================================
+~~  verify_pdf.spf — read a PDF back and check it is really one
+~~
+~~      sprfst run tools/verify_pdf.spf -- <file.pdf> [expected pages]
+~~
+~~  A PDF is only valid if its cross reference table points at the right
+~~  bytes, so this walks it the way a reader does: find startxref, read
+~~  every offset, land on each object, then check the page tree count and
+~~  every stream length.
+~~ =====================================================================
+
+use std.io
+use std.fs
+use std.sys
+use std.math
+
+fn number_after(text: Text, key: Text, from: Int) -> Int {
+    let at = text.slice(from, text.len()).index_of(key)
+    if at < 0 { give -1 }
+    var i = from + at + key.len()
+    while i < text.len() {
+        let c = text.slice(i, i + 1)
+        if c != " " and c != "\n" and c != "\r" { break }
+        i = i + 1
+    }
+    var digits = ""
+    while i < text.len() {
+        let c = text.slice(i, i + 1)
+        if c.to_int() == nil { break }
+        digits = digits + c
+        i = i + 1
+    }
+    give digits.to_int() ?? -1
+}
+
+fn count_of(text: Text, needle: Text) -> Int {
+    var n = 0
+    var at = 0
+    while at < text.len() {
+        let found = text.slice(at, text.len()).index_of(needle)
+        if found < 0 { break }
+        n = n + 1
+        at = at + found + needle.len()
+    }
+    give n
+}
+
+fn main() {
+    let args = sys.args()
+    if args.len() < 1 {
+        io.warn("usage: sprfst run tools/verify_pdf.spf -- <file.pdf> [expected pages]")
+        sys.exit(1)
+    }
+    let path = args[0]
+    let want_pages = if args.len() > 1 { args[1].to_int() ?? 0 } else { 0 }
+
+    let text = fs.read(path)
+    if text == nil {
+        io.warn("cannot read {path}")
+        sys.exit(1)
+    }
+    let pdf = text ?? ""
+    var bad: [Text] = []
+
+    io.say("")
+    io.say("  {path}   {pdf.len()} bytes")
+
+    if not pdf.starts_with("%PDF-1.") { bad.push("it does not start with a PDF header") }
+    if not pdf.ends_with("%%EOF\n") { bad.push("it does not end with %%EOF") }
+
+    ~~ the trailer says where the cross reference table starts
+    let sx = pdf.index_of("startxref")
+    if sx < 0 {
+        io.warn("  no startxref")
+        sys.exit(1)
+    }
+    let start = number_after(pdf, "startxref", sx)
+    if start < 0 or start >= pdf.len() { bad.push("startxref points outside the file") }
+
+    let xref = pdf.slice(start, pdf.len())
+    if not xref.starts_with("xref") { bad.push("startxref does not land on the table") }
+
+    ~~ walk the table: every entry must land exactly on "<n> 0 obj"
+    let size = number_after(pdf, "/Size", pdf.index_of("/Size"))
+    var checked = 0
+    var i = 0
+    let lines = xref.lines()
+    var obj_no = 0
+    for line in lines {
+        if line.starts_with("xref") or line.starts_with("0 ") { skip }
+        if line.starts_with("trailer") { break }
+        if line.len() < 18 { skip }
+        let off = line.slice(0, 10).to_int() ?? -1
+        let kind = line.slice(17, 18)
+        if kind == "f" { obj_no = obj_no + 1  skip }
+        if off < 0 or off >= pdf.len() {
+            bad.push("object {obj_no} points outside the file")
+        } else {
+            let header = "{obj_no} 0 obj"
+            if pdf.slice(off, off + header.len()) != header {
+                bad.push("object {obj_no} is not where the table says")
+            } else {
+                checked = checked + 1
+            }
+        }
+        obj_no = obj_no + 1
+        i = i + 1
+    }
+    io.say("  cross reference table: {checked} of {size - 1} objects land where it says")
+    if checked != size - 1 { bad.push("the table lists {size - 1} objects but {checked} were found") }
+
+    ~~ the page tree must agree with the number of page objects
+    let count = number_after(pdf, "/Count", pdf.index_of("/Count"))
+    let pages = count_of(pdf, "/Type /Page ")
+    io.say("  page tree says {count} pages, {pages} page objects present")
+    if count != pages { bad.push("the page tree says {count} but there are {pages} page objects") }
+    if want_pages > 0 and count != want_pages {
+        bad.push("expected {want_pages} pages, found {count}")
+    }
+
+    ~~ every stream must be exactly as long as its /Length says
+    var streams = 0
+    var at = 0
+    while at < pdf.len() {
+        let rel = pdf.slice(at, pdf.len()).index_of("stream\n")
+        if rel < 0 { break }
+        let here = at + rel
+        let body = here + 7
+        ~~ the word "stream" turns up in the prose too; a real one follows a dictionary
+        if here < 3 or pdf.slice(here - 3, here) != ">>\n" { at = body  skip }
+        ~~ the /Length sits in the dictionary just before
+        let dict_start = math.floor(math.max(0, here - 60))
+        let dict = pdf.slice(dict_start, here)
+        let length = number_after(dict, "/Length", dict.index_of("/Length"))
+        if length < 0 {
+            bad.push("a stream has no /Length")
+        } else {
+            let after = pdf.slice(body + length, body + length + 10)
+            if not after.starts_with("\nendstream") {
+                bad.push("a stream of {length} bytes does not end where it should")
+            }
+            streams = streams + 1
+        }
+        at = body + 1
+    }
+    io.say("  {streams} content streams, each as long as it claims")
+
+    let fonts = count_of(pdf, "/BaseFont")
+    io.say("  {fonts} fonts, {count_of(pdf, "/Title (")} titled objects")
+
+    io.say("")
+    if bad.len() == 0 {
+        io.say("  the document is sound")
+        io.say("")
+        give
+    }
+    for b in bad { io.warn("  {b}") }
+    io.warn("  {bad.len()} problems")
+    io.say("")
+    sys.exit(1)
+}

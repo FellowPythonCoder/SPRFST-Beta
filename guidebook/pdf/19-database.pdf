@@ -1,0 +1,284 @@
+%PDF-1.4
+%\342\343\317\323
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 2 /Kids [8 0 R 10 0 R] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
+endobj
+6 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >>
+endobj
+7 0 obj
+<< /Type /Outlines /Count 0 >>
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612.0 792.0] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> >> /Contents 9 0 R >>
+endobj
+9 0 obj
+<< /Length 11235 >>
+stream
+BT /F2 21.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 714.0 Tm (The database) Tj ET
+0.961 0.541 0.149 rg 72.0 703.0 46.0 2.4 re f
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 681.0 Tm (SPRFST) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 114.23 681.0 Tm (carries) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 147.01 681.0 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 155.35 681.0 Tm (small) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 181.46 681.0 Tm (relational) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 224.81 681.0 Tm (database) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 268.73 681.0 Tm (called) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 297.63 681.0 Tm (Ember.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 332.64 681.0 Tm (There) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 361.54 681.0 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 371.54 681.0 Tm (no) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 385.44 681.0 Tm (server) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 416 681.0 Tm (to) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 427.12 681.0 Tm (install) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 455.46 681.0 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 474.92 681.0 Tm (no) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 488.82 681.0 Tm (driver) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 516.6 681.0 Tm (to) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 666.4 Tm (add:) Tj ET
+0.961 0.961 0.969 rg 96.02 663.9 19.1 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 97.02 666.4 Tm (use) Tj ET
+0.961 0.961 0.969 rg 115.9 663.9 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 116.9 666.4 Tm (std.db) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 156.66 666.4 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 176.12 666.4 Tm (you) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 195.02 666.4 Tm (have) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 219.48 666.4 Tm (tables,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 251.72 666.4 Tm (SQL) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 274.51 666.4 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 293.97 666.4 Tm (transactions.) Tj ET
+0.961 0.961 0.969 rg 72.0 442 468.0 207.8 re f
+0.961 0.541 0.149 rg 72.0 442 2.2 207.8 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 640.8 Tm (use std.io) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 629.4 Tm (use std.db) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 606.6 Tm (fn main\(\) {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 595.2 Tm (    let store = db.open\(":memory:"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 572.4 Tm (    db.exec\(store, "create table people \(id int, name text, city text, score num\)"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 561.0 Tm (    db.exec\(store, "insert into people values \(1, 'Ada', 'London', 99.5\)"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 549.6 Tm (    db.exec\(store, "insert into people values \(2, 'Grace', 'New York', 97.0\)"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 538.2 Tm (    db.exec\(store, "insert into people values \(3, 'Alan', 'London', 95.5\)"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 515.4 Tm (    for row in db.query\(store, "select name, city from people order by name"\) {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 504 Tm (        io.say\("{row.get\("name"\) ?? "?"} \227 {row.get\("city"\) ?? "?"}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 492.6 Tm (    }) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 469.8 Tm (    db.close\(store\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 458.4 Tm (}) Tj ET
+0.961 0.961 0.969 rg 71.0 430.5 47.6 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 72.0 433 Tm (:memory:) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 123.16 433 Tm (keeps) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 152.62 433 Tm (everything) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 201.53 433 Tm (in) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 212.09 433 Tm (memory.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 253.76 433 Tm (Give) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 277.1 433 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 285.44 433 Tm (file) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 301 433 Tm (path) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 323.24 433 Tm (instead) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 358.26 433 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 377.72 433 Tm (Ember) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 409.95 433 Tm (writes) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 438.84 433 Tm (through) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 475.53 433 Tm (on) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 489.43 433 Tm (every) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 418.4 Tm (change,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 110.36 418.4 Tm (so) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 123.7 418.4 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 140.38 418.4 Tm (data) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 162.62 418.4 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 172.62 418.4 Tm (there) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 198.19 418.4 Tm (next) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 219.87 418.4 Tm (time.) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 384.8 Tm (Querying) Tj ET
+0.961 0.961 0.969 rg 72.0 117.4 468.0 253.4 re f
+0.961 0.541 0.149 rg 72.0 117.4 2.2 253.4 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 361.8 Tm (use std.io) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 350.4 Tm (use std.db) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 327.6 Tm (fn main\(\) {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 316.2 Tm (    let store = db.open\(":memory:"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 304.8 Tm (    db.exec\(store, "create table fruit \(name text, crates int\)"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 293.4 Tm (    db.exec\(store, "insert into fruit values \('apples', 12\), \('pears', 4\), \('plums', 0) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 282 Tm (  \)"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 259.2 Tm (    let in_stock = db.query\(store, "select name from fruit where crates > 0 order by c) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 247.8 Tm (  rates desc"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 236.4 Tm (    io.say\("{in_stock}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 213.6 Tm (    let counted = db.query\(store, "select count\(*\) from fruit"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 202.2 Tm (    io.say\("{counted.first\(\)?.get\("count"\) ?? 0} kinds"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 179.4 Tm (    let like = db.query\(store, "select name from fruit where name like 'p%'"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 168 Tm (    io.say\("{like}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 145.2 Tm (    db.close\(store\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 133.8 Tm (}) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 108.4 Tm (Ember) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 104.23 108.4 Tm (understands) Tj ET
+0.961 0.961 0.969 rg 163.82 105.9 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 164.82 108.4 Tm (create) Tj ET
+0.961 0.961 0.969 rg 200.8 105.9 30.5 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 201.8 108.4 Tm (table) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 233.08 108.4 Tm (,) Tj ET
+0.961 0.961 0.969 rg 240.42 105.9 24.8 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 241.42 108.4 Tm (drop) Tj ET
+0.961 0.961 0.969 rg 266 105.9 30.5 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 267 108.4 Tm (table) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 298.28 108.4 Tm (,) Tj ET
+0.961 0.961 0.969 rg 305.62 105.9 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 306.62 108.4 Tm (insert) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 343.6 108.4 Tm (,) Tj ET
+0.961 0.961 0.969 rg 350.94 105.9 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 351.94 108.4 Tm (select) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 391.7 108.4 Tm (with) Tj ET
+0.961 0.961 0.969 rg 414.04 105.9 30.5 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 415.04 108.4 Tm (where) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 446.32 108.4 Tm (,) Tj ET
+0.961 0.961 0.969 rg 453.66 105.9 30.5 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 454.66 108.4 Tm (order) Tj ET
+0.961 0.961 0.969 rg 484.94 105.9 13.4 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 485.94 108.4 Tm (by) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 502.9 108.4 Tm (and) Tj ET
+0.961 0.961 0.969 rg 71.0 91.3 30.5 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 72.0 93.8 Tm (limit) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 103.28 93.8 Tm (,) Tj ET
+0.961 0.961 0.969 rg 110.62 91.3 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 111.62 93.8 Tm (update) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 151.38 93.8 Tm (and) Tj ET
+0.961 0.961 0.969 rg 172.62 91.3 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 173.62 93.8 Tm (delete) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 210.6 93.8 Tm (.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 216.16 93.8 Tm (Conditions) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 266.18 93.8 Tm (support) Tj ET
+0.961 0.961 0.969 rg 304.09 91.3 7.7 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 305.09 93.8 Tm (=) Tj ET
+0.961 0.961 0.969 rg 312.57 91.3 13.4 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 313.57 93.8 Tm (!=) Tj ET
+0.961 0.961 0.969 rg 326.75 91.3 7.7 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 327.75 93.8 Tm (<) Tj ET
+0.961 0.961 0.969 rg 335.23 91.3 7.7 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 336.23 93.8 Tm (>) Tj ET
+0.961 0.961 0.969 rg 343.71 91.3 13.4 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 344.71 93.8 Tm (<=) Tj ET
+0.961 0.961 0.969 rg 357.89 91.3 13.4 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 358.89 93.8 Tm (>=) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 375.85 93.8 Tm (and) Tj ET
+0.961 0.961 0.969 rg 397.09 91.3 24.8 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 398.09 93.8 Tm (like) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 423.67 93.8 Tm (,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 429.23 93.8 Tm (joined) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 458.69 93.8 Tm (with) Tj ET
+0.961 0.961 0.969 rg 481.03 91.3 19.1 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 482.03 93.8 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 504.69 93.8 Tm (and) Tj ET
+0.961 0.961 0.969 rg 525.93 91.3 13.4 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 526.93 93.8 Tm (or) Tj ET
+0.87 0.87 0.89 rg 72.0 62.0 468.0 0.6 re f
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 72.0 48.0 Tm (SPRFST Guidebook) Tj ET
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 535.552 48.0 Tm (1) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612.0 792.0] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> >> /Contents 11 0 R >>
+endobj
+11 0 obj
+<< /Length 5392 >>
+stream
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 724.0 Tm (.) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 690.4 Tm (Transactions) Tj ET
+0.961 0.961 0.969 rg 72.0 457.2 468.0 219.2 re f
+0.961 0.541 0.149 rg 72.0 457.2 2.2 219.2 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 667.4 Tm (use std.io) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 656.0 Tm (use std.db) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 633.2 Tm (fn main\(\) {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 621.8 Tm (    let store = db.open\(":memory:"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 610.4 Tm (    db.exec\(store, "create table t \(n int\)"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 599.0 Tm (    db.exec\(store, "insert into t values \(1\), \(2\), \(3\)"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 576.2 Tm (    db.begin\(store\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 564.8 Tm (    db.exec\(store, "delete from t"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 553.4 Tm (    io.say\("inside: {db.query\(store, "select count\(*\) from t"\).first\(\)?.get\("count"\) ?) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 542.0 Tm (  ? 0}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 530.6 Tm (    db.rollback\(store\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 519.2 Tm (    io.say\("after rollback: {db.query\(store, "select count\(*\) from t"\).first\(\)?.get\("c) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 507.8 Tm (  ount"\) ?? 0}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 485.0 Tm (    db.close\(store\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 473.6 Tm (}) Tj ET
+0.961 0.961 0.969 rg 71.0 445.7 47.6 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 72.0 448.2 Tm (db.begin) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 123.16 448.2 Tm (takes) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 149.84 448.2 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 158.18 448.2 Tm (snapshot.) Tj ET
+0.961 0.961 0.969 rg 206.1 445.7 53.3 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 207.1 448.2 Tm (db.commit) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 263.96 448.2 Tm (keeps) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 293.42 448.2 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 310.1 448.2 Tm (changes) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 350.68 448.2 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 370.14 448.2 Tm (writes) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 399.03 448.2 Tm (them) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 424.04 448.2 Tm (out;) Tj ET
+0.961 0.961 0.969 rg 445.28 445.7 64.7 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 446.28 448.2 Tm (db.rollback) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 514.54 448.2 Tm (puts) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 433.6 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 88.68 433.6 Tm (snapshot) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 132.04 433.6 Tm (back.) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 400 Tm (Exercise) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 383 Tm (Build) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 97.01 383 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 105.35 383 Tm (tiny) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 123.69 383 Tm (address) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 162.04 383 Tm (book:) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 189.28 383 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 197.62 383 Tm (table,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 224.86 383 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 233.2 383 Tm (function) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 271.0 383 Tm (to) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 282.12 383 Tm (add) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 301.58 383 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 309.92 383 Tm (person,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 346.05 383 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 354.39 383 Tm (function) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 392.19 383 Tm (to) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 403.31 383 Tm (search) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 436.1 383 Tm (by) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 449.44 383 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 466.12 383 Tm (start) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 488.35 383 Tm (of) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 499.47 383 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 507.81 383 Tm (name,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 368.4 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 91.46 368.4 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 99.8 368.4 Tm (count) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 127.04 368.4 Tm (of) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 138.16 368.4 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 154.84 368.4 Tm (total.) Tj ET
+0.87 0.87 0.89 rg 72.0 62.0 468.0 0.6 re f
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 72.0 48.0 Tm (SPRFST Guidebook) Tj ET
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 535.552 48.0 Tm (2) Tj ET
+endstream
+endobj
+xref
+0 12
+0000000000 65535 f 
+0000000027 00000 n 
+0000000076 00000 n 
+0000000140 00000 n 
+0000000237 00000 n 
+0000000339 00000 n 
+0000000434 00000 n 
+0000000539 00000 n 
+0000000585 00000 n 
+0000000745 00000 n 
+0000012033 00000 n 
+0000012195 00000 n 
+trailer
+<< /Size 12 /Root 1 0 R /Info << /Title (The database) /Producer (SPRFST 0.1.0-beta) /CreationDate (D:20261005005520Z) >> >>
+startxref
+17640
+%%EOF

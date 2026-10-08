@@ -1,0 +1,764 @@
+%PDF-1.4
+%\342\343\317\323
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 3 /Kids [8 0 R 10 0 R 12 0 R] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
+endobj
+6 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >>
+endobj
+7 0 obj
+<< /Type /Outlines /Count 0 >>
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612.0 792.0] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> >> /Contents 9 0 R >>
+endobj
+9 0 obj
+<< /Length 7594 >>
+stream
+BT /F2 21.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 714.0 Tm (Forge, and extending SPRFST) Tj ET
+0.961 0.541 0.149 rg 72.0 703.0 46.0 2.4 re f
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 681.0 Tm (Forge) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 100.9 681.0 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 110.9 681.0 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 127.58 681.0 Tm (package) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 168.16 681.0 Tm (manager.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 213.18 681.0 Tm (It) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 221.52 681.0 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 231.52 681.0 Tm (built) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 252.64 681.0 Tm (into) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 271.54 681.0 Tm (the) Tj ET
+0.961 0.961 0.969 rg 290 678.5 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 291 681.0 Tm (sprfst) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 330.76 681.0 Tm (command,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 380.22 681.0 Tm (needs) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 410.24 681.0 Tm (no) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 424.14 681.0 Tm (account) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 461.94 681.0 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 481.4 681.0 Tm (no) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 495.3 681.0 Tm (online) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 666.4 Tm (registry,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 110.34 666.4 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 129.8 666.4 Tm (keeps) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 159.26 666.4 Tm (every) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 186.49 666.4 Tm (dependency) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 243.75 666.4 Tm (inside) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 272.65 666.4 Tm (your) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 294.88 666.4 Tm (project) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 327.67 666.4 Tm (where) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 357.68 666.4 Tm (you) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 376.58 666.4 Tm (can) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 395.48 666.4 Tm (read) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 418.27 666.4 Tm (it.) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 632.8 Tm (A project) Tj ET
+0.961 0.961 0.969 rg 72.0 525.0 468.0 93.8 re f
+0.961 0.541 0.149 rg 72.0 525.0 2.2 93.8 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 609.8 Tm (project.sprfst      what this is, and what it depends on) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 598.4 Tm (forge.lock          exactly what was installed, with checksums) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 587.0 Tm (src/                your code) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 575.6 Tm (tests/              your tests) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 564.2 Tm (assets/             files your program loads) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 552.8 Tm (packages/           dependencies, copied in) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 541.4 Tm (build/              output, safe to delete) Tj ET
+0.961 0.961 0.969 rg 71.0 513.5 81.8 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 72.0 516.0 Tm (project.sprfst) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 157.36 516.0 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 167.36 516.0 Tm (deliberately) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 221.27 516.0 Tm (dull:) Tj ET
+0.961 0.961 0.969 rg 72.0 382.8 468.0 116.6 re f
+0.961 0.541 0.149 rg 72.0 382.8 2.2 116.6 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 490.4 Tm ([package]) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 479.0 Tm (name = "notes") Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 467.6 Tm (version = "0.1.0") Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 456.2 Tm (entry = "src/main.spf") Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 444.8 Tm (description = "A small notebook") Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 422.0 Tm ([packages]) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 410.6 Tm (mathx = path:../mathx) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 399.2 Tm (palette = git:https://example.com/palette.git) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 359.8 Tm (The commands) Tj ET
+0.93 0.93 0.95 rg 72.0 329.8 383.378 18.0 re f
+BT /F2 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 80.0 334.8 Tm (Command) Tj ET
+BT /F2 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 295.8 334.8 Tm (What happens) Tj ET
+0.88 0.88 0.90 rg 72.0 311.8 383.378 0.4 re f
+BT /F3 9.0 Tf 0.20 0.20 0.24 rg 1 0 0 1 80.0 316.8 Tm (sprfst add <name> --path=../somewhere) Tj ET
+BT /F1 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 295.8 316.8 Tm (copy a local package in and record it) Tj ET
+0.88 0.88 0.90 rg 72.0 293.8 383.378 0.4 re f
+BT /F3 9.0 Tf 0.20 0.20 0.24 rg 1 0 0 1 80.0 298.8 Tm (sprfst add <name> --git=<url>) Tj ET
+BT /F1 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 295.8 298.8 Tm (clone a package in and record it) Tj ET
+0.88 0.88 0.90 rg 72.0 275.8 383.378 0.4 re f
+BT /F3 9.0 Tf 0.20 0.20 0.24 rg 1 0 0 1 80.0 280.8 Tm (sprfst remove <name>) Tj ET
+BT /F1 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 295.8 280.8 Tm (delete it from packages/ and both files) Tj ET
+0.88 0.88 0.90 rg 72.0 257.8 383.378 0.4 re f
+BT /F3 9.0 Tf 0.20 0.20 0.24 rg 1 0 0 1 80.0 262.8 Tm (sprfst install) Tj ET
+BT /F1 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 295.8 262.8 Tm (make packages/ match project.sprfst) Tj ET
+0.88 0.88 0.90 rg 72.0 239.8 383.378 0.4 re f
+BT /F3 9.0 Tf 0.20 0.20 0.24 rg 1 0 0 1 80.0 244.8 Tm (sprfst package) Tj ET
+BT /F1 9.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 295.8 244.8 Tm (build a .forge archive of this project) Tj ET
+0.88 0.88 0.90 rg 72.0 227.8 383.378 0.4 re f
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 216.8 Tm (Adding) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 105.91 216.8 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 114.25 216.8 Tm (package) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 154.83 216.8 Tm (prints) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 182.06 216.8 Tm (its) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 194.84 216.8 Tm (digest:) Tj ET
+0.961 0.961 0.969 rg 72.0 163.4 468.0 36.8 re f
+0.961 0.541 0.149 rg 72.0 163.4 2.2 36.8 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 191.2 Tm ($ sprfst add mathx --path=../mathx) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 179.8 Tm (  installed mathx            45c9c4769351) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 154.4 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 91.46 154.4 Tm (writes) Tj ET
+0.961 0.961 0.969 rg 122.13 151.9 59.0 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 123.13 154.4 Tm (forge.lock) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 182.91 154.4 Tm (:) Tj ET
+0.961 0.961 0.969 rg 72.0 101 468.0 36.8 re f
+0.961 0.541 0.149 rg 72.0 101 2.2 36.8 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 128.8 Tm (# Forge lockfile \227 do not edit by hand) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 117.4 Tm (mathx path:../mathx 45c9c4769351aebc70c04263a9920aaa3923f635402bf8ce76ac519cd17a0b7b) Tj ET
+0.87 0.87 0.89 rg 72.0 62.0 468.0 0.6 re f
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 72.0 48.0 Tm (SPRFST Guidebook) Tj ET
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 535.552 48.0 Tm (1) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612.0 792.0] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> >> /Contents 11 0 R >>
+endobj
+11 0 obj
+<< /Length 21224 >>
+stream
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 724.0 Tm (That) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 94.79 724.0 Tm (digest) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 124.25 724.0 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 134.25 724.0 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 142.59 724.0 Tm (SHA-256) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 185.94 724.0 Tm (over) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 208.17 724.0 Tm (every) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 235.4 724.0 Tm (file) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 250.96 724.0 Tm (in) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 261.52 724.0 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 278.2 724.0 Tm (package.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 321.56 724.0 Tm (On) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 337.68 724.0 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 354.36 724.0 Tm (next) Tj ET
+0.961 0.961 0.969 rg 377.82 721.5 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 378.82 724.0 Tm (sprfst) Tj ET
+0.961 0.961 0.969 rg 414.8 721.5 41.9 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 415.8 724.0 Tm (install) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 458.48 724.0 Tm (,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 464.04 724.0 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 480.72 724.0 Tm (contents) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 521.3 724.0 Tm (are) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 709.4 Tm (hashed) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 107.58 709.4 Tm (again) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 134.82 709.4 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 154.28 709.4 Tm (compared.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 204.3 709.4 Tm (If) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 212.64 709.4 Tm (they) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 234.32 709.4 Tm (differ,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 262.11 709.4 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 278.79 709.4 Tm (install) Tj ET
+BT /F2 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 309.91 709.4 Tm (stops) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 342.14 709.4 Tm (rather) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 371.04 709.4 Tm (than) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 393.28 709.4 Tm (quietly) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 424.96 709.4 Tm (using) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 451.64 709.4 Tm (something) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 500.55 709.4 Tm (else.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 694.8 Tm (Commit) Tj ET
+0.961 0.961 0.969 rg 111.0 692.3 59.0 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 112.0 694.8 Tm (forge.lock) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 171.78 694.8 Tm (;) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 177.34 694.8 Tm (it) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 185.12 694.8 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 195.12 694.8 Tm (what) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 219.02 694.8 Tm (makes) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 251.25 694.8 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 259.59 694.8 Tm (build) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 283.49 694.8 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 300.17 694.8 Tm (same) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 327.4 694.8 Tm (for) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 341.85 694.8 Tm (everybody.) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 661.2 Tm (Using a package) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 644.2 Tm (A) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 81.45 644.2 Tm (package) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 122.03 644.2 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 132.03 644.2 Tm (just) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 150.37 644.2 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 158.71 644.2 Tm (project) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 191.5 644.2 Tm (with) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 212.06 644.2 Tm (modules) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 252.63 644.2 Tm (in) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 263.19 644.2 Tm (it.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 273.75 644.2 Tm (Import) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 304.87 644.2 Tm (it) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 312.65 644.2 Tm (by) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 325.99 644.2 Tm (name:) Tj ET
+0.961 0.961 0.969 rg 72.0 545.2 468.0 82.4 re f
+0.961 0.541 0.149 rg 72.0 545.2 2.2 82.4 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 618.6 Tm (use std.io) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 607.2 Tm (use mathx) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 584.4 Tm (fn main\(\) {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 573 Tm (    io.say\("{mathx.double\(21\)}"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 561.6 Tm (}) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 536.2 Tm (The) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 92.01 536.2 Tm (import) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 122.57 536.2 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 132.57 536.2 Tm (resolved) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 173.14 536.2 Tm (in) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 183.7 536.2 Tm (this) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 202.04 536.2 Tm (order:) Tj ET
+BT /F1 10.0 Tf 0.961 0.541 0.149 rg 1 0 0 1 78.0 516.6 Tm (1.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 94.0 516.6 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 102.34 516.6 Tm (file) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 117.9 516.6 Tm (beside) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 150.14 516.6 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 166.82 516.6 Tm (one) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 186.28 516.6 Tm (importing) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 230.18 516.6 Tm (it) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 237.96 516.6 Tm (\227) Tj ET
+0.961 0.961 0.969 rg 245.85 514.1 59.0 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 246.85 516.6 Tm (shapes.spf) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 306.63 516.6 Tm (,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 312.19 516.6 Tm (or) Tj ET
+0.961 0.961 0.969 rg 325.64 514.1 81.8 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 326.64 516.6 Tm (shapes/mod.spf) Tj ET
+BT /F1 10.0 Tf 0.961 0.541 0.149 rg 1 0 0 1 78.0 502 Tm (2.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 94.0 502 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 110.68 502 Tm (entry) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 135.69 502 Tm (point) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 160.15 502 Tm (named) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 193.5 502 Tm (in) Tj ET
+0.961 0.961 0.969 rg 205.84 499.5 173.0 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 206.84 502 Tm (packages/<name>/project.sprfst) Tj ET
+BT /F1 10.0 Tf 0.961 0.541 0.149 rg 1 0 0 1 78.0 487.4 Tm (3.) Tj ET
+0.961 0.961 0.969 rg 93.0 484.9 173.0 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 94.0 487.4 Tm (packages/<name>/src/<name>.spf) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 267.78 487.4 Tm (,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 273.34 487.4 Tm (then) Tj ET
+0.961 0.961 0.969 rg 297.36 484.9 70.4 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 298.36 487.4 Tm (src/main.spf) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 369.54 487.4 Tm (,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 375.1 487.4 Tm (then) Tj ET
+0.961 0.961 0.969 rg 399.12 484.9 59.0 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 400.12 487.4 Tm (<name>.spf) Tj ET
+BT /F1 10.0 Tf 0.961 0.541 0.149 rg 1 0 0 1 78.0 472.8 Tm (4.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 94.0 472.8 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 110.68 472.8 Tm (standard) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 152.37 472.8 Tm (library) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 182.37 472.8 Tm (in) Tj ET
+0.961 0.961 0.969 rg 194.71 470.3 98.9 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 195.71 472.8 Tm ($SPRFST_HOME/std/) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 458.2 Tm (So) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 87.01 458.2 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 95.35 458.2 Tm (local) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 118.69 458.2 Tm (file) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 134.25 458.2 Tm (always) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 167.59 458.2 Tm (wins) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 190.37 458.2 Tm (over) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 212.6 458.2 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 220.94 458.2 Tm (package,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 264.3 458.2 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 283.76 458.2 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 292.1 458.2 Tm (package) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 332.68 458.2 Tm (always) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 366.02 458.2 Tm (wins) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 388.8 458.2 Tm (over) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 411.03 458.2 Tm (nothing.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 449.39 458.2 Tm (Nothing) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 486.63 458.2 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 496.63 458.2 Tm (fetched) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 443.6 Tm (behind) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 104.8 443.6 Tm (your) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 127.03 443.6 Tm (back) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 150.93 443.6 Tm (while) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 176.49 443.6 Tm (you) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 195.39 443.6 Tm (are) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 212.62 443.6 Tm (compiling.) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 410 Tm (Publishing) Tj ET
+0.961 0.961 0.969 rg 72.0 359.2 468.0 36.8 re f
+0.961 0.541 0.149 rg 72.0 359.2 2.2 36.8 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 387 Tm ($ sprfst package) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 375.6 Tm (  packaged ./notes-0.1.0.forge  2 files, 0 KB, 77730369e687) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 350.2 Tm (A) Tj ET
+0.961 0.961 0.969 rg 83.23 347.7 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 84.23 350.2 Tm (.forge) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 123.99 350.2 Tm (file) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 139.55 350.2 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 149.55 350.2 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 157.89 350.2 Tm (plain) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 181.79 350.2 Tm (archive:) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 219.58 350.2 Tm (a) Tj ET
+0.961 0.961 0.969 rg 229.7 347.7 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 230.7 350.2 Tm (FORGE1) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 270.46 350.2 Tm (header,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 307.15 350.2 Tm (one) Tj ET
+0.961 0.961 0.969 rg 328.39 347.7 24.8 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 329.39 350.2 Tm (file) Tj ET
+0.961 0.961 0.969 rg 353.97 347.7 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 354.97 350.2 Tm (<path>) Tj ET
+0.961 0.961 0.969 rg 390.95 347.7 47.6 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 391.95 350.2 Tm (<length>) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 443.11 350.2 Tm (record) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 474.23 350.2 Tm (per) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 491.46 350.2 Tm (file,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 509.8 350.2 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 335.6 Tm (bytes,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 101.46 335.6 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 120.92 335.6 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 129.26 335.6 Tm (SHA-256) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 172.61 335.6 Tm (of) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 183.73 335.6 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 200.41 335.6 Tm (whole) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 229.31 335.6 Tm (body.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 256.55 335.6 Tm (Hand) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 283.23 335.6 Tm (it) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 291.01 335.6 Tm (over) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 313.24 335.6 Tm (however) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 353.81 335.6 Tm (you) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 372.71 335.6 Tm (like) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 390.49 335.6 Tm (\227) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 396.6 335.6 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 404.94 335.6 Tm (web) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 426.06 335.6 Tm (server,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 459.4 335.6 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 467.74 335.6 Tm (shared) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 501.09 335.6 Tm (folder,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 321 Tm (an) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 85.9 321 Tm (email.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 115.35 321 Tm (There) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 144.25 321 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 154.25 321 Tm (no) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 168.15 321 Tm (registry) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 203.71 321 Tm (to) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 214.83 321 Tm (sign) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 235.95 321 Tm (up) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 249.85 321 Tm (to,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 263.75 321 Tm (and) Tj ET
+0.961 0.961 0.969 rg 284.99 318.5 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 285.99 321 Tm (--git=) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 325.75 321 Tm (means) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 358.54 321 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 366.88 321 Tm (repository) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 413.56 321 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 423.56 321 Tm (already) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 459.13 321 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 467.47 321 Tm (package.) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 287.4 Tm (Extending the language) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 270.4 Tm (Three) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 100.9 270.4 Tm (doors,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 131.47 270.4 Tm (from) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 154.25 270.4 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 170.93 270.4 Tm (easiest) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 205.39 270.4 Tm (to) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 216.51 270.4 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 233.19 270.4 Tm (deepest.) Tj ET
+BT /F2 10.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 240.8 Tm (1. SPRFST modules) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 226.8 Tm (The) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 92.01 226.8 Tm (standard) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 133.7 226.8 Tm (library's) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 170.61 226.8 Tm (own) Tj ET
+0.961 0.961 0.969 rg 193.51 224.3 24.8 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 194.51 226.8 Tm (core) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 220.09 226.8 Tm (,) Tj ET
+0.961 0.961 0.969 rg 227.43 224.3 64.7 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 228.43 226.8 Tm (collections) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 293.91 226.8 Tm (,) Tj ET
+0.961 0.961 0.969 rg 301.25 224.3 41.9 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 302.25 226.8 Tm (testing) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 347.71 226.8 Tm (and) Tj ET
+0.961 0.961 0.969 rg 368.95 224.3 13.4 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 369.95 226.8 Tm (ai) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 386.91 226.8 Tm (modules) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 427.48 226.8 Tm (are) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 444.71 226.8 Tm (ordinary) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 483.61 226.8 Tm (SPRFST) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 212.2 Tm (source) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 104.79 212.2 Tm (in) Tj ET
+0.961 0.961 0.969 rg 117.13 209.7 24.8 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 118.13 212.2 Tm (std/) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 143.71 212.2 Tm (.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 149.27 212.2 Tm (Anything) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 190.96 212.2 Tm (you) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 209.86 212.2 Tm (write) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 233.75 212.2 Tm (can) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 252.65 212.2 Tm (sit) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 265.43 212.2 Tm (beside) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 297.67 212.2 Tm (them,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 325.46 212.2 Tm (and) Tj ET
+0.961 0.961 0.969 rg 346.7 209.7 19.1 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 347.7 212.2 Tm (use) Tj ET
+0.961 0.961 0.969 rg 366.58 209.7 76.1 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 367.58 212.2 Tm (std.yourthing) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 447.24 212.2 Tm (will) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 463.9 212.2 Tm (find) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 482.8 212.2 Tm (it.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 493.36 212.2 Tm (That) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 516.15 212.2 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 197.6 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 88.68 197.6 Tm (whole) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 117.58 197.6 Tm (extension) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 163.16 197.6 Tm (mechanism) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 217.06 197.6 Tm (for) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 231.51 197.6 Tm (most) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 255.96 197.6 Tm (purposes.) Tj ET
+BT /F2 10.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 168 Tm (2. Shelling out) Tj ET
+0.961 0.961 0.969 rg 71.0 151.5 41.9 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 72.0 154 Tm (sys.run) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 117.46 154 Tm (gives) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 143.58 154 Tm (you) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 162.48 154 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 179.16 154 Tm (rest) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 198.61 154 Tm (of) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 209.73 154 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 226.41 154 Tm (operating) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 270.88 154 Tm (system,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 308.11 154 Tm (and) Tj ET
+0.961 0.961 0.969 rg 329.35 151.5 47.6 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 330.35 154 Tm (std.json) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 381.51 154 Tm (makes) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 413.74 154 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 430.42 154 Tm (conversation) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 489.89 154 Tm (easy:) Tj ET
+0.961 0.961 0.969 rg 72.0 89.2 468.0 48.2 re f
+0.961 0.541 0.149 rg 72.0 89.2 2.2 48.2 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 128.4 Tm (use std.io) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 117 Tm (use std.sys) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 105.6 Tm (use std.json) Tj ET
+0.87 0.87 0.89 rg 72.0 62.0 468.0 0.6 re f
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 72.0 48.0 Tm (SPRFST Guidebook) Tj ET
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 535.552 48.0 Tm (2) Tj ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612.0 792.0] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> >> /Contents 13 0 R >>
+endobj
+13 0 obj
+<< /Length 20815 >>
+stream
+0.961 0.961 0.969 rg 72.0 650.6 468.0 82.4 re f
+0.961 0.541 0.149 rg 72.0 650.6 2.2 82.4 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 712.6 Tm (fn main\(\) {) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 701.2 Tm (    let listing = sys.run\("ls -1"\).trim\(\).lines\(\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 689.8 Tm (    io.say\("{listing.len\(\)} entries here"\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 678.4 Tm (    io.say\(json.write\(["cwd_entries": listing.len\(\), "platform": sys.platform\(\)]\)\)) Tj ET
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 667.0 Tm (}) Tj ET
+BT /F2 10.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 631.6 Tm (3. Native functions) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 617.6 Tm (The) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 92.01 617.6 Tm (native) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 121.47 617.6 Tm (table) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 145.93 617.6 Tm (in) Tj ET
+0.961 0.961 0.969 rg 158.27 615.1 190.1 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 159.27 617.6 Tm (compiler/include/sprfst/natives.h) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 352.93 617.6 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 362.93 617.6 Tm (one) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 382.39 617.6 Tm (line) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 400.73 617.6 Tm (per) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 417.96 617.6 Tm (function:) Tj ET
+0.961 0.961 0.969 rg 72.0 575.6 468.0 25.4 re f
+0.961 0.541 0.149 rg 72.0 575.6 2.2 25.4 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 592.0 Tm (X\(MATH_SQRT, "math", "sqrt", "\(Num\) -> Num", "Square root"\)) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 566.6 Tm (The) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 92.01 566.6 Tm (line) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 110.35 566.6 Tm (declares) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 150.92 566.6 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 167.6 566.6 Tm (module,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 205.95 566.6 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 222.63 566.6 Tm (name,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 253.2 566.6 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 269.88 566.6 Tm (signature) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 313.79 566.6 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 330.47 566.6 Tm (typechecker) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 387.16 566.6 Tm (enforces) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 428.29 566.6 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 447.75 566.6 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 464.43 566.6 Tm (help) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 486.11 566.6 Tm (text) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 505.01 566.6 Tm (that) Tj ET
+0.961 0.961 0.969 rg 71.0 549.5 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 72.0 552.0 Tm (sprfst) Tj ET
+0.961 0.961 0.969 rg 107.98 549.5 24.8 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 108.98 552.0 Tm (docs) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 137.34 552.0 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 156.8 552.0 Tm (Studio) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 187.93 552.0 Tm (show.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 216.83 552.0 Tm (The) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 236.84 552.0 Tm (implementation) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 307.42 552.0 Tm (goes) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 331.88 552.0 Tm (in) Tj ET
+0.961 0.961 0.969 rg 344.22 549.5 138.8 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 345.22 552.0 Tm (compiler/src/nativelib.c) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 487.58 552.0 Tm (under) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 515.93 552.0 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 537.4 Tm (matching) Tj ET
+0.961 0.961 0.969 rg 117.13 534.9 19.1 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 118.13 537.4 Tm (NF_) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 140.79 537.4 Tm (case.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 167.47 537.4 Tm (Rebuild,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 206.93 537.4 Tm (and) Tj ET
+0.961 0.961 0.969 rg 228.17 534.9 53.3 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 229.17 537.4 Tm (math.sqrt) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 286.03 537.4 Tm (exists) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 314.37 537.4 Tm (everywhere) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 368.83 537.4 Tm (\227) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 374.94 537.4 Tm (in) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 385.5 537.4 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 402.18 537.4 Tm (checker,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 442.75 537.4 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 459.43 537.4 Tm (editor's) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 522.8 Tm (autocomplete,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 137.59 522.8 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 154.27 522.8 Tm (documentation) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 222.64 522.8 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 242.1 522.8 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 258.78 522.8 Tm (runtime) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 294.9 522.8 Tm (\227) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 301.01 522.8 Tm (with) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 321.57 522.8 Tm (no) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 335.47 522.8 Tm (glue) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 357.15 522.8 Tm (code,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 384.39 522.8 Tm (no) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 398.29 522.8 Tm (bindings) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 438.31 522.8 Tm (file) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 453.87 522.8 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 473.33 522.8 Tm (no) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 487.23 522.8 Tm (registration) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 508.2 Tm (call.) Tj ET
+0.961 0.961 0.969 rg 71.0 486.1 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 72.0 488.6 Tm (extern) Tj ET
+0.961 0.961 0.969 rg 107.98 486.1 13.4 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 108.98 488.6 Tm (fn) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 125.94 488.6 Tm (declarations) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 182.63 488.6 Tm (reserve) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 218.75 488.6 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 235.43 488.6 Tm (same) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 262.66 488.6 Tm (mechanism) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 316.56 488.6 Tm (for) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 331.01 488.6 Tm (functions) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 373.81 488.6 Tm (provided) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 414.94 488.6 Tm (by) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 428.28 488.6 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 436.62 488.6 Tm (host) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 458.3 488.6 Tm (application) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 474 Tm (embedding) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 124.25 474 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 140.93 474 Tm (runtime.) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 440.4 Tm (Editors other than Studio) Tj ET
+0.961 0.961 0.969 rg 71.0 420.9 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 72.0 423.4 Tm (sprfst) Tj ET
+0.961 0.961 0.969 rg 107.98 420.9 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 108.98 423.4 Tm (studio) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 148.74 423.4 Tm (starts) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 175.97 423.4 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 184.31 423.4 Tm (line) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 202.65 423.4 Tm (based) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 232.67 423.4 Tm (service:) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 269.9 423.4 Tm (one) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 289.36 423.4 Tm (JSON) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 318.81 423.4 Tm (request) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 354.94 423.4 Tm (per) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 372.17 423.4 Tm (line,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 393.29 423.4 Tm (one) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 412.75 423.4 Tm (JSON) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 442.2 423.4 Tm (reply.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 469.43 423.4 Tm (It) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 477.77 423.4 Tm (answers) Tj ET
+0.961 0.961 0.969 rg 71.0 406.3 30.5 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 72.0 408.8 Tm (check) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 103.28 408.8 Tm (,) Tj ET
+0.961 0.961 0.969 rg 110.62 406.3 41.9 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 111.62 408.8 Tm (outline) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 154.3 408.8 Tm (,) Tj ET
+0.961 0.961 0.969 rg 161.64 406.3 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 162.64 408.8 Tm (tokens) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 199.62 408.8 Tm (,) Tj ET
+0.961 0.961 0.969 rg 206.96 406.3 47.6 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 207.96 408.8 Tm (complete) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 256.34 408.8 Tm (,) Tj ET
+0.961 0.961 0.969 rg 263.68 406.3 30.5 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 264.68 408.8 Tm (hover) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 295.96 408.8 Tm (,) Tj ET
+0.961 0.961 0.969 rg 303.3 406.3 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 304.3 408.8 Tm (define) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 341.28 408.8 Tm (,) Tj ET
+0.961 0.961 0.969 rg 348.62 406.3 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 349.62 408.8 Tm (rename) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 386.6 408.8 Tm (,) Tj ET
+0.961 0.961 0.969 rg 393.94 406.3 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 394.94 408.8 Tm (format) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 431.92 408.8 Tm (,) Tj ET
+0.961 0.961 0.969 rg 439.26 406.3 41.9 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 440.26 408.8 Tm (natives) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 485.72 408.8 Tm (and) Tj ET
+0.961 0.961 0.969 rg 71.0 391.7 41.9 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 72.0 394.2 Tm (version) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 114.68 394.2 Tm (.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 120.24 394.2 Tm (Studio) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 151.37 394.2 Tm (speaks) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 185.83 394.2 Tm (it,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 196.39 394.2 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 215.85 394.2 Tm (so) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 229.19 394.2 Tm (can) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 248.09 394.2 Tm (any) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 266.99 394.2 Tm (editor) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 294.78 394.2 Tm (you) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 313.68 394.2 Tm (like) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 331.46 394.2 Tm (\227) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 337.57 394.2 Tm (it) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 345.35 394.2 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 355.35 394.2 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 363.69 394.2 Tm (dozen) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 393.71 394.2 Tm (lines) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 417.05 394.2 Tm (of) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 428.17 394.2 Tm (glue) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 449.85 394.2 Tm (in) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 460.41 394.2 Tm (most) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 484.86 394.2 Tm (of) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 495.98 394.2 Tm (them.) Tj ET
+0.961 0.961 0.969 rg 72.0 352.2 468.0 25.4 re f
+0.961 0.541 0.149 rg 72.0 352.2 2.2 25.4 re f
+BT /F3 8.6 Tf 0.18 0.18 0.22 rg 1 0 0 1 84.0 368.6 Tm ($ echo '{"id":1,"op":"check","file":"src/main.spf"}' | sprfst studio) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 329.2 Tm (Security, briefly) Tj ET
+BT /F1 10.0 Tf 0.961 0.541 0.149 rg 1 0 0 1 78.0 312.2 Tm (\\225) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 94.0 312.2 Tm (Packages) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 140.69 312.2 Tm (are) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 157.92 312.2 Tm (copied) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 190.16 312.2 Tm (in,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 203.5 312.2 Tm (never) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 231.29 312.2 Tm (run) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 248.52 312.2 Tm (during) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 279.09 312.2 Tm (installation.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 331.89 312.2 Tm (There) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 360.79 312.2 Tm (are) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 378.02 312.2 Tm (no) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 297.6 Tm (install) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 100.34 297.6 Tm (scripts.) Tj ET
+BT /F1 10.0 Tf 0.961 0.541 0.149 rg 1 0 0 1 78.0 278 Tm (\\225) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 94.0 278 Tm (Everything) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 144.02 278 Tm (is) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 154.02 278 Tm (hashed,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 192.38 278 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 211.84 278 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 220.18 278 Tm (mismatch) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 265.74 278 Tm (stops) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 292.42 278 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 309.1 278 Tm (build.) Tj ET
+BT /F1 10.0 Tf 0.961 0.541 0.149 rg 1 0 0 1 78.0 263.4 Tm (\\225) Tj ET
+0.961 0.961 0.969 rg 93.0 260.9 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 94.0 263.4 Tm (sprfst) Tj ET
+0.961 0.961 0.969 rg 129.98 260.9 41.9 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 130.98 263.4 Tm (package) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 176.44 263.4 Tm (hashes) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 211.46 263.4 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 228.14 263.4 Tm (archive) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 263.15 263.4 Tm (body) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 287.61 263.4 Tm (as) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 300.95 263.4 Tm (well.) Tj ET
+BT /F1 10.0 Tf 0.961 0.541 0.149 rg 1 0 0 1 78.0 248.8 Tm (\\225) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 94.0 248.8 Tm (The) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 114.01 248.8 Tm (runtime) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 150.13 248.8 Tm (does) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 174.59 248.8 Tm (nothing) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 210.17 248.8 Tm (surprising:) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 259.07 248.8 Tm (no) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 272.97 248.8 Tm (network,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 313.54 248.8 Tm (no) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 327.44 248.8 Tm (file) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 343 248.8 Tm (writes) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 371.89 248.8 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 234.2 Tm (no) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 85.9 234.2 Tm (process) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 123.69 234.2 Tm (launches) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 166.49 234.2 Tm (unless) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 198.17 234.2 Tm (your) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 220.4 234.2 Tm (program) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 260.41 234.2 Tm (asks) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 283.75 234.2 Tm (for) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 298.2 234.2 Tm (them.) Tj ET
+BT /F2 13.5 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 200.6 Tm (Exercise) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 183.6 Tm (Make) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 99.23 183.6 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 107.57 183.6 Tm (package) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 148.15 183.6 Tm (of) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 159.27 183.6 Tm (your) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 181.5 183.6 Tm (own:) Tj ET
+0.961 0.961 0.969 rg 207.18 181.1 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 208.18 183.6 Tm (sprfst) Tj ET
+0.961 0.961 0.969 rg 244.16 181.1 19.1 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 245.16 183.6 Tm (new) Tj ET
+0.961 0.961 0.969 rg 264.04 181.1 41.9 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 265.04 183.6 Tm (palette) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 307.72 183.6 Tm (,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 313.28 183.6 Tm (give) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 334.4 183.6 Tm (it) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 342.18 183.6 Tm (a) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 350.52 183.6 Tm (module) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 386.09 183.6 Tm (with) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 406.65 183.6 Tm (two) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 424.99 183.6 Tm (or) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 436.66 183.6 Tm (three) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 462.23 183.6 Tm (colour) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 492.24 183.6 Tm (helpers,) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 169 Tm (then) Tj ET
+0.961 0.961 0.969 rg 96.02 166.5 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 97.02 169 Tm (sprfst) Tj ET
+0.961 0.961 0.969 rg 133 166.5 19.1 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 134 169 Tm (add) Tj ET
+0.961 0.961 0.969 rg 152.88 166.5 41.9 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 153.88 169 Tm (palette) Tj ET
+0.961 0.961 0.969 rg 195.56 166.5 98.9 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 196.56 169 Tm (--path=../palette) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 299.02 169 Tm (from) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 321.8 169 Tm (another) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 358.49 169 Tm (project) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 391.28 169 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 410.74 169 Tm (use) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 429.64 169 Tm (it.) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 440.2 169 Tm (Change) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 478 169 Tm (one) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 497.46 169 Tm (character) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 72.0 154.4 Tm (in) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 82.56 154.4 Tm (the) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 99.24 154.4 Tm (package) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 139.82 154.4 Tm (and) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 159.28 154.4 Tm (watch) Tj ET
+0.961 0.961 0.969 rg 189.96 151.9 36.2 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 190.96 154.4 Tm (sprfst) Tj ET
+0.961 0.961 0.969 rg 226.94 151.9 41.9 11.5 re f
+BT /F3 9.5 Tf 0.20 0.20 0.24 rg 1 0 0 1 227.94 154.4 Tm (install) Tj ET
+BT /F1 10.0 Tf 0.102 0.102 0.118 rg 1 0 0 1 273.4 154.4 Tm (refuse.) Tj ET
+0.87 0.87 0.89 rg 72.0 62.0 468.0 0.6 re f
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 72.0 48.0 Tm (SPRFST Guidebook) Tj ET
+BT /F1 8.0 Tf 0.42 0.42 0.46 rg 1 0 0 1 535.552 48.0 Tm (3) Tj ET
+endstream
+endobj
+xref
+0 14
+0000000000 65535 f 
+0000000027 00000 n 
+0000000076 00000 n 
+0000000147 00000 n 
+0000000244 00000 n 
+0000000346 00000 n 
+0000000441 00000 n 
+0000000546 00000 n 
+0000000592 00000 n 
+0000000752 00000 n 
+0000008398 00000 n 
+0000008560 00000 n 
+0000029838 00000 n 
+0000030000 00000 n 
+trailer
+<< /Size 14 /Root 1 0 R /Info << /Title (Forge, and extending SPRFST) /Producer (SPRFST 0.1.0-beta) /CreationDate (D:20261005005520Z) >> >>
+startxref
+50869
+%%EOF

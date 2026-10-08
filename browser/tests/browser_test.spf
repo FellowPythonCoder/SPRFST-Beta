@@ -1,0 +1,393 @@
+~~ =====================================================================
+~~  The browser's own test suite.  From the browser folder:  sprfst test
+~~
+~~  Everything here runs offline: the engine is fed text and asked what
+~~  it made of it.  The one test that needs a server is in
+~~  tools/browser_live.sh, which starts the fixture and reads a page.
+~~ =====================================================================
+use std.testing
+use uri
+use html
+use css
+use shield
+use layout
+use reader
+use fetch
+use page
+
+~~ ------------------------------------------------------------- helpers
+fn lay(source: Text, width: Num) -> layout.Page {
+    let doc = html.parse(source)
+    var sheet = css.Sheet { }
+    for node in collect(doc, "style") { sheet = css.parse(html.raw_text(node)) }
+    give layout.run(doc, sheet, [], width)
+}
+
+fn text_of(drawn: layout.Page) -> Text {
+    var words: [Text] = []
+    for item in drawn.items {
+        if item.text != "" { words.push(item.text) }
+    }
+    give words.join(" ")
+}
+
+fn find(node: html.Node, name: Text) -> html.Node {
+    if node.name == name { give node }
+    for kid in node.kids {
+        let hit = find(kid, name)
+        if hit.name == name { give hit }
+    }
+    give html.Node { }
+}
+
+fn collect(node: html.Node, name: Text) -> [html.Node] {
+    var out: [html.Node] = []
+    if node.name == name { out.push(node) }
+    for kid in node.kids {
+        for hit in collect(kid, name) { out.push(hit) }
+    }
+    give out
+}
+
+fn count_of(node: html.Node, name: Text) -> Int {
+    give collect(node, name).len()
+}
+
+~~ ------------------------------------------------------------ addresses
+test "an address comes apart correctly" {
+    let u = uri.parse("https://news.example.co.uk:8443/a/b?q=1&r=2#top")
+    testing.same(u.scheme, "https", "scheme")
+    testing.same(u.host, "news.example.co.uk", "host")
+    testing.same(u.port, 8443, "port")
+    testing.same(u.path, "/a/b", "path")
+    testing.same(u.query, "q=1&r=2", "query")
+    testing.same(u.frag, "top", "fragment")
+    testing.yes(u.is_secure(), "https is secure")
+    testing.same(u.site(), "news.example.co.uk", "site name")
+    testing.same(u.target(), "/a/b?q=1&r=2", "request target")
+}
+
+test "a bare host is still an address" {
+    let u = uri.parse("example.com")
+    testing.same(u.scheme, "https", "bare hosts are tried over https")
+    testing.same(u.host, "example.com", "host")
+    testing.same(u.path, "/", "root path")
+    testing.same(u.port, 443, "https port")
+}
+
+test "relative addresses resolve against the page" {
+    let base = uri.parse("https://example.com/docs/guide/index.html?x=1")
+    testing.same(uri.resolve(base, "there.html").full(),
+                 "https://example.com/docs/guide/there.html", "sibling")
+    testing.same(uri.resolve(base, "../up.html").full(),
+                 "https://example.com/docs/up.html", "one level up")
+    testing.same(uri.resolve(base, "/root.html").full(),
+                 "https://example.com/root.html", "from the root")
+    testing.same(uri.resolve(base, "//other.org/x").full(),
+                 "https://other.org/x", "same scheme, other host")
+    testing.same(uri.resolve(base, "http://plain.org/").full(),
+                 "http://plain.org/", "already absolute")
+    testing.same(uri.resolve(base, "#here").full(),
+                 "https://example.com/docs/guide/index.html?x=1#here", "a fragment only")
+}
+
+test "typing words is not typing an address" {
+    testing.yes(uri.looks_like_address("example.com"), "a host")
+    testing.yes(uri.looks_like_address("http://a.b/c"), "with a scheme")
+    testing.yes(uri.looks_like_address("localhost:8080"), "localhost with a port")
+    testing.no(uri.looks_like_address("how tall is everest"), "a question")
+    testing.no(uri.looks_like_address("sprfst language"), "two words")
+    let settings = page.Settings { }
+    testing.yes(page.address_for("how tall is everest", settings).starts_with("https://duckduckgo.com/html/?q="),
+                "words go to the chosen engine")
+    testing.same(page.address_for("example.com", settings), "https://example.com/", "an address is opened")
+    testing.yes(page.address_for("a b", settings).contains("a+b"), "spaces are encoded")
+}
+
+~~ ----------------------------------------------------------------- HTML
+test "the parser builds the tree a browser would" {
+    let doc = html.parse("<!doctype html><html><head><title>Hi</title></head>" +
+                         "<body><p class='a b'>One<br>Two</p><img src=x.png alt=pic>" +
+                         "<ul><li>a<li>b</ul></body></html>")
+    testing.same(html.title_of(doc), "Hi", "the title")
+    let body = find(doc, "body")
+    testing.same(body.kids.len(), 3, "paragraph, image, list")
+    testing.same(body.kids[0].name, "p", "first is the paragraph")
+    testing.same(body.kids[0].classes().len(), 2, "two classes from single quotes")
+    testing.same(body.kids[1].attr("src"), "x.png", "unquoted attribute")
+    let list = body.kids[2]
+    testing.same(list.kids.len(), 2, "an unclosed <li> closes the one before it")
+    testing.same(html.squash(list.inner_text()).trim(), "a b", "the words inside")
+}
+
+test "void and raw elements behave" {
+    let doc = html.parse("<p>a<br>b<hr><script>if (1<2) {{ x() }}</script><p>c")
+    testing.same(count_of(doc, "p"), 2, "two paragraphs")
+    testing.same(count_of(doc, "br"), 1, "br takes no children")
+    testing.same(count_of(doc, "script"), 1, "the script is one node")
+    testing.no(html.squash(doc.inner_text()).contains("x()"), "script text is not page text")
+}
+
+test "entities are decoded, once" {
+    testing.same(html.decode("a &amp; b &lt;c&gt; &quot;d&quot; &#65; &#x42; &nbsp;x"),
+                 "a & b <c> \"d\" A B \u{a0}x", "the common ones")
+    testing.same(html.decode("100% &unknown; &amp"), "100% &unknown; &amp", "nonsense is left alone")
+    testing.same(html.squash("  a\n\t b  "), " a b ", "runs of space become one")
+}
+
+test "comments and malformed tags do not derail it" {
+    let doc = html.parse("<div><!-- <p>not here</p> --><b>here</b><i>open")
+    testing.no(doc.inner_text().contains("not here"), "comments are not text")
+    testing.yes(doc.inner_text().contains("here"), "real text survives")
+    testing.yes(doc.inner_text().contains("open"), "an unclosed tag still holds its words")
+}
+
+~~ ------------------------------------------------------------------ CSS
+test "the style sheet is understood" {
+    let sheet = css.parse("p, .lead {{ color: #ff0000; font-size: 18px }}" +
+                          "@media print {{ p {{ color: blue }} }}" +
+                          "#top a:hover {{ color: rgb(0,128,0); font-weight: bold }}")
+    testing.yes(sheet.rules.len() >= 3, "every selector becomes a rule")
+    testing.same(css.colour_of("#ff0000"), 16711680, "hex")
+    testing.same(css.colour_of("#0f0"), 65280, "short hex")
+    testing.same(css.colour_of("rgb(0, 128, 0)"), 32768, "rgb()")
+    testing.same(css.colour_of("white"), 16777215, "a name")
+    testing.same(css.colour_of("not a colour"), -1, "nonsense is no colour")
+}
+
+test "lengths and weights" {
+    testing.close(css.length("18px", 16.0), 18.0, 0.001, "pixels")
+    testing.close(css.length("1.5em", 16.0), 24.0, 0.001, "em against the parent")
+    testing.close(css.length("50%", 20.0), 10.0, 0.001, "per cent of the parent")
+    testing.close(css.length("12pt", 16.0), 16.0, 0.001, "points")
+}
+
+test "a selector matches the way it should" {
+    testing.yes(css.part_matches("p", "p", "", []), "by tag")
+    testing.yes(css.part_matches(".lead", "p", "", ["lead"]), "by class")
+    testing.yes(css.part_matches("#top", "div", "top", []), "by id")
+    testing.yes(css.part_matches("p.lead", "p", "", ["lead"]), "tag and class")
+    testing.yes(css.part_matches("*", "anything", "", []), "the star")
+    testing.no(css.part_matches(".lead", "p", "", ["other"]), "the wrong class")
+    testing.no(css.part_matches("#top", "div", "bottom", []), "the wrong id")
+}
+
+~~ --------------------------------------------------------------- shield
+test "the shield blocks what it is told to" {
+    var guard = shield.Shield { }
+    for line in ["||ads.example.com^", "||tracker.io^$third-party",
+                 "/pagead/", "@@||ads.example.com/allowed.js",
+                 "##.ad-banner", "news.site##.promo"] {
+        guard.add(line)
+    }
+    testing.yes(guard.check(uri.parse("https://ads.example.com/x.js"), "news.site"), "a blocked host")
+    testing.yes(guard.check(uri.parse("https://deep.ads.example.com/x.js"), "news.site"), "and below it")
+    testing.no(guard.check(uri.parse("https://ads.example.com/allowed.js"), "news.site"), "an exception wins")
+    testing.yes(guard.check(uri.parse("https://x.com/pagead/show"), "news.site"), "a path anywhere")
+    testing.yes(guard.check(uri.parse("https://tracker.io/t.gif"), "news.site"), "third party is blocked away from home")
+    testing.no(guard.check(uri.parse("https://tracker.io/t.gif"), "tracker.io"), "and allowed at home")
+    testing.no(guard.check(uri.parse("https://news.site/photo.jpg"), "news.site"), "the page's own files pass")
+}
+
+test "the shield can be turned off, and counts what it did" {
+    var guard = shield.Shield { }
+    guard.add("||ads.example.com^")
+    guard.reset_counts()
+    guard.check(uri.parse("https://ads.example.com/a.js"), "s.com")
+    guard.check(uri.parse("https://s.com/b.js"), "s.com")
+    testing.same(guard.blocked, 1, "one blocked")
+    testing.same(guard.passed, 1, "one passed")
+    guard.enabled = false
+    testing.no(guard.check(uri.parse("https://ads.example.com/a.js"), "s.com"), "off means off")
+}
+
+test "hiding rules are gathered for the site you are on" {
+    var guard = shield.Shield { }
+    guard.add("##.ad-banner")
+    guard.add("news.site##.promo")
+    guard.add("other.site##.nope")
+    let here = guard.hiding("www.news.site")
+    testing.yes(here.contains(".ad-banner"), "the everywhere rule")
+    testing.yes(here.contains(".promo"), "the site rule, www and all")
+    testing.no(here.contains(".nope"), "not another site's rule")
+}
+
+test "the built-in list is real and loads" {
+    var guard = shield.from_file("no/such/file.rules")
+    testing.yes(guard.loaded > 30, "the compiled-in list is used when there is no file")
+    testing.yes(guard.check(uri.parse("https://doubleclick.net/x"), "news.site"), "and it blocks the obvious")
+}
+
+test "the shipped rules file parses" {
+    var guard = shield.from_file("rules/shield.rules")
+    testing.yes(guard.loaded > 300, "the file holds a few hundred rules")
+    testing.yes(guard.check(uri.parse("https://www.googletagmanager.com/gtm.js"), "news.site"), "a tag manager")
+    testing.yes(guard.check(uri.parse("https://cdn.taboola.com/x.js"), "news.site"), "a content farm")
+    testing.no(guard.check(uri.parse("https://cdnjs.cloudflare.com/x.js"), "news.site"), "a library host is let by")
+    testing.yes(guard.hiding("any.site").len() > 40, "and plenty to hide")
+}
+
+~~ --------------------------------------------------------------- layout
+test "words are placed, wrapped and measured" {
+    let drawn = lay("<p>" + "word ".repeat(60) + "</p>", 400.0)
+    testing.yes(drawn.words >= 60, "every word is placed")
+    testing.yes(drawn.height > 80.0, "sixty words do not fit on one line")
+    var widest = 0.0
+    for item in drawn.items {
+        if item.x + item.w > widest { widest = item.x + item.w }
+    }
+    testing.yes(widest <= 400.0, "nothing is placed past the right edge")
+}
+
+test "headings are bigger and are collected for the outline" {
+    let drawn = lay("<h1>Big</h1><p>small</p><h2>Less big</h2>", 600.0)
+    var big = 0.0
+    var small = 0.0
+    for item in drawn.items {
+        if item.text == "Big" { big = item.size }
+        if item.text == "small" { small = item.size }
+    }
+    testing.yes(big > small, "h1 is larger than a paragraph")
+    testing.same(drawn.headings.len(), 2, "two headings in the outline")
+    testing.yes(drawn.headings[0].starts_with("1|"), "the level is kept")
+}
+
+test "the page's own style sheet is obeyed" {
+    let drawn = lay("<style>.red{{color:#ff0000}} p{{font-size:30px}}</style>" +
+                    "<p class='red'>here</p>", 600.0)
+    var found = false
+    for item in drawn.items {
+        if item.text == "here" {
+            found = true
+            testing.same(item.colour, 16711680, "the class gave it a colour")
+            testing.close(item.size, 30.0, 0.5, "the tag gave it a size")
+        }
+    }
+    testing.yes(found, "the word was laid out")
+}
+
+test "display none and hidden things are not laid out" {
+    let drawn = lay("<p>shown</p><p style='display:none'>gone</p>" +
+                    "<div hidden>also gone</div><script>var x = 1</script>", 600.0)
+    testing.yes(text_of(drawn).contains("shown"), "the visible paragraph")
+    testing.no(text_of(drawn).contains("gone"), "nothing hidden is drawn")
+    testing.no(text_of(drawn).contains("var"), "no script text")
+}
+
+test "cosmetic rules remove elements before layout" {
+    let doc = html.parse("<div class='ad-banner'>buy this</div><p>the article</p>")
+    let drawn = layout.run(doc, css.Sheet { }, [".ad-banner"], 600.0)
+    testing.no(text_of(drawn).contains("buy"), "the banner is gone")
+    testing.yes(text_of(drawn).contains("article"), "the article stays")
+    testing.same(drawn.hidden, 1, "and it was counted")
+}
+
+test "lists, rules and images each leave their mark" {
+    let drawn = lay("<ul><li>one</li><li>two</li></ul><hr><img src='a.png' alt='a picture'>", 600.0)
+    var bullets = 0
+    var rules = 0
+    var images = 0
+    for item in drawn.items {
+        if item.kind == "bullet" { bullets = bullets + 1 }
+        if item.kind == "rule" { rules = rules + 1 }
+        if item.kind == "image" { images = images + 1 }
+    }
+    testing.same(bullets, 2, "a mark for each item")
+    testing.same(rules, 1, "the horizontal rule")
+    testing.same(images, 1, "the image has a box of its own")
+}
+
+test "links carry their address down to the display list" {
+    let doc = html.parse("<a href='https://example.com/x'>go</a>")
+    let drawn = layout.run(doc, css.Sheet { }, [], 600.0)
+    var linked = ""
+    for item in drawn.items {
+        if item.text == "go" { linked = item.link }
+    }
+    testing.same(linked, "https://example.com/x", "the word knows where it goes")
+    testing.same(drawn.links, 1, "and the page counted it")
+}
+
+~~ --------------------------------------------------------------- reader
+test "the lens finds the article and drops the furniture" {
+    var body = ["<body>",
+        "<nav><a href='/'>Home</a> <a href='/a'>News</a> <a href='/b'>Sport</a></nav>",
+        "<div class='sidebar'><a href='/x'>Trending</a> <a href='/y'>Popular</a></div>",
+        "<article><h1>The headline</h1>"]
+    for i in 1...12 {
+        body.push("<p>Sentence number {i}, which is long enough to count as writing, " +
+                  "with commas, clauses, and the ordinary shape of prose.</p>")
+    }
+    body.push("</article><footer>All rights reserved</footer></body>")
+    let doc = html.parse(body.join(""))
+    let lens = reader.distil(doc, "The headline")
+    let words = html.squash(lens.inner_text())
+    testing.yes(words.contains("Sentence number 7"), "the article is kept")
+    testing.no(words.contains("Trending"), "the sidebar is dropped")
+    testing.no(words.contains("All rights reserved"), "the footer is dropped")
+}
+
+test "the lens leaves alone a page that is already plain" {
+    let doc = html.parse("<body><p>Just a few words.</p></body>")
+    let lens = reader.distil(doc, "")
+    testing.yes(html.squash(lens.inner_text()).contains("few words"), "nothing is lost")
+}
+
+~~ ------------------------------------------------------- pages and trips
+test "the internal pages are real pages" {
+    var session = page.Session { }
+    session.guard = shield.from_file("rules/shield.rules")
+    for address in ["sprfst://start", "sprfst://about", "sprfst://settings",
+                    "sprfst://trail", "sprfst://shield"] {
+        let result = page.open(session, address, 800.0, true)
+        testing.same(result.error, "", "{address} opens")
+        testing.yes(result.page.items.len() > 5, "{address} has something on it")
+        testing.yes(result.title != "", "{address} has a title")
+    }
+}
+
+test "a page that cannot be reached says so, as a page" {
+    var session = page.Session { }
+    let result = page.open(session, "http://127.0.0.1:1/nothing", 800.0, true)
+    testing.yes(result.error != "", "the trip failed")
+    testing.yes(result.page.items.len() > 2, "and the reason is laid out to read")
+    testing.yes(text_of(result.page).lower().contains("reach") or
+                text_of(result.page).lower().contains("refused") or
+                text_of(result.page).lower().contains("not"), "in words")
+}
+
+test "history walks backwards and forwards" {
+    var session = page.Session { }
+    page.open(session, "sprfst://start", 800.0, true)
+    page.open(session, "sprfst://about", 800.0, true)
+    page.open(session, "sprfst://settings", 800.0, true)
+    testing.yes(session.can_back(), "there is a way back")
+    testing.no(session.can_forward(), "but not forward yet")
+    testing.same(session.back(), "sprfst://about", "back one")
+    testing.same(session.back(), "sprfst://start", "back two")
+    testing.no(session.can_back(), "and that is the beginning")
+    testing.same(session.forward(), "sprfst://about", "forward again")
+    testing.same(session.trail.len(), 3, "three visits are remembered")
+}
+
+test "the settings page reflects the settings" {
+    var session = page.Session { }
+    session.settings.shield_on = false
+    let result = page.open(session, "sprfst://settings", 800.0, true)
+    testing.yes(text_of(result.page).contains("off"), "it says the shield is off")
+    session.settings.shield_on = true
+    let again = page.open(session, "sprfst://settings", 800.0, true)
+    testing.yes(text_of(again.page).contains("on"), "and when it is on, it says so")
+}
+
+test "nothing is fetched twice in a row" {
+    var store = fetch.Store { }
+    var answer = fetch.Response { address: "http://x/", body: "<p>hi</p>", status: 200 }
+    store.keep("http://x/", answer)
+    let found = store.look("http://x/")
+    testing.yes(found != nil, "it was kept")
+    testing.same((found ?? fetch.Response { }).body, "<p>hi</p>", "and is the same page")
+    store.forget()
+    testing.yes(store.look("http://x/") == nil, "and can be dropped")
+}
+
