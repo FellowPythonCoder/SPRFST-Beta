@@ -18,10 +18,12 @@ if command -v swiftc >/dev/null 2>&1; then
     echo "  swiftc is available — the real build is ./tools/build_macos_app.sh"
 fi
 
-# Two applications share one kit: Theme, Chrome and the logo.
+# Three applications share one kit: Theme, Chrome and the logo.
 KIT="$ROOT/ide/macos/Sources/Theme.swift $ROOT/ide/macos/Sources/Chrome.swift $ROOT/ide/macos/Sources/LogoView.swift"
 
-python3 - "Studio|$ROOT/ide/macos/Sources" "Browser|$ROOT/browser/macos/Sources|$KIT" <<'PY'
+python3 - "Studio|$ROOT/ide/macos/Sources" \
+        "Browser|$ROOT/browser/macos/Sources|$KIT" \
+        "Tour|$ROOT/learn/macos/Sources|$KIT" <<'PY'
 import re, sys, glob, os
 
 def gather(spec):

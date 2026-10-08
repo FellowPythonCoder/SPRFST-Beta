@@ -41,7 +41,7 @@ OBJS := $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRCS))
 DEPS := $(OBJS:.o=.d)
 
 .PHONY: all clean test install dirs app studio dmg pdf stage docs guidebook \
-        browser browser-app browser-dmg browser-test
+        browser browser-app browser-dmg browser-test tour tour-app tour-test
 
 all: dirs $(BIN)/sprfst
 
@@ -109,6 +109,18 @@ browser-test: all
 	@cd browser && ../build/bin/sprfst test
 	@./tools/browser_live.sh
 
+# ---------------------------------------------------------------- tour
+# twenty six lessons in a window: build it, install it, open it
+tour: all
+	./tools/build_tour_app.sh --install
+
+tour-app: all
+	./tools/build_tour_app.sh
+
+# every lesson, run against the real interpreter
+tour-test: all
+	@./build/bin/sprfst run learn/tour.spf -- --verify
+
 # the guidebook as PDFs: one per chapter and one book, typeset by sprfst
 pdf: all
 	./build/bin/sprfst run tools/make_pdf.spf -- guidebook/pdf
@@ -120,3 +132,4 @@ stage: all
 	./tools/make_dmg.sh --stage
 	./tools/build_browser_app.sh --stage
 	./tools/make_browser_dmg.sh --stage
+	./tools/build_tour_app.sh --stage
